@@ -15,8 +15,9 @@
 int main() {
 
     //Declaring vars
+    std::string IP = "192.168.3.52"; //jw-internal
     //std::string IP = "192.168.37.130";
-    std::string IP = "127.0.0.1";
+    //std::string IP = "127.0.0.1";
     std::vector<double> joints{-1.54, -2.1, -2.28, -0.35, 1.60, 0.023};
     std::vector<double> joints2{0.0, -90, 0.0, 0.0, 0.0, 0.0};
     double speed = 0.5;
