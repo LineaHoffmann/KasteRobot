@@ -50,3 +50,33 @@ compile_commands.json
 
 # QtCreator local machine specific files for imported projects
 *creator.user*
+
+# Visual studio code / WSL2 specific ignores
+.vs/CMake Overview
+.vs/ProjectSettings.json
+.vs/slnx.sqlite
+.vs/VSWorkspaceState.json
+.vs/KasteRobot/v16/.suo
+.vs/KasteRobot/v16/Browse.VC.db
+RC/build/.ninja_deps
+RC/build/.ninja_log
+RC/build/build.ninja
+RC/build/cmake_install.cmake
+RC/build/CMakeCache.txt
+RC/build/RobotControl
+RC/build/rules.ninja
+RC/build/.vscode/settings.json
+RC/build/CMakeFiles/cmake.check_cache
+RC/build/CMakeFiles/CMakeError.log
+RC/build/CMakeFiles/CMakeOutput.log
+RC/build/CMakeFiles/TargetDirectories.txt
+RC/build/CMakeFiles/3.10.2/CMakeCCompiler.cmake
+RC/build/CMakeFiles/3.10.2/CMakeCXXCompiler.cmake
+RC/build/CMakeFiles/3.10.2/CMakeDetermineCompilerABI_C.bin
+RC/build/CMakeFiles/3.10.2/CMakeDetermineCompilerABI_CXX.bin
+RC/build/CMakeFiles/3.10.2/CMakeSystem.cmake
+RC/build/CMakeFiles/3.10.2/CompilerIdC/CMakeCCompilerId.c
+RC/build/CMakeFiles/3.10.2/CompilerIdCXX/CMakeCXXCompilerId.cpp
+RC/src/.vs/slnx.sqlite
+RC/src/.vscode/launch.json
+RC/src/.vscode/settings.json
