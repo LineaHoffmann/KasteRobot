@@ -15,11 +15,12 @@
 int main() {
 
     //Declaring vars
-    std::string IP = "192.168.3.52"; //jw-internal
+    //std::string IP = "192.168.3.52"; //jw-internal
     //std::string IP = "192.168.37.130";
+    std::string IP = "192.168.100.49"; //UR5 robot
     //std::string IP = "127.0.0.1";
-    std::vector<double> joints{-1.54, -2.1, -2.28, -0.35, 1.60, 0.023};
-    std::vector<double> joints2{0.0, -90, 0.0, 0.0, 0.0, 0.0};
+    std::vector<double> joints{-2.756, -1.5, -2.28, -0.95, 1.60, 0.023};
+    std::vector<double> joints2{-65.0, -90, 0.0, 0.0, 0.0, 0.0};
     double speed = 0.5;
     double acc = 0.5;
 
@@ -35,12 +36,12 @@ int main() {
 
     ur_control.moveJDeg(joints2, speed, acc);
 
-    std::vector<double> currentPose(ur_control.getCurrentPoseDeg());
+
+    std::vector<double> currentPose(ur_control.getCurrentPose());
 
     for (auto q : currentPose) {
         std::cout << std::fixed << std::setprecision(4) << q << " ";
     };
-
 
 
 //    //Example from SDU Robotics
