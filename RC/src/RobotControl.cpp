@@ -26,18 +26,24 @@ int main() {
 
     double dt = 1.0/125; //refresh rate for UR5CB RTDE
 
+    UR_Control *ur_control;
+
     //ur_rtde::RTDEControlInterface *rtde_control;
     //contructing RTDE control object
     //rtde_control = new ur_rtde::RTDEControlInterface(IP);
 
-    UR_Control ur_control(IP);
+    try{
+        ur_control = new UR_Control(IP);
+    } catch(std::exception &e){
+        return -1;
+    }
 
-    ur_control.moveJ(joints,speed,acc);
+    ur_control->moveJ(joints,speed,acc);
 
-    ur_control.moveJDeg(joints2, speed, acc);
+    ur_control->moveJDeg(joints2, speed, acc);
 
 
-    std::vector<double> currentPose(ur_control.getCurrentPose());
+    std::vector<double> currentPose(ur_control->getCurrentPose());
 
     for (auto q : currentPose) {
         std::cout << std::fixed << std::setprecision(4) << q << " ";

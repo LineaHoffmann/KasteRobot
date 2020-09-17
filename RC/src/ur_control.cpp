@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <math.h>
+#include <chrono>
+#include <mutex>
 
 #define USE_MATH_DEFINES
 
@@ -14,14 +16,19 @@ UR_Control::UR_Control(std::string IP)
         mUrRecieve = new ur_rtde::RTDEReceiveInterface(IP);
 
     } catch (std::exception &e) {
+        mEptr = std::current_exception();
         std::cout << "ur_rtde exception: " << e.what() << std::endl; //check up on exception handling to deny further trow.
+        std::rethrow_exception(mEptr);
     };
+
+    //datasharing struct
+    mURStruct = new UR_STRUCT;
 }
 
 UR_Control::~UR_Control()
 {
-    delete mUrControl, mUrRecieve;
-
+    if (mUrControl)   {delete mUrControl;}
+    if (mUrRecieve != nullptr)   {delete mUrRecieve;}
 }
 /**
  * @brief UR_Control::moveJ use ur_rtde to move to specified TCP position in linear path
@@ -53,7 +60,8 @@ bool UR_Control::moveJ(const std::vector<double> &q, double speed, double accele
 {
     // TODO: add check if all vector-entries are within value of -2pi< q_n < 2pi
     try {
-        mUrControl->moveJ(q,speed,acceleration);
+        if(mUrControl)
+            mUrControl->moveJ(q,speed,acceleration);
     } catch (std::exception &e) {
         std::cerr << "moveJ exception: " << e.what() << std::endl;
         return false;
@@ -123,10 +131,54 @@ std::string UR_Control::getIP() const
 {
     return mIP;
 }
-
+/**
+ * @brief UR_Control::setIP
+ * @param value
+ */
 void UR_Control::setIP(const std::string &value)
 {
     mIP = value;
+}
+
+/**
+ * @brief UR_Control::getData
+ */
+void UR_Control::getData()
+{
+    //preparing timers
+    std::chrono::system_clock::time_point timePoint;
+    long waitTime = 1000 / mPollingRate; //pollingrate in millis
+
+    while (mContinue) {
+        timePoint = std::chrono::system_clock::now() + std::chrono::milliseconds(waitTime);
+
+        //lock Scope
+        {
+        std::unique_lock<std::mutex> dataLock(urMutex); //NOTE: unique lock applied, check type when merging programs.
+
+        //get values from RTDE
+        // TODO: define the struct and get the remaining struct members
+        mURStruct->isConnected = mUrRecieve->isConnected();
+        *mURStruct->pose = mUrRecieve->getActualTCPPose();
+        } //lock scope ends
+
+        //sleep until time + waitTime
+        std::this_thread::sleep_until(timePoint);
+    }
+
+}
+
+void UR_Control::startPolling()
+{
+    mThread = new std::thread(&UR_Control::getData, this);
+}
+
+void UR_Control::stopPolling()
+{
+    mContinue = false;
+
+    while (!mThread->joinable()){
+    }
 }
 
 /**
@@ -159,4 +211,14 @@ std::vector<double> UR_Control::radToDeg(const std::vector<double> &qRad)
     }
 
     return out;
+}
+
+int UR_Control::getPollingRate() const
+{
+    return mPollingRate;
+}
+
+void UR_Control::setPollingRate(int pollingRate)
+{
+    mPollingRate = pollingRate;
 }
