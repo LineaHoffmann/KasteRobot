@@ -10,6 +10,10 @@
 // System headers
 #include <iostream>
 
+/**
+ * @brief Worker thread class constructor for camera streaming
+ * @param Parent frame
+ */
 cCamWorker::cCamWorker(cMain *pFrame) : wxThread(wxTHREAD_DETACHED)
 {
     mpFrame = pFrame;
@@ -19,6 +23,9 @@ cCamWorker::cCamWorker(cMain *pFrame) : wxThread(wxTHREAD_DETACHED)
 
     return;
 }
+/**
+ * @brief Destructor just resets pointers, wx handles rest
+ */
 cCamWorker::~cCamWorker()
 {
     mpFrame = nullptr;
@@ -26,7 +33,10 @@ cCamWorker::~cCamWorker()
     mCreation = nullptr;
     mMutex = nullptr;
 }
-
+/**
+ * @brief Entry point for thread creation
+ * @return Absolutely nothing, as a pointer
+ */
 void* cCamWorker::Entry()
 {
     *mCreation = std::chrono::steady_clock::now();
@@ -40,16 +50,22 @@ void* cCamWorker::Entry()
         // Sleep for 20ms (just to lower CPU time a bit)
         this->Sleep(20);
     }
-
+    return nullptr;
 }
+/**
+ * @brief wxWidgets destructor (sorta, not really)
+ */
 void cCamWorker::OnExit()
 {
     delete(mCreation);
     delete(mMutex);
 }
-
+/**
+ * @brief Returns time passed since thread entry
+ * @return Milliseconds with 3 digits as double
+ */
 double cCamWorker::GetTime(void)
 {
-    using namespace std::chrono; // Just to shorten things a bit
+    using namespace std::chrono; // Just to shorten things a bit. Don't worry, it's only local scope
     return (double) (duration_cast<milliseconds>(steady_clock::now() - *mCreation).count() / 1000.0f);
 }

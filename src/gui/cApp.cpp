@@ -10,6 +10,8 @@ cApp::cApp()
 }
 cApp::~cApp()
 {
+    // Generally nothing GUI related should be manually destroyed
+    // The wx package handles destruction of any elements it relies on
 }
 
 bool cApp::OnInit() {
@@ -20,6 +22,8 @@ bool cApp::OnInit() {
     // cMain is derived from wxFrame
     // Everything is handled in there
     mFrame = new cMain();
+    // The privately defined default doesn't play well with my gtk2 environment
+    mFrame->SetSize(1280,1024);
     mFrame->Show();
 
     return true;
