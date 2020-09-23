@@ -63,7 +63,7 @@ int main(int argc, char** argv)
     conn = mysql_connection_setup(mysqlID);
 
     // assign the results return to the MYSQL_RES pointer
-    res = mysql_peform_query(conn, "SHOW DATABASES");
+    res = mysql_peform_query(conn, "SHOW DATABASES"); // Make another class for queryies, ot txt file.
 
     printf("MySQL Tables in mysql database: \n");
     while ((row = mysql_fetch_row(res)) !=NULL)

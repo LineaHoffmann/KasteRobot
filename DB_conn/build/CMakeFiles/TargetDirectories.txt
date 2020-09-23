@@ -1,3 +1,3 @@
-/home/lineah/workspace/DB_conn/build/CMakeFiles/rebuild_cache.dir
-/home/lineah/workspace/DB_conn/build/CMakeFiles/DB_conn.dir
-/home/lineah/workspace/DB_conn/build/CMakeFiles/edit_cache.dir
+/home/lineah/workspace/SemProject /KasteRobot/DB_conn/build/CMakeFiles/rebuild_cache.dir
+/home/lineah/workspace/SemProject /KasteRobot/DB_conn/build/CMakeFiles/DB_conn.dir
+/home/lineah/workspace/SemProject /KasteRobot/DB_conn/build/CMakeFiles/edit_cache.dir

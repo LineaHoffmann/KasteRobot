@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/lineah/workspace/DB_conn/src/DB_conn.cpp
+/home/lineah/workspace/SemProject /KasteRobot/DB_conn/src/DB_conn.cpp
 iostream
 -
 mysql/mysql.h
