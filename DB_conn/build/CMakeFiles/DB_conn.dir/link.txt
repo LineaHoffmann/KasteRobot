@@ -1,0 +1,1 @@
+/usr/bin/g++     CMakeFiles/DB_conn.dir/DB_conn.cpp.o  -o DB_conn -lmysqlclient 
