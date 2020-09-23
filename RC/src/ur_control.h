@@ -8,7 +8,7 @@
 #include <ur_rtde/rtde_control_interface.h>
 #include <ur_rtde/rtde_receive_interface.h>
 
-class myExcep : public std::exception {
+class myExcep : public std::exception{
 
     const char* what() const throw()
     {
@@ -22,8 +22,8 @@ class UR_Control : std::thread
     //definition of data struct
     struct UR_STRUCT {
 
-        std::vector<double> *pose;
-        bool isConnected;
+        std::vector<double> pose{0};
+        bool isConnected = false;
 
     };
 
@@ -49,9 +49,10 @@ public:
     void setIP(const std::string &value);
 
     //Data polling for datasharing
-    void getData();
     void startPolling();
     void stopPolling();
+
+    std::vector<double> getLastPose();
 
     int getPollingRate() const;
     void setPollingRate(int pollingRate);
@@ -61,6 +62,7 @@ private:
     //helping functions
     std::vector<double> degToRad(const std::vector<double> &qDeg);
     std::vector<double> radToDeg(const std::vector<double> &qRad);
+    void getData();
 
     //Member Variables
     bool mContinue = true;

@@ -17,8 +17,8 @@ int main() {
     //Declaring vars
     //std::string IP = "192.168.3.52"; //jw-internal
     //std::string IP = "192.168.37.130";
-    std::string IP = "192.168.100.49"; //UR5 robot
-    //std::string IP = "127.0.0.1";
+    //std::string IP = "192.168.100.49"; //UR5 robot
+    std::string IP = "127.0.0.1";
     std::vector<double> joints{-2.756, -1.5, -2.28, -0.95, 1.60, 0.023};
     std::vector<double> joints2{-65.0, -90, 0.0, 0.0, 0.0, 0.0};
     double speed = 0.5;
@@ -38,39 +38,31 @@ int main() {
         return -1;
     }
 
+    ur_control->setPollingRate(10);
+    ur_control->startPolling();
+
     ur_control->moveJ(joints,speed,acc);
+
+    std::vector<double> jointsRet = ur_control->getLastPose();
+
+    for (double d : jointsRet){
+        std:: cout << d << "\t";
+    } std::cout << std::endl;
 
     ur_control->moveJDeg(joints2, speed, acc);
 
+    jointsRet = ur_control->getLastPose();
 
-    std::vector<double> currentPose(ur_control->getCurrentPose());
+    for (double d : jointsRet){
+        std:: cout << d << "\t";
+    } std::cout << std::endl;
+
+
+    std::vector<double> currentPose(ur_control->getCurrentPoseDeg());
 
     for (auto q : currentPose) {
         std::cout << std::fixed << std::setprecision(4) << q << " ";
     };
-
-
-//    //Example from SDU Robotics
-//    rtde_control->moveJ(joints);  //simple move to joint values
-
-
-//    for (unsigned int i=0; i<1000; i++)
-//      {
-//        auto t_start = std::chrono::high_resolution_clock::now();
-//        rtde_control->speedJ(joints2, acc, dt);
-//        joints2[0] += 0.0005;
-//        joints2[1] += 0.0005;
-//        auto t_stop = std::chrono::high_resolution_clock::now();
-//        auto t_duration = std::chrono::duration<double>(t_stop - t_start);
-
-//        if (t_duration.count() < dt)
-//        {
-//          std::this_thread::sleep_for(std::chrono::duration<double>(dt - t_duration.count()));
-//        }
-//      }
-
-//      rtde_control->speedStop();
-//      rtde_control->stopScript();
 
     return 0;
 }

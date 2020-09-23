@@ -27,6 +27,7 @@ UR_Control::UR_Control(std::string IP)
 
 UR_Control::~UR_Control()
 {
+    stopPolling();
     if (mUrControl)   {delete mUrControl;}
     if (mUrRecieve != nullptr)   {delete mUrRecieve;}
 }
@@ -159,7 +160,7 @@ void UR_Control::getData()
         //get values from RTDE
         // TODO: define the struct and get the remaining struct members
         mURStruct->isConnected = mUrRecieve->isConnected();
-        *mURStruct->pose = mUrRecieve->getActualTCPPose();
+        mURStruct->pose = mUrRecieve->getActualTCPPose();
         } //lock scope ends
 
         //sleep until time + waitTime
@@ -170,6 +171,7 @@ void UR_Control::getData()
 
 void UR_Control::startPolling()
 {
+    std::cout << "starting polling thread" << std::endl;
     mThread = new std::thread(&UR_Control::getData, this);
 }
 
@@ -177,8 +179,15 @@ void UR_Control::stopPolling()
 {
     mContinue = false;
 
+    std::cout << "stopping polling from robot" << std::endl;
+
     while (!mThread->joinable()){
     }
+}
+
+std::vector<double> UR_Control::getLastPose()
+{
+    return mURStruct->pose;
 }
 
 /**
