@@ -57,6 +57,9 @@ public:
     int getPollingRate() const;
     void setPollingRate(int pollingRate);
 
+    //returning pointer to the datastruct.
+    UR_STRUCT *getURStruct() const;
+
 private:
 
     //helping functions

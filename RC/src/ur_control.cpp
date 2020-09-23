@@ -9,7 +9,7 @@
 
 
 
-UR_Control::UR_Control(std::string IP)
+UR_Control::UR_Control(std::string IP) // TODO: Make default constructor and (dis)connector functions.
 {
     try {
         mUrControl = new ur_rtde::RTDEControlInterface(IP);
@@ -153,7 +153,7 @@ void UR_Control::getData()
 {
     //preparing timers
     std::chrono::system_clock::time_point timePoint;
-    long waitTime = 1000 / mPollingRate; //pollingrate in millis
+    long waitTime = 1000 / mPollingRate; //polling rate in millis
 
     while (mContinue) {
         timePoint = std::chrono::system_clock::now() + std::chrono::milliseconds(waitTime);
@@ -172,6 +172,14 @@ void UR_Control::getData()
         std::this_thread::sleep_until(timePoint);
     }
 
+}
+/**
+ * @brief UR_Control::getURStruct
+ * @return pointer to the URStruct, for data exchange
+ */
+UR_Control::UR_STRUCT *UR_Control::getURStruct() const
+{
+    return mURStruct;
 }
 
 void UR_Control::startPolling()
