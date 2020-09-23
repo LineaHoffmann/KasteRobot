@@ -17,7 +17,7 @@ class myExcep : public std::exception{
 };
 
 
-class UR_Control : std::thread
+class UR_Control
 {
     //definition of data struct
     struct UR_STRUCT {
