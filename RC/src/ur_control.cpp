@@ -28,6 +28,11 @@ UR_Control::UR_Control(std::string IP)
 UR_Control::~UR_Control()
 {
     stopPolling();
+
+    //check if pointer types exists and delete if they exists.
+    if(mURStruct) {delete mURStruct;}
+    if(mJoints) {delete mJoints;}
+    if(mThread) {delete mThread;}
     if (mUrControl)   {delete mUrControl;}
     if (mUrRecieve != nullptr)   {delete mUrRecieve;}
 }
