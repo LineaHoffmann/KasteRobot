@@ -9,12 +9,12 @@
 
 
 
-UR_Control::UR_Control() // TODO: Make default constructor and (dis)connector functions.
+UR_Control::UR_Control()
 {
     init();
 }
 
-UR_Control::UR_Control(std::string IP) // TODO: Make default constructor and (dis)connector functions.
+UR_Control::UR_Control(std::string IP)
 {
     init();
     try{
@@ -165,6 +165,10 @@ std::vector<double> UR_Control::getCurrentPose()
     return out;
 }
 
+/**
+ * @brief UR_Control::getCurrentPoseDeg
+ * @return
+ */
 std::vector<double> UR_Control::getCurrentPoseDeg()
 {
     if(!isConnected){   return std::vector<double>(0); }
@@ -176,7 +180,7 @@ std::vector<double> UR_Control::getCurrentPoseDeg()
 
 /**
  * @brief UR_Control::getIP
- * @return
+ * @return string with stored IP address
  */
 std::string UR_Control::getIP() const
 {
@@ -192,7 +196,7 @@ void UR_Control::setIP(const std::string &value)
 }
 
 /**
- * @brief UR_Control::getData
+ * @brief UR_Control::getData private function to poll data from the robot at the given polling rate. used by "startPolling()"
  */
 void UR_Control::getData()
 {
@@ -240,6 +244,9 @@ UR_Control::UR_STRUCT *UR_Control::getURStruct() const
     return mURStruct;
 }
 
+/**
+ * @brief UR_Control::startPolling starts a new thread, to poll data from the robot via UR RTDE recieve interface.
+ */
 void UR_Control::startPolling()
 {
     if(!isConnected){   return; }
@@ -248,6 +255,9 @@ void UR_Control::startPolling()
     mThread = new std::thread(&UR_Control::getData, this);
 }
 
+/**
+ * @brief UR_Control::stopPolling stopping the polling thread, to poll realtime data from the robot
+ */
 void UR_Control::stopPolling()
 {
     mContinue = false;
@@ -260,6 +270,10 @@ void UR_Control::stopPolling()
     }
 }
 
+/**
+ * @brief UR_Control::getLastPose getting last postion stored in the URStruct
+ * @return return vector with latest saved position from the URStruct
+ */
 std::vector<double> UR_Control::getLastPose()
 {
     return mURStruct->pose;
@@ -299,7 +313,7 @@ std::vector<double> UR_Control::radToDeg(const std::vector<double> &qRad)
 
 /**
  * @brief UR_Control::getPollingRate getting pollingrate in hz
- * @return
+ * @return pollingrate as integer representing polling rate in [Hz]
  */
 int UR_Control::getPollingRate() const
 {
@@ -315,6 +329,6 @@ void UR_Control::setPollingRate(int pollingRate)
     if(pollingRate <= 125 && pollingRate > 0){
         mPollingRate = pollingRate;
     } else {
-        std::cerr << "number not within specified range, polling rate not changed!" << std::endl;
+        std::cerr << "Input not within specified range, polling rate not changed!" << std::endl;
     }
 }
