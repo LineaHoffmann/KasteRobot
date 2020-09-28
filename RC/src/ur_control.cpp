@@ -9,20 +9,21 @@
 
 
 
+UR_Control::UR_Control() // TODO: Make default constructor and (dis)connector functions.
+{
+    init();
+}
+
 UR_Control::UR_Control(std::string IP) // TODO: Make default constructor and (dis)connector functions.
 {
-    try {
-        mUrControl = new ur_rtde::RTDEControlInterface(IP);
-        mUrRecieve = new ur_rtde::RTDEReceiveInterface(IP);
-
-    } catch (std::exception &e) {
-        mEptr = std::current_exception();
-        std::cout << "ur_rtde exception: " << e.what() << std::endl; //check up on exception handling to deny further trow.
+    init();
+    try{
+        connect(IP);
+        isConnected = true;
+    } catch(std::exception &e){
         std::rethrow_exception(mEptr);
-    };
+    }
 
-    //datasharing struct
-    mURStruct = new UR_STRUCT;
 }
 
 UR_Control::~UR_Control()
@@ -36,6 +37,38 @@ UR_Control::~UR_Control()
     if (mUrControl)   {delete mUrControl;}
     if (mUrRecieve != nullptr)   {delete mUrRecieve;}
 }
+
+/**
+ * @brief connect tries to connect to robot meanwhile constructing the objects of ur_RTDE
+ * @param IP
+ */
+void UR_Control::connect(std::string IP){
+
+    if(isConnected){    return; }
+
+    if(!mUrRecieve){
+        try {
+            mUrRecieve = new ur_rtde::RTDEReceiveInterface(IP);
+
+        } catch (std::exception &e) {
+            mEptr = std::current_exception();
+            std::cout << "ur_rtde Recieve exception: " << e.what() << std::endl;
+            std::rethrow_exception(mEptr);
+        };
+    }
+
+    if(!mUrControl){
+        try {
+            mUrControl = new ur_rtde::RTDEControlInterface(IP);
+
+        } catch (std::exception &e) {
+            mEptr = std::current_exception();
+            std::cout << "ur_rtde Control exception: " << e.what() << std::endl;
+            std::rethrow_exception(mEptr);
+        };
+    }
+}
+
 /**
  * @brief UR_Control::moveJ use ur_rtde to move to specified TCP position in linear path
  *          using default speed, and default acceleration.
@@ -44,6 +77,8 @@ UR_Control::~UR_Control()
  */
 bool UR_Control::moveJ(const std::vector<double> &q)
 {
+    if(!isConnected){   return false; }
+
     // TODO: add check if all vector-entries are within value of -2pi< q_n < 2pi
     try {
         mUrControl->moveJ(q,0.2,0.2);
@@ -64,6 +99,8 @@ bool UR_Control::moveJ(const std::vector<double> &q)
  */
 bool UR_Control::moveJ(const std::vector<double> &q, double speed, double acceleration)
 {
+    if(!isConnected){   return false; }
+
     // TODO: add check if all vector-entries are within value of -2pi< q_n < 2pi
     try {
         if(mUrControl)
@@ -82,6 +119,8 @@ bool UR_Control::moveJ(const std::vector<double> &q, double speed, double accele
  */
 bool UR_Control::moveJDeg(const std::vector<double> &qDeg)
 {
+    if(!isConnected){   return false; }
+
     try {
         mUrControl->moveJ(degToRad(qDeg), 0.2, 0.2);
     } catch (std::exception &e) {
@@ -100,6 +139,8 @@ bool UR_Control::moveJDeg(const std::vector<double> &qDeg)
  */
 bool UR_Control::moveJDeg(const std::vector<double> &qDeg, double speed, double acceleration)
 {
+    if(!isConnected){   return false; }
+
     std::vector<double> q = degToRad(qDeg);
 
     try {
@@ -117,6 +158,8 @@ bool UR_Control::moveJDeg(const std::vector<double> &qDeg, double speed, double 
  */
 std::vector<double> UR_Control::getCurrentPose()
 {
+    if(!isConnected){   return std::vector<double>(0); }
+
     std::vector<double> out = mUrRecieve->getActualQ();
 
     return out;
@@ -124,6 +167,8 @@ std::vector<double> UR_Control::getCurrentPose()
 
 std::vector<double> UR_Control::getCurrentPoseDeg()
 {
+    if(!isConnected){   return std::vector<double>(0); }
+
     std::vector<double> out = mUrRecieve->getActualQ();
 
     return radToDeg(out);
@@ -151,6 +196,7 @@ void UR_Control::setIP(const std::string &value)
  */
 void UR_Control::getData()
 {
+
     //preparing timers
     std::chrono::system_clock::time_point timePoint;
     long waitTime = 1000 / mPollingRate; //polling rate in millis
@@ -173,6 +219,18 @@ void UR_Control::getData()
     }
 
 }
+
+/**
+ * @brief UR_Control::init private function to initialize and allocate memory, to be used in contructors.
+ */
+void UR_Control::init()
+{
+    //datasharing struct
+    mURStruct = new UR_STRUCT;
+    isConnected = false;
+}
+
+
 /**
  * @brief UR_Control::getURStruct
  * @return pointer to the URStruct, for data exchange
@@ -184,6 +242,8 @@ UR_Control::UR_STRUCT *UR_Control::getURStruct() const
 
 void UR_Control::startPolling()
 {
+    if(!isConnected){   return; }
+
     std::cout << "starting polling thread" << std::endl;
     mThread = new std::thread(&UR_Control::getData, this);
 }
@@ -192,9 +252,11 @@ void UR_Control::stopPolling()
 {
     mContinue = false;
 
-    std::cout << "stopping polling from robot" << std::endl;
+   if(mThread){
+        std::cout << "stopping polling from robot" << std::endl;
 
-    while (!mThread->joinable()){
+        while (!mThread->joinable()){
+        }
     }
 }
 
@@ -235,12 +297,24 @@ std::vector<double> UR_Control::radToDeg(const std::vector<double> &qRad)
     return out;
 }
 
+/**
+ * @brief UR_Control::getPollingRate getting pollingrate in hz
+ * @return
+ */
 int UR_Control::getPollingRate() const
 {
     return mPollingRate;
 }
 
+/**
+ * @brief UR_Control::setPollingRate setting private parameter "pollingRate", and checking if its within limits of the robots pollingrate
+ * @param pollingRate int in hertz [Hz] between 0 and 125 [Hz]
+ */
 void UR_Control::setPollingRate(int pollingRate)
 {
-    mPollingRate = pollingRate;
+    if(pollingRate <= 125 && pollingRate > 0){
+        mPollingRate = pollingRate;
+    } else {
+        std::cerr << "number not within specified range, polling rate not changed!" << std::endl;
+    }
 }

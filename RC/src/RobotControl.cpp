@@ -17,7 +17,7 @@ int main() {
     //Declaring vars
     //std::string IP = "192.168.3.52"; //jw-internal
     //std::string IP = "192.168.37.130";
-    //std::string IP = "192.168.100.49"; //UR5 robot
+//    std::string IP = "192.168.100.49"; //UR5 robot
     std::string IP = "127.0.0.1";
     std::vector<double> joints{-2.756, -1.5, -2.28, -0.95, 1.60, 0.023};
     std::vector<double> joints2{-65.0, -90, 0.0, 0.0, 0.0, 0.0};

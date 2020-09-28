@@ -28,9 +28,12 @@ class UR_Control
     };
 
 public:
+    UR_Control();
     UR_Control(std::string IP);
 
     ~UR_Control();
+
+    void connect(std::string IP);
 
     //move with rad input
     bool moveJ(const std::vector<double> &q);
@@ -66,6 +69,10 @@ private:
     std::vector<double> degToRad(const std::vector<double> &qDeg);
     std::vector<double> radToDeg(const std::vector<double> &qRad);
     void getData();
+    void init();
+
+    //flags
+    bool isConnected = false;
 
     //Member Variables
     bool mContinue = true;
