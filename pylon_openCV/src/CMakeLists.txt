@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.9.8)
 project( pylon_opencv )
 
 
@@ -15,4 +15,4 @@ include_directories(${Pylon_INCLUDE_DIRS})
 
 add_executable( main main.cpp basler_cam.cpp basler_cam.h)
 target_link_libraries( main ${OpenCV_LIBS} ${Pylon_LIBRARIES})
-
+target_link_libraries(main pthread)

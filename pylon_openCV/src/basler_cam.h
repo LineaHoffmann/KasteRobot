@@ -6,6 +6,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <pylon/PylonIncludes.h>
 #include <iostream>
+#include <mutex>
+#include <thread>
 
 
 class basler_cam
@@ -13,25 +15,27 @@ class basler_cam
 public:
     basler_cam(std::string calibrationPath);
     basler_cam(std::string calibrationPath, int exposure);
-    void calibrate();
-    void calibrate(std::vector<cv::Mat> imageList);
+
+    ~basler_cam();
+
+    void calibrate(); //run calibration on pictures in path
+    void updateCameraMatrix(cv::Mat NewCameraMatrix, cv::Mat NewCoeffs); //changing calibration manually
+    void GrabPictures(); //runs to get pictures from camera
+    cv::Mat getImage(); //get newest cv:Mat image (remapped)
 
 
+    std::thread *baslerCamThread;
 
 private:
-    // The exit code of the sample application.
-    int exitCode = 0;
 
     // Create a PylonImage that will be used to create OpenCV images later.
     Pylon::CPylonImage pylonImage;
-    // Create an OpenCV image.
-    cv::Mat openCvImage;
-    // Path of the folder containing checkerboard images
-    std::string path = "../imgs/*.bmp";
+    cv::Mat openCvImage;    // Create an OpenCV image.
+    std::string path = "../imgs/*.bmp";     // Path of the folder containing checkerboard images
 
     int myExposure = 12500;
     int frame = 1;
-    bool isCalibrated = false;
+    bool isRectified = false;
     int CHECKERBOARD[2]{9,6};
 
     std::vector<cv::Mat> caliPics;
@@ -43,6 +47,9 @@ private:
     cv::Mat distCoeffs;
     cv::Mat R;
     cv::Mat T;
+
+    std::mutex *PicsMtx = nullptr;
+
 };
 
 #endif // BASLER_CAM_H
