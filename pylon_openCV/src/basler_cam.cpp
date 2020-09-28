@@ -1,30 +1,35 @@
 #include "basler_cam.h"
 
-
-
-basler_cam::basler_cam(std::string calibrationPath)
+basler_cam::basler_cam()
 {
     PicsMtx = new std::mutex();
-    path = calibrationPath;
-    calibrate();
-    baslerCamThread = new std::thread(&basler_cam::GrabPictures,this);
-
-
 }
 
-basler_cam::basler_cam(std::string calibrationPath, int exposure)
-{
-    PicsMtx = new std::mutex();
-    path = calibrationPath;
-    myExposure = exposure;
-    calibrate();
-    baslerCamThread = new std::thread(&basler_cam::GrabPictures,this);
-
-}
+basler_cam::basler_cam(std::string calibrationPath) : basler_cam() {path = calibrationPath;}
+basler_cam::basler_cam(std::string calibrationPath, int exposure) : basler_cam(calibrationPath){myExposure = exposure;}
 
 basler_cam::~basler_cam()
 {
     delete PicsMtx;
+}
+
+bool basler_cam::isConnected()
+{
+    if(baslerCamThread->joinable()) {
+        baslerCamThread->join();
+        return 0;
+    }
+    return 1;
+}
+
+bool basler_cam::start()
+{
+    calibrate();
+    baslerCamThread = new std::thread(&basler_cam::GrabPictures,this);
+    if (!openCvImage.data) {
+        return 0;
+    }
+    return 1;
 }
 
 
@@ -87,6 +92,9 @@ void basler_cam::updateCameraMatrix(cv::Mat NewCameraMatrix, cv::Mat NewCoeffs)
 
 cv::Mat basler_cam::getImage()
 {
+    if (baslerCamThread->joinable()){
+
+    }
     std::lock_guard<std::mutex> lock(*PicsMtx);
     //get pic and remap
     if (!openCvImage.data) {
@@ -171,9 +179,6 @@ void basler_cam::GrabPictures()
         }
         std::cout << "New exposure: " << exposureTime->GetValue() << std::endl;
 
-
-        // Start the grabbing of c_countOfImagesToGrab images.
-        // The camera device is parameterized with a default configuration which
         // sets up free-running continuous acquisition.
         camera.StartGrabbing(Pylon::GrabStrategy_LatestImageOnly);
 
@@ -199,23 +204,13 @@ void basler_cam::GrabPictures()
                     openCvImage= cv::Mat(ptrGrabResult->GetHeight(), ptrGrabResult->GetWidth(), CV_8UC3, (uint8_t *) pylonImage.GetBuffer());
                 }
 
-                //detect keypress
-                int keyPressed = cv::waitKey(1);
-
-                //press q to exit
-                if(keyPressed == 'q'){ //quit
-                    std::cout << "Shutting down camera..." << std::endl;
-                    camera.Close();
-                    std::cout << "Camera successfully closed." << std::endl;
-                    break;
-                }
-
                 frame++;
 
             }
             else
             {
                 std::cout << "Error: " << ptrGrabResult->GetErrorCode() << " " << ptrGrabResult->GetErrorDescription() << std::endl;
+                return;
             }
         }
 
@@ -225,26 +220,9 @@ void basler_cam::GrabPictures()
         // Error handling.
         std::cerr << "An exception occurred." << std::endl
                   << e.GetDescription() << std::endl;
-        std::cout << "Could not find camera, do you want to exit?" << std::endl;
-        std::cout << "press q to exit, or t to test with pictures from disk" << std::endl;
 
         cv::Mat warningImg;
         warningImg = cv::imread("../src/warning.jpg", CV_LOAD_IMAGE_COLOR);
         cv::imshow( "warning", warningImg);
-        while (true) {
-            int keyPressed = cv::waitKey(1);
-
-            //exit
-            if(keyPressed == 'q'){ //quit
-                std::cout << "Exiting" << std::endl;
-                break;
-            }
-
-            //start test
-            if(keyPressed == 't'){
-                std::cout << "test" << std::endl;
-                break;
-            }
-        }
     }
 }

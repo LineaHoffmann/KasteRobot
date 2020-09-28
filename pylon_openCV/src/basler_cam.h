@@ -13,20 +13,26 @@
 class basler_cam
 {
 public:
+    basler_cam();
     basler_cam(std::string calibrationPath);
     basler_cam(std::string calibrationPath, int exposure);
 
     ~basler_cam();
 
+    bool isConnected(); //returns true if we have a connection to the camera.
+    bool start(); //returns true if the camera was started correctly.
+
+    void setPath(std::string calibrationPath) {path = calibrationPath; }
     void calibrate(); //run calibration on pictures in path
-    void updateCameraMatrix(cv::Mat NewCameraMatrix, cv::Mat NewCoeffs); //changing calibration manually
-    void GrabPictures(); //runs to get pictures from camera
+    void updateCameraMatrix(cv::Mat NewCameraMatrix, cv::Mat NewCoeffs); //changing calibration manually use with care
+
     cv::Mat getImage(); //get newest cv:Mat image (remapped)
 
 
-    std::thread *baslerCamThread;
+    std::thread *baslerCamThread; //skal muligvis senere flyttes til private.
 
 private:
+    void GrabPictures(); //polling pictures from cam to memory
 
     // Create a PylonImage that will be used to create OpenCV images later.
     Pylon::CPylonImage pylonImage;
