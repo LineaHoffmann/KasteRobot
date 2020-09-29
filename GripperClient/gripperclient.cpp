@@ -1,14 +1,13 @@
 #include "gripperclient.h"
 
 GripperClient::GripperClient() {
+    this->mT1 = new std::thread(&GripperClient::EntryThread, this);
 }
 
-void GripperClient::StartThread() {
-    mT1 = new std::thread(GripperClient::EntryThread());
-}
 
 void GripperClient::EntryThread() {
     std::cout << "Client Thread started" << std::endl;
+
 
 }
 
