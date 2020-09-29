@@ -1,0 +1,4 @@
+#ifndef ROBOTEXEPTIONS_H
+#define ROBOTEXEPTIONS_H
+
+#endif // ROBOTEXEPTIONS_H
