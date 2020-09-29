@@ -1,0 +1,5 @@
+def init():
+	textmsg("init commencing")
+	set_payload_mass(1.2)
+	set_tcp(p[0.,0.,.1,0.,0.,0.])
+end

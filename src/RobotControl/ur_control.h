@@ -58,6 +58,7 @@ private:
     //private functions
     void getData();
     void init();
+    void initRobot();
 
         //move with rad input
         bool moveJ(const std::vector<double> &q);

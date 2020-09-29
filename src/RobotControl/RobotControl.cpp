@@ -33,7 +33,7 @@ int main() {
     //rtde_control = new ur_rtde::RTDEControlInterface(IP);
 
     try{
-        ur_control = new UR_Control();
+        ur_control = new UR_Control(IP);
     } catch(std::exception &e){
         return -1;
     }

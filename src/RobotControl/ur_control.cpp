@@ -7,9 +7,7 @@
 
 #include <exception>
 
-#define USE_MATH_DEFINES
-
-
+#include <ur_rtde/script_client.h>
 
 UR_Control::UR_Control()
 {
@@ -19,18 +17,19 @@ UR_Control::UR_Control()
 UR_Control::UR_Control(std::string IP)
 {
     init();
+    initRobot();
     try{
         connect(IP);
         isConnected = true;
     } catch(std::exception &e){
         std::rethrow_exception(mEptr);
     }
-
 }
 
 UR_Control::~UR_Control()
 {
     stopPolling();
+    mUrControl->disconnect();
 
     //check if pointer types exists and delete if they exists.
     if(mURStruct) {delete mURStruct;}
@@ -46,16 +45,17 @@ UR_Control::~UR_Control()
  */
 void UR_Control::connect(std::string IP){
 
-    if(mUrRecieve && mUrControl){    return; }
+    if(isConnected){    return; }
 
     if(!mUrRecieve){
         try {
             mUrRecieve = new ur_rtde::RTDEReceiveInterface(IP);
 
         } catch (std::exception &e) {
-            //mEptr = std::current_exception();
+            mEptr = std::current_exception();
             std::cout << "ur_rtde Recieve exception: " << e.what() << std::endl;
-            throw;
+            std::rethrow_exception(mEptr);
+            return;
         };
     }
 
@@ -63,7 +63,7 @@ void UR_Control::connect(std::string IP){
         try {
             mUrControl = new ur_rtde::RTDEControlInterface(IP);
 
-        } catch (std::system_error &e) {
+        } catch (std::exception &e) {
             mEptr = std::current_exception();
             std::cout << "ur_rtde Control exception: " << e.what() << std::endl;
             std::rethrow_exception(mEptr);
@@ -193,6 +193,18 @@ void UR_Control::init()
     //datasharing struct
     mURStruct = new UR_STRUCT;
     isConnected = false;
+}
+
+/**
+ * @brief UR_Control::initRobot send scriptfile to robot, to init TCP ect.
+ */
+void UR_Control::initRobot()
+{
+    ur_rtde::ScriptClient script("127.0.0.1",3,14);
+    script.connect();
+    if (script.isConnected()) {
+        script.sendScript("../../src/startupScript.txt");
+    }
 }
 
 
