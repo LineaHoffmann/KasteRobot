@@ -19,8 +19,8 @@ int main() {
     //std::string IP = "192.168.37.130";
 //    std::string IP = "192.168.100.49"; //UR5 robot
     std::string IP = "127.0.0.1";
-    std::vector<double> joints{-2.756, -1.5, -2.28, -0.95, 1.60, 0.023};
-    std::vector<double> joints2{-65.0, -90, 0.0, 0.0, 0.0, 0.0};
+    std::vector<std::vector<double>> joints{{-2.756, -1.5, -2.28, -0.95, 1.60, 0.023}};
+    std::vector<std::vector<double>> joints2{{-1.13, -1.57, 0.0, 0.0, 0.0, 0.0}};
     double speed = 0.5;
     double acc = 0.5;
 
@@ -33,7 +33,7 @@ int main() {
     //rtde_control = new ur_rtde::RTDEControlInterface(IP);
 
     try{
-        ur_control = new UR_Control(IP);
+        ur_control = new UR_Control();
     } catch(std::exception &e){
         return -1;
     }
@@ -41,7 +41,7 @@ int main() {
     ur_control->setPollingRate(10);
     ur_control->startPolling();
 
-    ur_control->moveJ(joints,speed,acc);
+    ur_control->move(joints,speed,acc, UR_Control::MOVE_LFK);
 
     std::vector<double> jointsRet = ur_control->getLastPose();
 
@@ -49,7 +49,7 @@ int main() {
         std:: cout << d << "\t";
     } std::cout << std::endl;
 
-    ur_control->moveJDeg(joints2, speed, acc);
+    ur_control->move(joints2,speed,acc, UR_Control::MOVE_LFK);
 
     jointsRet = ur_control->getLastPose();
 

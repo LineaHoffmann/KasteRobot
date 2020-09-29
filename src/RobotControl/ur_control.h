@@ -7,15 +7,7 @@
 #include <mutex>
 #include <ur_rtde/rtde_control_interface.h>
 #include <ur_rtde/rtde_receive_interface.h>
-
-class myExcep : public std::exception{
-
-    const char* what() const throw()
-    {
-        return "Connection to host could not be resolved";
-    }
-};
-
+#include "robotexceptions.h"
 
 class UR_Control
 {
@@ -35,13 +27,11 @@ public:
 
     void connect(std::string IP);
 
-    //move with rad input
-    bool moveJ(const std::vector<double> &q);
-    bool moveJ(const std::vector<double> &q, double speed, double acceleration);
+    //move ENUM
+    enum moveEnum {MOVE_JLIN, MOVE_JPATH, MOVE_LFK, MOVE_TLIN, SERVOJ, SPEEDJ}; // WARNING: Update Enums to fit code, before final export:
 
-    //move with degree input
-    bool moveJDeg(const std::vector<double> &qDeg);
-    bool moveJDeg(const std::vector<double> &qDeg, double speed, double acceleration);
+    //move function to access private move functions of UR_RTDE
+    bool move(std::vector<std::vector<double>> &q, double &acc, double &speed, UR_Control::moveEnum moveMode);
 
     //read current pose in rads or deg
     std::vector<double> getCurrentPose();
@@ -65,11 +55,14 @@ public:
 
 private:
 
-    //helping functions
-    std::vector<double> degToRad(const std::vector<double> &qDeg);
-    std::vector<double> radToDeg(const std::vector<double> &qRad);
+    //private functions
     void getData();
     void init();
+
+        //move with rad input
+        bool moveJ(const std::vector<double> &q);
+        bool moveJ(const std::vector<double> &q, double speed, double acceleration);
+
 
     //flags
     bool isConnected = false;

@@ -5,6 +5,8 @@
 #include <chrono>
 #include <mutex>
 
+#include <exception>
+
 #define USE_MATH_DEFINES
 
 
@@ -44,16 +46,16 @@ UR_Control::~UR_Control()
  */
 void UR_Control::connect(std::string IP){
 
-    if(isConnected){    return; }
+    if(mUrRecieve && mUrControl){    return; }
 
     if(!mUrRecieve){
         try {
             mUrRecieve = new ur_rtde::RTDEReceiveInterface(IP);
 
         } catch (std::exception &e) {
-            mEptr = std::current_exception();
+            //mEptr = std::current_exception();
             std::cout << "ur_rtde Recieve exception: " << e.what() << std::endl;
-            std::rethrow_exception(mEptr);
+            throw;
         };
     }
 
@@ -61,7 +63,7 @@ void UR_Control::connect(std::string IP){
         try {
             mUrControl = new ur_rtde::RTDEControlInterface(IP);
 
-        } catch (std::exception &e) {
+        } catch (std::system_error &e) {
             mEptr = std::current_exception();
             std::cout << "ur_rtde Control exception: " << e.what() << std::endl;
             std::rethrow_exception(mEptr);
@@ -69,87 +71,45 @@ void UR_Control::connect(std::string IP){
     }
 }
 
-/**
- * @brief UR_Control::moveJ use ur_rtde to move to specified TCP position in linear path
- *          using default speed, and default acceleration.
- * @param q vector of double values in radian range -2pi< q_n < 2pi
- * @return true, if no error caught from ur_rtde moveJ funktion.
- */
-bool UR_Control::moveJ(const std::vector<double> &q)
+bool UR_Control::move(std::vector<std::vector<double>> &q, double &speed, double &acc, UR_Control::moveEnum moveMode)
 {
-    if(!isConnected){   return false; }
-
-    // TODO: add check if all vector-entries are within value of -2pi< q_n < 2pi
-    try {
-        mUrControl->moveJ(q,0.2,0.2);
-    } catch (std::exception &e) {
-        std::cerr << "moveJ exception: " << e.what() << std::endl;
+    if (!isConnected) {
+        std::cerr << "UR_Control::move: Host not connected!" << std::endl;
+        throw(UR_NotConnected());
         return false;
     }
-    return true;
-}
 
-
-/**
- * @brief UR_Control::moveJ Use ur_rtde lib to move to specified TCP position in linear path, using speed and acceleration parameters and position vector6d
- * @param q Vector6d of double values in radians
- * @param speed
- * @param acceleration
- * @return
- */
-bool UR_Control::moveJ(const std::vector<double> &q, double speed, double acceleration)
-{
-    if(!isConnected){   return false; }
-
-    // TODO: add check if all vector-entries are within value of -2pi< q_n < 2pi
-    try {
-        if(mUrControl)
-            mUrControl->moveJ(q,speed,acceleration);
-    } catch (std::exception &e) {
-        std::cerr << "moveJ exception: " << e.what() << std::endl;
-        return false;
+    /*NOTE: if robot is connected, switch statement will choose correct movefunction to execute!
+     * chosen as enum to ease calling from controller-class
+     */
+    std::cout << "UR_Control::move: ";
+        switch (moveMode) {
+        case MOVE_JLIN:
+            std::cout << "MOVE_JLIN: move commenced!" << std::endl;
+            if(mUrControl->moveJ(q[0], speed, acc)){
+                std::cout << "MOVE_JLIN: move completed!" << std::endl;
+                return true;
+            }
+            break;
+        case MOVE_JPATH :
+            std::cout << "MOVE_JPATH: move commenced!" << std::endl;
+            if (mUrControl->moveJ(q)){
+                std::cout << "MOVE_JPATH: move completed!" << std::endl;
+                return true;
+            }
+            break;
+        case MOVE_LFK:
+            std::cout << "MOVE_LFK: move commenced!" << std::endl;
+            if (mUrControl->moveL_FK(q[0], speed, acc)){
+                std::cout << "MOVE_LFK: move completed!" << std::endl;
+                return true;
+            break;
+        default:
+            std::cerr << "Wrong mode set!" << std::endl;
+            break;
+        }
+    return false;
     }
-    return true;
-}
-
-/**
- * @brief UR_Control::moveJDeg
- * @param qDeg
- * @return
- */
-bool UR_Control::moveJDeg(const std::vector<double> &qDeg)
-{
-    if(!isConnected){   return false; }
-
-    try {
-        mUrControl->moveJ(degToRad(qDeg), 0.2, 0.2);
-    } catch (std::exception &e) {
-        std::cerr << "moveJ exception: " << e.what() << std::endl;
-        return false;
-    }
-    return true;
-}
-
-/**
- * @brief UR_Control::moveJDeg
- * @param qDeg
- * @param speed
- * @param acceleration
- * @return
- */
-bool UR_Control::moveJDeg(const std::vector<double> &qDeg, double speed, double acceleration)
-{
-    if(!isConnected){   return false; }
-
-    std::vector<double> q = degToRad(qDeg);
-
-    try {
-        mUrControl->moveJ(q,speed,acceleration);
-    } catch (std::exception &e) {
-        std::cerr << "moveJ exception: " << e.what() << std::endl;
-        return false;
-    }
-    return true;
 }
 
 /**
@@ -175,7 +135,7 @@ std::vector<double> UR_Control::getCurrentPoseDeg()
 
     std::vector<double> out = mUrRecieve->getActualQ();
 
-    return radToDeg(out);
+    return out;
 }
 
 /**
@@ -216,6 +176,7 @@ void UR_Control::getData()
         // TODO: define the struct and get the remaining struct members
         mURStruct->isConnected = mUrRecieve->isConnected();
         mURStruct->pose = mUrRecieve->getActualTCPPose();
+
         } //lock scope ends
 
         //sleep until time + waitTime
@@ -277,38 +238,6 @@ void UR_Control::stopPolling()
 std::vector<double> UR_Control::getLastPose()
 {
     return mURStruct->pose;
-}
-
-/**
- * @brief UR_Control::DegToRad private function to convert degrees to radians
- * @param qDeg  vector6d in degrees
- * @return vector6d converted to radians
- */
-std::vector<double> UR_Control::degToRad(const std::vector<double> &qDeg)
-{
-    std::vector<double> out;
-    out.reserve(6);
-
-    for (int i = 0, total = qDeg.size(); i < total; ++i) {
-        out.push_back(qDeg.at(i) * (M_PI/180)); //convert from deg to rad.
-    }
-    return out;
-}
-/**
- * @brief UR_Control::radToDeg
- * @param qRad
- * @return
- */
-std::vector<double> UR_Control::radToDeg(const std::vector<double> &qRad)
-{
-    std::vector<double> out;
-    out.reserve(6);
-
-    for(double q : qRad){
-        out.push_back(q * (180/M_PI));
-    }
-
-    return out;
 }
 
 /**
