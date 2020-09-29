@@ -1,3 +1,0 @@
-/home/jacob/workspace/KasteRobot/build/default/CMakeFiles/rebuild_cache.dir
-/home/jacob/workspace/KasteRobot/build/default/CMakeFiles/RobotControl.dir
-/home/jacob/workspace/KasteRobot/build/default/CMakeFiles/edit_cache.dir
