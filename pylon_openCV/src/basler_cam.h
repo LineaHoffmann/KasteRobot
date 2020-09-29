@@ -16,11 +16,13 @@ public:
     basler_cam();
     basler_cam(std::string calibrationPath);
     basler_cam(std::string calibrationPath, int exposure);
+    basler_cam(std::string calibrationPath, int exposure, int maxFrameRate);
 
     ~basler_cam();
 
     bool isConnected(); //returns true if we have a connection to the camera.
     bool start(); //returns true if the camera was started correctly.
+    void shutdown();
 
     void setPath(std::string calibrationPath) {path = calibrationPath; }
     void calibrate(); //run calibration on pictures in path
@@ -40,7 +42,9 @@ private:
     std::string path = "../imgs/*.bmp";     // Path of the folder containing checkerboard images
 
     int myExposure = 12500;
+    int frameRate  = 60;
     int frame = 1;
+    bool exit = false;
     bool isRectified = false;
     int CHECKERBOARD[2]{9,6};
 

@@ -31,6 +31,9 @@ int main(int argc, char* argv[])
         //exit
         if(keyPressed == 'q'){ //quit
             std::cout << "Exiting" << std::endl;
+
+            camera1.shutdown();
+
             cv::destroyAllWindows();
             break;
         }

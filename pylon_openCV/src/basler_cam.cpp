@@ -5,8 +5,14 @@ basler_cam::basler_cam()
     PicsMtx = new std::mutex();
 }
 
-basler_cam::basler_cam(std::string calibrationPath) : basler_cam() {path = calibrationPath;}
-basler_cam::basler_cam(std::string calibrationPath, int exposure) : basler_cam(calibrationPath){myExposure = exposure;}
+basler_cam::basler_cam(std::string calibrationPath) : basler_cam()
+{path = calibrationPath;}
+basler_cam::basler_cam(std::string calibrationPath, int exposure) : basler_cam(calibrationPath)
+{myExposure = exposure;}
+basler_cam::basler_cam(std::string calibrationPath, int exposure, int maxFrameRate) : basler_cam(calibrationPath, exposure)
+{frameRate = maxFrameRate;}
+
+
 
 basler_cam::~basler_cam()
 {
@@ -27,6 +33,16 @@ bool basler_cam::start()
     calibrate();
     baslerCamThread = new std::thread(&basler_cam::GrabPictures,this);
     if (!openCvImage.data) {
+        return 0;
+    }
+    return 1;
+}
+
+void basler_cam::shutdown()
+{
+
+    if(baslerCamThread->joinable()) {
+        baslerCamThread->join();
         return 0;
     }
     return 1;
@@ -179,6 +195,24 @@ void basler_cam::GrabPictures()
         }
         std::cout << "New exposure: " << exposureTime->GetValue() << std::endl;
 
+
+        //TEST FOR FRAMERATE CAP!! HAVE NOT BEEN TESTED LIVE YET!//
+        // enable framerate cap
+        GenApi::CEnumerationPtr AcquisitionFrameRateEnable( nodemap.GetNode( "AcquisitionFrameRateEnable"));
+        if ( GenApi::IsWritable( AcquisitionFrameRateEnable)){
+            AcquisitionFrameRateEnable->FromString("true");
+            std::cout << "AcquisitionFrameRateEnable enabled." << std::endl;
+        }
+        // set framerate cap
+        GenApi::CEnumerationPtr AcquisitionFrameRate( nodemap.GetNode( "AcquisitionFrameRate"));
+        if(AcquisitionFrameRate.IsValid()) {
+            AcquisitionFrameRate->SetIntValue(frameRate);
+            std::cout << "AcquisitionFrameRate set to: " << frameRate << std::endl;
+        }
+
+
+
+
         // sets up free-running continuous acquisition.
         camera.StartGrabbing(Pylon::GrabStrategy_LatestImageOnly);
 
@@ -191,6 +225,11 @@ void basler_cam::GrabPictures()
         {
             // Wait for an image and then retrieve it. A timeout of 5000 ms is used.
             camera.RetrieveResult( 5000, ptrGrabResult, Pylon::TimeoutHandling_ThrowException);
+
+            if(exit) {
+                camera.Close();
+                return;
+            }
 
             // Image grabbed successfully?
             if (ptrGrabResult->GrabSucceeded())
