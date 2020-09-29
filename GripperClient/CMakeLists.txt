@@ -11,3 +11,5 @@ set ( project_sources
 add_executable(${PROJECT_NAME}
     ${project_sources}
     )
+
+target_link_libraries(${PROJECT_NAME} pthread)

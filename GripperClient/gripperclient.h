@@ -9,6 +9,7 @@
 #include <string>
 #include <string.h>
 #include <thread>
+#include <mutex>
 
 
 class GripperClient
@@ -17,14 +18,18 @@ public:
     GripperClient();
     void CreateSocket();
     void ConnectSocket();
-    std::string WriteRead(std::string command_);
+    std::string WriteRead(std::string mCommand);
+    void EntryThread();
+    void StartThread();
 
 private:
-    int sock_, connectS_;
-    std::string ipAddress_, command_, userInput_, answer_;
-    sockaddr_in hint_;
+    int mSock, mConnectS;
+    std::string mIpAddress, mCommand, mUserInput, mAnswer;
+    sockaddr_in mHint;
+    std::thread* mT1;
+    std::mutex mMtx;
 
-    std::thread *worker;
+    std::thread *mWorker;
 
 };
 
