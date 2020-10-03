@@ -1,14 +1,12 @@
 #include "cmain.h"
 
-#include <iostream>
-
 // Event -> Function binding table
-// IDs should be defined as more useful names some other place
+// Event binding name enum is in the header
 wxBEGIN_EVENT_TABLE(cMain, wxFrame)
-    EVT_MENU(10001, cMain::OnMenuSaveLog)
-    EVT_MENU(10002, cMain::OnMenuSaveSnap)
-    EVT_MENU(10003, cMain::OnMenuExit)
-    EVT_MENU(10004, cMain::OnMenuAbout)
+    EVT_MENU(ID_MENU_SAVE_LOG, cMain::OnMenuSaveLog)
+    EVT_MENU(ID_MENU_SAVE_SNAPSHOT, cMain::OnMenuSaveSnap)
+    EVT_MENU(ID_MENU_EXIT, cMain::OnMenuExit)
+    EVT_MENU(ID_MENU_ABOUT, cMain::OnMenuAbout)
 wxEND_EVENT_TABLE()
 
 /**
@@ -174,10 +172,10 @@ void cMain::initMenu()
     mMenuBar = new wxMenuBar();
     this->SetMenuBar(mMenuBar);
     wxMenu *menuFile = new wxMenu();
-    menuFile->Append(10001, "Save Log");
-    menuFile->Append(10002, "Save Snapshot");
-    menuFile->Append(10003, "Exit");
-    menuFile->Append(10004, "About");
+    menuFile->Append(ID_MENU_SAVE_LOG, "Save Log");
+    menuFile->Append(ID_MENU_SAVE_SNAPSHOT, "Save Snapshot");
+    menuFile->Append(ID_MENU_EXIT, "Exit");
+    menuFile->Append(ID_MENU_ABOUT, "About");
     mMenuBar->Append(menuFile,"File");
 }
 void cMain::initTabGeneral()
@@ -260,14 +258,13 @@ void cMain::initTabGeneral()
     mTabGeneralTreeList->SetItemText(*mTabGeneralSubDatabaseState, 1, "NO CONNECTION");
     mTabGeneralTreeList->SetItemText(*mTabGeneralSubDatabaseLastEntry, 1, "NO CONNECTION");
 
-    // Allocation of text area for cout & cerr output
+    // Allocation of text area for log output
     mTabGeneralTextCtrl = new wxTextCtrl(mLeftSubPanelGeneral,
                                          wxID_ANY,
                                          "",
                                          wxDefaultPosition,
                                          wxDefaultSize,
                                          wxTE_READONLY | wxTE_MULTILINE | wxTE_LEFT | wxTE_CHARWRAP);
-
     mTabGeneralLog = new wxLogTextCtrl(mTabGeneralTextCtrl);
     wxLog::SetActiveTarget(mTabGeneralLog);
 
@@ -279,20 +276,78 @@ void cMain::initTabGeneral()
 void cMain::initTabRobot()
 {
     // Creation of GUI objects
+    mTabRobotConnectBtn = new wxButton(mLeftSubPanelRobot, ID_BTN_ROBOT_CONNECT, "Connect");
+    mTabRobotDisconnectBtn = new wxButton(mLeftSubPanelRobot, ID_BTN_ROBOT_DISCONNECT, "Disonnect");
+    mTabRobotIpEntryTxtCtrl = new wxTextCtrl(mLeftSubPanelRobot, wxID_ANY,
+                                             "IP address",
+                                             wxDefaultPosition,
+                                             wxDefaultSize,
+                                             wxTE_LEFT);
+
     // Adding objects to the tab sizer
+    mSizerLeftRobot->Add(mTabRobotConnectBtn);
+    mSizerLeftRobot->Add(mTabRobotDisconnectBtn);
+    mSizerLeftRobot->Add(mTabRobotIpEntryTxtCtrl);
+
 }
 void cMain::initTabGripper()
 {
     // Creation of GUI objects
+    mTabGripperConnectBtn = new wxButton(mLeftSubPanelGripper, ID_BTN_GRIPPER_CONNECT, "Connect");
+    mTabGripperDisconnectBtn = new wxButton(mLeftSubPanelGripper, ID_BTN_GRIPPER_DISCONNECT, "Disconnect");
+    mTabGripperIpEntryTxtCtrl = new wxTextCtrl(mLeftSubPanelGripper, wxID_ANY,
+                                               "IP address",
+                                               wxDefaultPosition,
+                                               wxDefaultSize,
+                                               wxTE_LEFT);
+
     // Adding objects to the tab sizer
+    mSizerLeftGripper->Add(mTabGripperConnectBtn);
+    mSizerLeftGripper->Add(mTabGripperDisconnectBtn);
+    mSizerLeftGripper->Add(mTabGripperIpEntryTxtCtrl);
+
 }
 void cMain::initTabCamera()
 {
     // Creation of GUI objects
+    mTabCameraConnectBtn = new wxButton(mLeftSubPanelCamera, ID_BTN_CAMERA_CONNECT, "Connect");
+    mTabCameraDisconnectBtn = new wxButton(mLeftSubPanelCamera, ID_BTN_CAMERA_DISCONNECT, "Disconnect");
+    mTabCameraIpEntryTxtCtrl = new wxTextCtrl(mLeftSubPanelCamera, wxID_ANY,
+                                              "IP address",
+                                              wxDefaultPosition,
+                                              wxDefaultSize,
+                                              wxTE_LEFT);
+
     // Adding objects to the tab sizer
+    mSizerLeftCamera->Add(mTabCameraConnectBtn);
+    mSizerLeftCamera->Add(mTabCameraDisconnectBtn);
+    mSizerLeftCamera->Add(mTabCameraIpEntryTxtCtrl);
 }
 void cMain::initTabDatabase()
 {
     // Creation of GUI objects
+    mTabDatabaseConnectBtn = new wxButton(mLeftSubPanelDatabase, ID_BTN_DATABASE_CONNECT, "Connect");
+    mTabDatabaseDisconnectBtn = new wxButton(mLeftSubPanelDatabase, ID_BTN_DATABASE_DISCONNECT, "Disconnect");
+    mTabDatabaseHostEntryTxtCtrl = new wxTextCtrl(mLeftSubPanelDatabase, wxID_ANY,
+                                                  "Host",
+                                                  wxDefaultPosition,
+                                                  wxDefaultSize,
+                                                  wxTE_LEFT);
+    mTabDatabaseUserEntryTxtCtrl = new wxTextCtrl(mLeftSubPanelDatabase, wxID_ANY,
+                                                  "User",
+                                                  wxDefaultPosition,
+                                                  wxDefaultSize,
+                                                  wxTE_LEFT);
+    mTabDatabasePasswordEntryTxtCtrl = new wxTextCtrl(mLeftSubPanelDatabase, wxID_ANY,
+                                                      "Password",
+                                                      wxDefaultPosition,
+                                                      wxDefaultSize,
+                                                      wxTE_LEFT);
+
     // Adding objects to the tab sizer
+    mSizerLeftDatabase->Add(mTabDatabaseConnectBtn);
+    mSizerLeftDatabase->Add(mTabDatabaseDisconnectBtn);
+    mSizerLeftDatabase->Add(mTabDatabaseHostEntryTxtCtrl);
+    mSizerLeftDatabase->Add(mTabDatabaseUserEntryTxtCtrl);
+    mSizerLeftDatabase->Add(mTabDatabasePasswordEntryTxtCtrl);
 }

@@ -1,11 +1,8 @@
 #ifndef CLINKER_H
 #define CLINKER_H
+#pragma once
 
-#include <vector>
-#include <mutex>
-
-#include "wx/wx.h"
-
+#include "../includeheader.h"
 #include "../logic/xlinker.h"
 
 class cLinker

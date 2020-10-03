@@ -68,17 +68,21 @@ void cImagePanel::Draw(wxDC &dc) {
     if( !dc.IsOk() || mDrawing == true ){ return; }
     mDrawing = true;
     int x,y,w,h;
-    dc.GetClippingBox( &x, &y, &w, &h );
+    dc.GetClippingBox(&x, &y, &w, &h);
     if( mNewImage )
     {
         *mImage = mLinker->getCameraFrame()->Copy();
         dc.SetUserScale(mHScale, mWScale);
-        dc.DrawBitmap( *mImage, x, y );
+        dc.DrawBitmap(*mImage, x, y);
         mNewImage = false;
     } else if (mImage == nullptr) {
         dc.SetUserScale(mHScale, mWScale);
-        dc.DrawBitmap( *mDefaultImage, x, y);
+        dc.DrawBitmap(*mDefaultImage, x, y);
+    } else {
+        dc.SetUserScale(mHScale, mWScale);
+        dc.DrawBitmap(*mImage, x, y);
     }
+
     mDrawing = false;
     return;
 }

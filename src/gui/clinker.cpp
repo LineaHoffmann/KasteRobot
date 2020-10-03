@@ -1,13 +1,6 @@
 #include "clinker.h"
 
-#ifndef logstd
-#define logstd wxLogMessage
-#define logwar wxLogWarning
-#define logerr wxLogError
-#endif
-
 cLinker::cLinker() {}
-
 
 void cLinker::getCameraState() {}
 wxImage* cLinker::getCameraFrame() {

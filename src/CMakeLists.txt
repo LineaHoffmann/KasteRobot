@@ -23,6 +23,7 @@ include_directories(${ROBWORK_INCLUDE_DIRS})
 
 # USE EXPLICIT GLOBBING! please ..
 file(GLOB SRC
+    ${PROJECT_SOURCE_DIR}/includeheader.h
     )
 
 # GUI layer source files GLOB

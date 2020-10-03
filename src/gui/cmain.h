@@ -1,29 +1,28 @@
 #ifndef CMAIN_H
 #define CMAIN_H
+#pragma once
 
-#include <mutex>
-#include <sstream>
-
-#include "cimagepanel.h"
+#include "../includeheader.h"
 #include "clinker.h"
+#include "cimagepanel.h"
 
-#include "wx/wxprec.h"
-#ifndef WX_PRECOMP
-    #include "wx/app.h"
-    #include "wx/frame.h"
-    #include "wx/menu.h"
-    #include "wx/sizer.h"
-    #include "wx/textctrl.h"
-#endif
 
-#include "wx/notebook.h"
-#include "wx/treelist.h"
-#include "wx/aboutdlg.h"
-#include "wx/artprov.h"
+enum FUNCTION_BINDING_IDS {
+    ID_MENU_SAVE_LOG,
+    ID_MENU_SAVE_SNAPSHOT,
+    ID_MENU_EXIT,
+    ID_MENU_ABOUT,
 
-#ifndef wxHAS_IMAGES_IN_RESOURCES
-    #include "sample.xpm"
-#endif
+    ID_BTN_ROBOT_CONNECT,
+    ID_BTN_ROBOT_DISCONNECT,
+    ID_BTN_GRIPPER_CONNECT,
+    ID_BTN_GRIPPER_DISCONNECT,
+    ID_BTN_CAMERA_CONNECT,
+    ID_BTN_CAMERA_DISCONNECT,
+    ID_BTN_DATABASE_CONNECT,
+    ID_BTN_DATABASE_DISCONNECT
+};
+
 
 class cMain : public wxFrame
 {

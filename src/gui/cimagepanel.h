@@ -1,12 +1,9 @@
 #ifndef CIMAGEPANEL_H
 #define CIMAGEPANEL_H
+#pragma once
 
-#include <thread>
-#include <mutex>
-
-#include "wx/wx.h"
-#include "wx/sizer.h"
-#include "wx/splitter.h"
+#include "../includeheader.h"
+#include "cimagepanel.h"
 #include "clinker.h"
 
 class cImagePanel : public wxPanel

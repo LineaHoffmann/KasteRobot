@@ -1,13 +1,5 @@
 #include "capp.h"
 
-// We're not getting cout and cerr to GUI, wxLog does it much easier
-// Shortening the names a bit for ease of logging, so log as 'logXXX("This shows in GUI");'
-#ifndef logstd
-#define logstd wxLogMessage
-#define logwar wxLogWarning
-#define logerr wxLogError
-#endif
-
 wxIMPLEMENT_APP(cApp);
 
 // This class is the application itself
