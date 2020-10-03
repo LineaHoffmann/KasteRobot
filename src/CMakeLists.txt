@@ -1,31 +1,65 @@
-cmake_minimum_required(VERSION 3.16.3)
-project(ProjGUI)
+cmake_minimum_required(VERSION 3.10.2) # Ubuntu 18.04 default right now?
+project(KasteRobot)
 
+# Using C++17 (used previously for inline const globals.. Probably unnecessary)
 set(CMAKE_CXX_STANDARD 17)
 
-find_package(wxWidgets REQUIRED COMPONENTS net core base)
-include(${wxWidgets_USE_FILE})
+# Building as debug for now (my robworks is not though, may be a problem)
+set(CMAKE_BUILD_TYPE Debug)
 
+# wxWidgets library
+find_package(wxWidgets REQUIRED COMPONENTS net core base)
+include("${wxWidgets_USE_FILE}")
+
+# OpenCV library
 find_package(OpenCV REQUIRED)
 
-#file(GLOB_RECURSE src
-#    "*.h"
-#    "*.cpp"
-#    )
+# Robworks library
+set(RW_ROOT /usr/lib/x86_64-linux-gnu/RobWork)
+set(RW_DIR /${RW_ROOT}/cmake)
+find_package(RobWork REQUIRED)
+link_directories(${ROBWORK_LIBRARY_DIRS})
+include_directories(${ROBWORK_INCLUDE_DIRS})
 
-file(GLOB SRC_FILES
-    ${PROJECT_SOURCE_DIR}/gui/cApp.cpp
-    ${PROJECT_SOURCE_DIR}/gui/cApp.h
-    ${PROJECT_SOURCE_DIR}/gui/cMain.cpp
-    ${PROJECT_SOURCE_DIR}/gui/cMain.h
-    ${PROJECT_SOURCE_DIR}/gui/cCamWorker.cpp
-    ${PROJECT_SOURCE_DIR}/gui/cCamWorker.h
-    ${PROJECT_SOURCE_DIR}/gui/cImagePanel.cpp
-    ${PROJECT_SOURCE_DIR}/gui/cImagePanel.h
+# USE EXPLICIT GLOBBING! please ..
+file(GLOB SRC
     )
 
-add_executable(${PROJECT_NAME} ${SRC_FILES})
-target_link_libraries(${PROJECT_NAME} ${wxWidgets_LIBRARIES})
-target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
+# GUI layer source files GLOB
+file(GLOB GUI_FILES
+    ${PROJECT_SOURCE_DIR}/gui/capp.cpp
+    ${PROJECT_SOURCE_DIR}/gui/capp.h
+    ${PROJECT_SOURCE_DIR}/gui/cmain.cpp
+    ${PROJECT_SOURCE_DIR}/gui/cmain.h
 
-#target_link_libraries(${PROJECT_NAME} pthread)
+    ${PROJECT_SOURCE_DIR}/gui/cimagepanel.cpp
+    ${PROJECT_SOURCE_DIR}/gui/cimagepanel.h
+
+    ${PROJECT_SOURCE_DIR}/gui/clinker.cpp
+    ${PROJECT_SOURCE_DIR}/gui/clinker.h
+    )
+
+# Logic layer source files GLOB
+file(GLOB LOGIC_FILES
+    ${PROJECT_SOURCE_DIR}/logic/xlinker.cpp
+    ${PROJECT_SOURCE_DIR}/logic/xlinker.h
+    )
+
+# Database layer source files GLOB
+file (GLOB DB_FILES
+    )
+
+# Creating executable, linked with source files
+add_executable(${PROJECT_NAME} ${SRC} ${GUI_FILES} ${LOGIC_FILES} ${DB_FILES})
+
+# Some more wxWidgets compiling stuff (wx-config --cxxflags)
+set(GCC_COVERAGE_COMPILE_FLAGS "-I/usr/local/lib/wx/include/gtk2-unicode-static-3.0 -I/usr/local/include/wx-3.0 -D_FILE_OFFSET_BITS=64 -D__WXGTK__ -pthread")
+set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
+#set(GCC_COVERAGE_LINK_FLAGS "")
+#set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CMAKE_COVERAGE_LINK_FLAGS}")
+
+# Linking libraries
+target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
+target_link_libraries(${PROJECT_NAME} ${ROBWORK_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${wxWidgets_LIBRARIES}) # Not doing enough, next line corrects that (from wx-config --libs)
+target_link_libraries(${PROJECT_NAME} -L/usr/local/lib -pthread   /usr/local/lib/libwx_gtk2u_xrc-3.0.a /usr/local/lib/libwx_gtk2u_qa-3.0.a /usr/local/lib/libwx_baseu_net-3.0.a /usr/local/lib/libwx_gtk2u_html-3.0.a /usr/local/lib/libwx_gtk2u_adv-3.0.a /usr/local/lib/libwx_gtk2u_core-3.0.a /usr/local/lib/libwx_baseu_xml-3.0.a /usr/local/lib/libwx_baseu-3.0.a -lgthread-2.0 -pthread -lX11 -lSM -lgtk-x11-2.0 -lgdk-x11-2.0 -lpangocairo-1.0 -latk-1.0 -lcairo -lgdk_pixbuf-2.0 -lgio-2.0 -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lglib-2.0 -lharfbuzz -lfontconfig -lfreetype -lpng -ljpeg -ltiff -lexpat -lwxregexu-3.0 -lz -ldl -lm)
