@@ -1,0 +1,12 @@
+CREATE DATABASE SemProj
+
+CREATE TABLE log( 
+log_ID INT AUTO_INCREMENT PRIMARY KEY,
+log_text VARCHAR(255) NOT NULL,
+log_date DATETIME);
+
+CREATE TABLE throw ( 
+throw_ID INT AUTO_INCREMENT PRIMARY KEY, 
+throw_position VARCHAR(255),
+calculated_path VARCHAR(255),
+created_at DATETIME);
