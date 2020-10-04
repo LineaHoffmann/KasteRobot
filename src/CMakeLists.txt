@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10.2) # Ubuntu 18.04 default right now? My 20.04 is 3.16.3
-project(KasteRobotGUI)
+project(KasteRobot)
 
 # Using C++17 (used previously for inline const globals.. Probably unnecessary)
 # Jonas used C++11 for the camera, 17 should be good
