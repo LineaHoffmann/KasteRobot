@@ -8,14 +8,15 @@
  */
 struct connection_details
 {
-    char *server;
-    char *user;
-    char *password;
-    char *database;
+    char *server = "localhost";
+    char *user = "root";
+    char *password = "vrg77pkh";
+    char *database = "testDB";
+
 };
 
 /**
- * @brief mysql_connection_setup
+ * @brief mysql_connection_setup, using the struct connection_details
  * @param mysql_details
  * @return MYSQL pointer to the new connection
  */
@@ -32,7 +33,12 @@ MYSQL* mysql_connection_setup(struct connection_details mysql_details)
     return connection;
 }
 
-
+/**
+ * @brief mysql_peform_query, performs sql queries
+ * @param connection
+ * @param sql_query
+ * @return MYSQL_RES (mysql result pointer)
+ */
 MYSQL_RES* mysql_peform_query(MYSQL *connection, char *sql_query)
 {
     //send the query to the database
@@ -54,22 +60,21 @@ int main(int argc, char** argv)
     MYSQL_ROW row; //the results row (line by line)
 
     struct connection_details mysqlID;
-    mysqlID.server = "localhost";
-    mysqlID.user = "root";
-    mysqlID.password = "vrg77pkh";
-    mysqlID.database = "testDB";
 
     // connect to mysql database
     conn = mysql_connection_setup(mysqlID);
 
     // assign the results return to the MYSQL_RES pointer
-    res = mysql_peform_query(conn, "SHOW DATABASES"); // Make another class for queryies, ot txt file.
+    res = mysql_peform_query(conn, "SHOW TABLES"); // Make another class for queryies, ot txt file.
 
     printf("MySQL Tables in mysql database: \n");
     while ((row = mysql_fetch_row(res)) !=NULL)
         printf(("%s\n", row[0]));
 
+    // Cleans up the db result set
     mysql_free_result(res);
+
+    // closes the db connection
     mysql_close(conn);
 
     return 0;
