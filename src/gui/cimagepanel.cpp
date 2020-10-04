@@ -11,7 +11,7 @@ wxEND_EVENT_TABLE()
  */
 cImagePanel::cImagePanel(wxWindow* parent, wxStandardID id) : wxPanel(parent, id)
 {
-    mDefaultImage = new wxImage(wxT("../examples/Astronaut1.jpg"), wxBITMAP_TYPE_ANY);
+    mDefaultImage = new wxImage(wxT("../resources/defaultImage.jpg"), wxBITMAP_TYPE_ANY);
 }
 cImagePanel::~cImagePanel() {
 }

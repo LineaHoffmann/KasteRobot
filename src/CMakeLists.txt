@@ -48,8 +48,8 @@ file(GLOB GUI_FILES
 
 # Logic layer source files GLOB
 file(GLOB LOGIC_FILES
-#    ${PROJECT_SOURCE_DIR}/logic/xbaslercam.cpp
-#    ${PROJECT_SOURCE_DIR}/logic/xbaslercam.h
+    ${PROJECT_SOURCE_DIR}/logic/xbaslercam.cpp
+    ${PROJECT_SOURCE_DIR}/logic/xbaslercam.h
 
     ${PROJECT_SOURCE_DIR}/logic/xlinker.cpp
     ${PROJECT_SOURCE_DIR}/logic/xlinker.h
