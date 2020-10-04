@@ -16,7 +16,8 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxPoint(
 {
     // Icon for the window
     wxIcon icon(wxT("../src/gui/icon.png"), wxBITMAP_TYPE_PNG);
-    SetIcon(icon);
+    if (icon.IsOk()) SetIcon(icon);
+    else logerr("Icon not loaded. Path probably incorrect ..");
 
     // Init of the layer linker
     mLinker = new cLinker();

@@ -1,15 +1,15 @@
-#ifndef CAPP_H
-#define CAPP_H
+#ifndef APP_H
+#define APP_H
 #pragma once
 
-#include "../includeheader.h"
-#include "cmain.h"
+#include "includeheader.h"
+#include "gui/cmain.h"
 
-class cApp : public wxApp
+class app : public wxApp
 {
 public:
-    cApp();
-    ~cApp();
+    app();
+    ~app();
 
 public:
     virtual bool OnInit();
@@ -22,4 +22,4 @@ private:
     [[noreturn]] void threadFunc();
 };
 
-#endif // CAPP_H
+#endif // APP_H

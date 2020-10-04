@@ -40,4 +40,16 @@
     #include "gui/sample.xpm"
 #endif
 
+// OpenCV and Pylon includes
+#include "opencv2/opencv.hpp"
+#include "opencv2/core.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/core/types_c.h"       // Noooo (for Term Criteria defines)
+#include "opencv2/calib3d/calib3d_c.h"  // More noooo (for Calib 3D defines)
+//#include "pylon/PylonIncludes.h"
+// The types_c.h and calib3d_c.h are not ideal. Very old OpenCV indeed. Also not C++ ಠ_ಠ
+// TODO: Same defines should (are) be available in the .hpp versions of those headers (new names though)
+
+
+
 #endif // INCLUDEHEADER_H
