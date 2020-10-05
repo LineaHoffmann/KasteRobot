@@ -25,6 +25,7 @@ public:
     void shutdown();
 
     void setPath(std::string calibrationPath) {path = calibrationPath; }
+
     void calibrate(); //run calibration on pictures in path
     void updateCameraMatrix(cv::Mat NewCameraMatrix, cv::Mat NewCoeffs); //changing calibration manually use with care
 

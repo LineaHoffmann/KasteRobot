@@ -30,7 +30,8 @@ bool basler_cam::isConnected()
 
 bool basler_cam::start()
 {
-    calibrate();
+    // !!!! husk at tilføje calibrate igen
+    //calibrate();
     baslerCamThread = new std::thread(&basler_cam::GrabPictures,this);
     if (!openCvImage.data) {
         return 0;
@@ -40,12 +41,7 @@ bool basler_cam::start()
 
 void basler_cam::shutdown()
 {
-
-    if(baslerCamThread->joinable()) {
-        baslerCamThread->join();
-        return 0;
-    }
-    return 1;
+    exit = true;
 }
 
 
@@ -108,13 +104,13 @@ void basler_cam::updateCameraMatrix(cv::Mat NewCameraMatrix, cv::Mat NewCoeffs)
 
 cv::Mat basler_cam::getImage()
 {
-    if (baslerCamThread->joinable()){
-
-    }
     std::lock_guard<std::mutex> lock(*PicsMtx);
     //get pic and remap
     if (!openCvImage.data) {
     openCvImage = cv::imread("../imgs/Image__2020-09-17__02-51-54.bmp", CV_LOAD_IMAGE_COLOR);
+
+    //fjern hvis billede skal gennem remapping
+    return openCvImage;
     }
 
     if (!isRectified){

@@ -5,6 +5,7 @@
 #include <pylon/PylonIncludes.h>
 #include <iostream>
 #include "basler_cam.h"
+#include "imagehandler.h"
 
 int main(int argc, char* argv[])
 {
@@ -27,7 +28,6 @@ int main(int argc, char* argv[])
 
     while (true) {
         int keyPressed = cv::waitKey(1);
-
         //exit
         if(keyPressed == 'q'){ //quit
             std::cout << "Exiting" << std::endl;
