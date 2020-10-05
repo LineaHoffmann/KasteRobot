@@ -3,10 +3,20 @@
 // Event -> Function binding table
 // Event binding name enum is in the header
 wxBEGIN_EVENT_TABLE(cMain, wxFrame)
+    // Menu bindings
     EVT_MENU(ID_MENU_SAVE_LOG, cMain::OnMenuSaveLog)
     EVT_MENU(ID_MENU_SAVE_SNAPSHOT, cMain::OnMenuSaveSnap)
     EVT_MENU(ID_MENU_EXIT, cMain::OnMenuExit)
     EVT_MENU(ID_MENU_ABOUT, cMain::OnMenuAbout)
+    // Connect / disconnect button bindings
+    EVT_BUTTON(ID_BTN_ROBOT_CONNECT, cMain::OnBtnRobotConnect)
+    EVT_BUTTON(ID_BTN_ROBOT_DISCONNECT, cMain::OnBtnRobotDisconnect)
+    EVT_BUTTON(ID_BTN_GRIPPER_CONNECT, cMain::OnBtnGripperConnect)
+    EVT_BUTTON(ID_BTN_GRIPPER_DISCONNECT, cMain::OnBtnGripperDisconnect)
+    EVT_BUTTON(ID_BTN_CAMERA_CONNECT, cMain::OnBtnCameraConnect)
+    EVT_BUTTON(ID_BTN_CAMERA_DISCONNECT, cMain::OnBtnCameraDisconnect)
+    EVT_BUTTON(ID_BTN_DATABASE_CONNECT, cMain::OnBtnDatabaseConnect)
+    EVT_BUTTON(ID_BTN_DATABASE_DISCONNECT, cMain::OnBtnDatabaseDisconnect)
 wxEND_EVENT_TABLE()
 
 /**
@@ -31,19 +41,21 @@ cMain::~cMain()
 }
 // This will be handler functions galore
 void cMain::OnMenuSaveLog(wxCommandEvent &evt) {
-    std::cout << "Menu->Save Log clicked" << std::endl;
+    logstd("Menu->Save Log clicked");
     evt.Skip();
 }
 void cMain::OnMenuSaveSnap(wxCommandEvent &evt) {
-    std::cout << "Menu->Save Snapshot clicked" << std::endl;
+    logstd("Menu->Save Snapshot clicked");
     evt.Skip();
 }
 void cMain::OnMenuExit(wxCommandEvent &evt) {
+    // Sending to cout because the application will die now
     std::cout << "Menu->Exit clicked" << std::endl;
     Close(true);
+    evt.Skip();
 }
 void cMain::OnMenuAbout(wxCommandEvent &evt) {
-    std::cout << "Menu->About clicked" << std::endl;
+    logstd("Menu->About clicked");
     wxString msg;
     msg.Append("3rd Semester Project in Robotics\n"
                "University of Southern Denmark\n\n"
@@ -55,6 +67,38 @@ void cMain::OnMenuAbout(wxCommandEvent &evt) {
                "Mikkel Joergensen\n"
                "Soeren Pedersen");
     wxMessageBox(msg, "About");
+    evt.Skip();
+}
+void cMain::OnBtnRobotConnect(wxCommandEvent &evt) {
+    logstd("Robot->Connect clicked");
+    evt.Skip();
+}
+void cMain::OnBtnRobotDisconnect(wxCommandEvent &evt) {
+    logstd("Robot->Disconnect clicked");
+    evt.Skip();
+}
+void cMain::OnBtnGripperConnect(wxCommandEvent &evt) {
+    logstd("Gripper->Connect clicked");
+    evt.Skip();
+}
+void cMain::OnBtnGripperDisconnect(wxCommandEvent &evt) {
+    logstd("Gripper->Disconnect clicked");
+    evt.Skip();
+}
+void cMain::OnBtnCameraConnect(wxCommandEvent &evt) {
+    logstd("Camera->Connect clicked");
+    evt.Skip();
+}
+void cMain::OnBtnCameraDisconnect(wxCommandEvent &evt) {
+    logstd("Camera->Disconnect clicked");
+    evt.Skip();
+}
+void cMain::OnBtnDatabaseConnect(wxCommandEvent &evt) {
+    logstd("Database->Connect clicked");
+    evt.Skip();
+}
+void cMain::OnBtnDatabaseDisconnect(wxCommandEvent &evt) {
+    logstd("Database->Disconnect clicked");
     evt.Skip();
 }
 /**

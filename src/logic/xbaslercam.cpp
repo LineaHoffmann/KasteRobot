@@ -35,7 +35,8 @@ bool xBaslerCam::isConnected()
 
 bool xBaslerCam::start()
 {
-    calibrate();
+    // NOTE: husk at tilføje calibrate igen
+    //calibrate();
     baslerCamThread = new std::thread(&xBaslerCam::GrabPictures,this);
     if (!openCvImage.data) {
         return 0;
@@ -43,14 +44,14 @@ bool xBaslerCam::start()
     return 1;
 }
 
-bool xBaslerCam::shutdown()
+void xBaslerCam::shutdown()
 {
 
     if(baslerCamThread->joinable()) {
         baslerCamThread->join();
-        return 0;
+        exit = true;
     }
-    return 1;
+    return;
 }
 
 
@@ -112,13 +113,13 @@ void xBaslerCam::updateCameraMatrix(cv::Mat NewCameraMatrix, cv::Mat NewCoeffs)
 
 cv::Mat xBaslerCam::getImage()
 {
-    if (baslerCamThread->joinable()){
-
-    }
     std::lock_guard<std::mutex> lock(*PicsMtx);
     //get pic and remap
     if (!openCvImage.data) {
     openCvImage = cv::imread("../resources/pylonimgs/Image__2020-09-17__02-51-54.bmp", cv::IMREAD_COLOR);
+
+    // NOTE: fjern hvis billede skal gennem remapping
+    return openCvImage;
     }
 
     if (!isRectified){

@@ -3,7 +3,10 @@
 #pragma once
 
 #include "includeheader.h"
+
+// NOTE: cMain and xBaslerCam should be encapsulated by cLinker and xLinker
 #include "gui/cmain.h"
+#include "logic/xbaslercam.h"
 
 class app : public wxApp
 {
@@ -13,13 +16,14 @@ public:
 
 public:
     virtual bool OnInit();
-//    virtual int MainLoop();
+
 private:
     cMain* mFrame = nullptr;
     
-    
+    // Treat this thread as the main program loop for now ..
     std::thread* thread = nullptr;
-    [[noreturn]] void threadFunc();
+    void threadFunc();
+    bool mJoinThread = false;
 };
 
 #endif // APP_H

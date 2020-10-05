@@ -30,16 +30,27 @@ public:
     cMain();
     ~cMain();
 
+
+
+    // Pointer to the logic layer interface class
+    cLinker *mLinker = nullptr;
+private:
     // GUI event handler functions, linked in top of cMain.cpp
     // Main window top bar functions
     void OnMenuSaveLog(wxCommandEvent &evt);
     void OnMenuSaveSnap(wxCommandEvent &evt);
     void OnMenuExit(wxCommandEvent &evt);
     void OnMenuAbout(wxCommandEvent &evt);
+    // Left panel controls handler functions
+    void OnBtnRobotConnect(wxCommandEvent &evt);
+    void OnBtnRobotDisconnect(wxCommandEvent &evt);
+    void OnBtnGripperConnect(wxCommandEvent &evt);
+    void OnBtnGripperDisconnect(wxCommandEvent &evt);
+    void OnBtnCameraConnect(wxCommandEvent &evt);
+    void OnBtnCameraDisconnect(wxCommandEvent &evt);
+    void OnBtnDatabaseConnect(wxCommandEvent &evt);
+    void OnBtnDatabaseDisconnect(wxCommandEvent &evt);
 
-    // Pointer to the logic layer interface class
-    cLinker *mLinker = nullptr;
-private:
     // Functions for keeping the main constructor readable
     void initSizers();
     void initMainWindow();

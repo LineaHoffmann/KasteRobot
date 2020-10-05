@@ -15,7 +15,7 @@ public:
 
     bool isConnected(); //returns true if we have a connection to the camera.
     bool start(); //returns true if the camera was started correctly.
-    bool shutdown();
+    void shutdown();
 
     void setPath(std::string calibrationPath) {path = calibrationPath; }
     void calibrate(); //run calibration on pictures in path

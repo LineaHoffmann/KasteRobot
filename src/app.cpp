@@ -13,6 +13,9 @@ app::~app()
     // Generally nothing GUI related should be manually destroyed
     // The wx package handles destruction of any elements it relies on
     // Everything else must go
+    mJoinThread = true;
+
+    thread->join();
     delete thread;
 }
 bool app::OnInit() {
@@ -31,8 +34,25 @@ bool app::OnInit() {
     return true;
 }
 void app::threadFunc() {
-    while (1) {
-        std::this_thread::sleep_for(std::chrono::seconds(2));
-        logstd("Thread saying hi!");
+    logstd("Thread trying out the camera!");
+
+//    xBaslerCam camera("../resources/pylonimgs/*.bmp", 12500);
+//    if (camera.start()) {
+//        logstd("Camera started succesfully ..");
+//    } else {
+//        logerr("Camera failed to start! A test image will be displayed instead ..");
+//    }
+
+//    //cv::imshow("Test Image", camera.getImage());
+
+//    if (camera.isConnected()) {
+//        logstd("Camera connected succesfully ..");
+//    } else {
+//        logerr("Camera is not connecteed ..");
+//    }
+    while (!mJoinThread) {
+        logstd("Thread is waiting!");
+        std::this_thread::sleep_for(std::chrono::seconds(10));
     }
+    std::cout << "Thread is dying now .." << std::endl;
 }

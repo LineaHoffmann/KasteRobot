@@ -7,6 +7,7 @@
  */
 
 // Redefining logging function names
+// cout is still legal, but will only show in terminal
 #ifndef LOG_DEFINES
 #define LOG_DEFINES 1
 #define logstd wxLogMessage
@@ -41,10 +42,10 @@
 #endif
 
 // OpenCV includes
-#include "opencv4/opencv2/opencv.hpp"
-#include "opencv4/opencv2/core.hpp"
-#include "opencv4/opencv2/core/types_c.h"
-#include "opencv4/opencv2/calib3d/calib3d_c.h"
+#include "opencv2/opencv.hpp"
+#include "opencv2/core.hpp"
+#include "opencv2/core/types_c.h"
+#include "opencv2/calib3d/calib3d_c.h"
 
 // Pylon includes
 #include "pylon/PylonIncludes.h"
