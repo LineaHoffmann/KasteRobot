@@ -16,14 +16,13 @@ class GripperClient
 {
 public:
     GripperClient();
-    void CreateSocket();
-    void ConnectSocket();
+    void ConnectSocket(std::string ipAddress, int port);
     std::string WriteRead(std::string mCommand);
     void EntryThread();
     void StartThread();
 
 private:
-    int mSock, mConnectS;
+    int mSock, mConnectS, mPort;
     std::string mIpAddress, mCommand, mUserInput, mAnswer;
     sockaddr_in mHint;
     std::thread* mT1;

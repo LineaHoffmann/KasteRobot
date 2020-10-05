@@ -11,27 +11,24 @@ void GripperClient::EntryThread() {
 
 }
 
-//void GripperClient::CreateSocket() {
-//    int sock_ = socket(AF_INET, SOCK_STREAM, 0);
-// }
 
-
-void GripperClient::ConnectSocket() {
+void GripperClient::ConnectSocket(std::string ipAddress, int port) {
 
     int sock = socket(AF_INET, SOCK_STREAM, 0);
-    int port = 1000;
-    std::string ipAddress = "192.168.0.1";
+    int mPort = port;
+    std::string mIpAddress = ipAddress;
 
     sockaddr_in mHint;
     mHint.sin_family = AF_INET;
-    mHint.sin_port = htons(port);
-    inet_pton(AF_INET, ipAddress.c_str(), &mHint.sin_addr);
+    mHint.sin_port = htons(mPort);
+    inet_pton(AF_INET, mIpAddress.c_str(), &mHint.sin_addr);
 
     connect(mSock, (sockaddr*)&mHint, sizeof(mHint));
-    return;
-}
+    }
 
-std::string GripperClient::WriteRead(std::string mCommand) {
+
+std::string GripperClient::WriteRead(std::string command) {
+    mCommand = command;
     char buf[32];
     int bytesRecieved = -1; //Resetting response length
     int sendRes = send(mSock, mCommand.c_str(), mCommand.size() + 1, 0); // Sending command
