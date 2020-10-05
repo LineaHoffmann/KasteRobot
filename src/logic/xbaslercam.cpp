@@ -269,7 +269,8 @@ void xBaslerCam::GrabPictures()
 
         cv::Mat warningImg;
         warningImg = cv::imread("../resources/warning.jpeg", cv::IMREAD_COLOR);
-        cv::imshow( "warning", warningImg);
+        // No calls to imshow, pretty please
+        //cv::imshow( "warning", warningImg);
     }
 
 }

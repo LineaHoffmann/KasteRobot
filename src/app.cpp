@@ -36,23 +36,24 @@ bool app::OnInit() {
 void app::threadFunc() {
     logstd("Thread trying out the camera!");
 
-//    xBaslerCam camera("../resources/pylonimgs/*.bmp", 12500);
-//    if (camera.start()) {
-//        logstd("Camera started succesfully ..");
-//    } else {
-//        logerr("Camera failed to start! A test image will be displayed instead ..");
-//    }
-
-//    //cv::imshow("Test Image", camera.getImage());
-
-//    if (camera.isConnected()) {
-//        logstd("Camera connected succesfully ..");
-//    } else {
-//        logerr("Camera is not connecteed ..");
-//    }
-    while (!mJoinThread) {
-        logstd("Thread is waiting!");
-        std::this_thread::sleep_for(std::chrono::seconds(10));
+    xBaslerCam camera("../resources/pylonimgs/*.bmp", 12500);
+    if (camera.start()) {
+        logstd("Camera started succesfully ..");
+    } else {
+        logerr("Camera failed to start! A test image will be displayed instead ..");
     }
+
+    //cv::imshow("Test Image", camera.getImage());
+
+    if (camera.isConnected()) {
+        logstd("Camera connected succesfully ..");
+    } else {
+        logerr("Camera is not connecteed ..");
+    }
+
+    while (!mJoinThread) {
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+    }
+
     std::cout << "Thread is dying now .." << std::endl;
 }
