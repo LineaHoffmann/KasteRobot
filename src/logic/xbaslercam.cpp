@@ -1,23 +1,10 @@
 #include "xbaslercam.h"
 /*
  * FIXME: All uses from types_c.h and calib3d_c.h should be replaced with the modern C++ versions.
- *        The definitions have been renamed, but it shouldn't be too much work
+ *        The definitions have been renamed, but it shouldn't be too much work. Very old OpenCV indeed.
+ *        Also not C++ ಠ_ಠ
 */
 
-/*
- * WARNING: Is Pylon 5.0.12.11829 (mine) too old? It produces more than 350 warnings on some compilations ..
- *          6.x is out and has been for a while.
-*/
-
-/*
- * BUG: When this class is included, it clashes with wxWidgets (GTK+2 / GTK+3 not compatible)
- *      Ouch, this is a fun one. It happens by just being included in the CMake file ..
- *      Which is GTK+3 and which is GTK+2, I don't know
- *      wxWidgets can be compiled in either form, where GTK+3 is default.
- *      Maybe recompiling wxWidgets in GTK+2 would fix this.
- *      Maybe not using any of the functions from OpenCV, dependent on the GTK environment, would fix this.
- *      From terminal: Gtk-ERROR **: 22:26:52.372: GTK+ 2.x symbols detected. Using GTK+ 2.x and GTK+ 3 in the same process is not supported
-*/
 xBaslerCam::xBaslerCam()
 {
     PicsMtx = new std::mutex();
@@ -145,9 +132,11 @@ cv::Mat xBaslerCam::getImage()
 
 void xBaslerCam::GrabPictures()
 {
+
     // Automagically call PylonInitialize and PylonTerminate to ensure the pylon runtime system
     // is initialized during the lifetime of this object.
     Pylon::PylonAutoInitTerm autoInitTerm;
+
     try
     {
 
@@ -281,4 +270,5 @@ void xBaslerCam::GrabPictures()
         warningImg = cv::imread("../resources/warning.jpeg", cv::IMREAD_COLOR);
         cv::imshow( "warning", warningImg);
     }
+
 }

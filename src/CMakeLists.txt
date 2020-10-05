@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.10.2) # Ubuntu 18.04 default right now? My 20.04 is 3.16.3
 project(KasteRobot)
 
+#set(CMAKE_COMPILER_GTK_FLAGS "-DWITH_GTK_3_X=ON")
+#set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${CMAKE_COMPILER_GTK_FLAGS}")
+
 # Using C++17 (used previously for inline const globals.. Probably unnecessary)
 # Jonas used C++11 for the camera, 17 should be good
 set(CMAKE_CXX_STANDARD 17)
@@ -63,7 +66,7 @@ file (GLOB DB_FILES
 add_executable(${PROJECT_NAME} ${SRC} ${GUI_FILES} ${LOGIC_FILES} ${DB_FILES})
 
 # Some more wxWidgets compiling stuff (wx-config --cxxflags)
-set(GCC_COVERAGE_COMPILE_FLAGS "-I/usr/local/lib/wx/include/gtk2-unicode-static-3.0 -I/usr/local/include/wx-3.0 -D_FILE_OFFSET_BITS=64 -D__WXGTK__ -pthread")
+set(GCC_COVERAGE_COMPILE_FLAGS "-I/usr/local/lib/wx/include/gtk3-unicode-3.0 -I/usr/local/include/wx-3.0 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread")
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
 
 # Linking libraries
@@ -71,4 +74,4 @@ target_link_libraries(${PROJECT_NAME} ${Pylon_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
 target_link_libraries(${PROJECT_NAME} ${ROBWORK_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${wxWidgets_LIBRARIES}) # Not doing enough, next line corrects that (from wx-config --libs)
-target_link_libraries(${PROJECT_NAME} -L/usr/local/lib -pthread   /usr/local/lib/libwx_gtk2u_xrc-3.0.a /usr/local/lib/libwx_gtk2u_qa-3.0.a /usr/local/lib/libwx_baseu_net-3.0.a /usr/local/lib/libwx_gtk2u_html-3.0.a /usr/local/lib/libwx_gtk2u_adv-3.0.a /usr/local/lib/libwx_gtk2u_core-3.0.a /usr/local/lib/libwx_baseu_xml-3.0.a /usr/local/lib/libwx_baseu-3.0.a -lgthread-2.0 -pthread -lX11 -lSM -lgtk-x11-2.0 -lgdk-x11-2.0 -lpangocairo-1.0 -latk-1.0 -lcairo -lgdk_pixbuf-2.0 -lgio-2.0 -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lglib-2.0 -lharfbuzz -lfontconfig -lfreetype -lpng -ljpeg -ltiff -lexpat -lwxregexu-3.0 -lz -ldl -lm)
+target_link_libraries(${PROJECT_NAME} -L/usr/local/lib -pthread   -lwx_gtk3u_xrc-3.0 -lwx_gtk3u_html-3.0 -lwx_gtk3u_qa-3.0 -lwx_gtk3u_adv-3.0 -lwx_gtk3u_core-3.0 -lwx_baseu_xml-3.0 -lwx_baseu_net-3.0 -lwx_baseu-3.0)

@@ -26,7 +26,6 @@ void cImagePanel::OnPaintEvt(wxPaintEvent &evt)
 {
     wxPaintDC dc(this);
     Draw(dc);
-    evt.Skip();
 }
 /**
  * @brief wxClientDC paint-event handler function
@@ -60,9 +59,7 @@ void cImagePanel::OnSize(wxSizeEvent &evt) {
             mHScale = mWScale;
         }
     }
-    wxPaintDC dc(this);
-    Draw(dc);
-    evt.Skip();
+    Refresh();
 }
 void cImagePanel::Draw(wxDC &dc) {
     if( !dc.IsOk() || mDrawing == true ){ return; }
