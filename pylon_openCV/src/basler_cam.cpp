@@ -1,4 +1,5 @@
 #include "basler_cam.h"
+#include <chrono>
 
 basler_cam::basler_cam()
 {
@@ -21,18 +22,30 @@ basler_cam::~basler_cam()
 
 bool basler_cam::isConnected()
 {
-    if(baslerCamThread->joinable()) {
-        baslerCamThread->join();
-        return 0;
+    if(running) {
+        //baslerCamThread->join();
+        return 1;
     }
-    return 1;
+    return 0;
 }
 
 bool basler_cam::start()
 {
-    // !!!! husk at tilføje calibrate igen
-    //calibrate();
+    calibrate();
     baslerCamThread = new std::thread(&basler_cam::GrabPictures,this);
+
+    auto start_time = std::chrono::high_resolution_clock::now();
+    auto current_time = std::chrono::high_resolution_clock::now();
+    while(true) {
+        current_time = std::chrono::high_resolution_clock::now();
+
+        if (running){
+            return 1;
+        }
+        if (std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count() > 10){
+            return 0;
+        }
+    }
     if (!openCvImage.data) {
         return 0;
     }
@@ -107,10 +120,10 @@ cv::Mat basler_cam::getImage()
     std::lock_guard<std::mutex> lock(*PicsMtx);
     //get pic and remap
     if (!openCvImage.data) {
-    openCvImage = cv::imread("../imgs/Image__2020-09-17__02-51-54.bmp", CV_LOAD_IMAGE_COLOR);
+    openCvImage = cv::imread("../imgs/Image__2020-09-17__02-52-03.bmp", CV_LOAD_IMAGE_COLOR);
 
     //fjern hvis billede skal gennem remapping
-    return openCvImage;
+    //return openCvImage;
     }
 
     if (!isRectified){
@@ -217,29 +230,35 @@ void basler_cam::GrabPictures()
 
 
         // image grabbing loop
+
         while ( camera.IsGrabbing())
         {
             // Wait for an image and then retrieve it. A timeout of 5000 ms is used.
             camera.RetrieveResult( 5000, ptrGrabResult, Pylon::TimeoutHandling_ThrowException);
 
-            if(exit) {
-                camera.Close();
-                return;
-            }
+
 
             // Image grabbed successfully?
             if (ptrGrabResult->GrabSucceeded())
             { // Convert the grabbed buffer to openCV image
+
                 {
                     // Convert the grabbed buffer to a pylon image.
                     formatConverter.Convert(pylonImage, ptrGrabResult);
 
                     // Create an OpenCV image from a pylon image.
                     std::lock_guard<std::mutex> lock(*PicsMtx);
-                    openCvImage= cv::Mat(ptrGrabResult->GetHeight(), ptrGrabResult->GetWidth(), CV_8UC3, (uint8_t *) pylonImage.GetBuffer());
+                    openCvImage = cv::Mat(ptrGrabResult->GetHeight(), ptrGrabResult->GetWidth(), CV_8UC3, (uint8_t *) pylonImage.GetBuffer());
+                running = true;
                 }
 
                 frame++;
+
+                if(exit) {
+                    camera.Close();
+                    running = false;
+                    return;
+                }
 
             }
             else

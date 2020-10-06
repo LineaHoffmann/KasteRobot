@@ -46,6 +46,7 @@ private:
     int frameRate  = 60;
     int frame = 1;
     bool exit = false;
+    bool running = false;
     bool isRectified = false;
     int CHECKERBOARD[2]{9,6};
 

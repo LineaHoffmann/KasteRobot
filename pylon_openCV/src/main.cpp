@@ -9,6 +9,7 @@
 
 int main(int argc, char* argv[])
 {
+
     //example: given a path and exposure time
     basler_cam camera1("../imgs/*.bmp", 12500);
 
@@ -17,16 +18,24 @@ int main(int argc, char* argv[])
     } else std::cout << "camera not connected, showing test image..." << std::endl;
 
     //get latest image. if no connection is present. it will return a test pic or the latest picture from the camera.
-    cv::imshow("Test Image", camera1.getImage());
+    cv::Mat testImg = camera1.getImage();
+    cv::imshow("Test Image", testImg);
+
+    //cv::imwrite("remappedTestImg.png", testImg);
 
     //returns true if we got a connection. if it returns false, we thread is finished executing and has been joined.
-    camera1.isConnected();
+    std::cout << camera1.isConnected() << std::endl;
 
 
+//    imageHandler test;;
+
+//    test.loadImage(cv::imread("remappedTestImg.png"));
+//    test.cutOutTable();
 
 
 
     while (true) {
+        cv::imshow("Test Image", camera1.getImage());
         int keyPressed = cv::waitKey(1);
         //exit
         if(keyPressed == 'q'){ //quit

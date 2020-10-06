@@ -12,7 +12,7 @@ list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR} )
 find_package(Pylon)
 include_directories(${Pylon_INCLUDE_DIRS})
 
+add_executable( main main.cpp basler_cam.cpp basler_cam.h imagehandler.cpp imagehandler.h)
 
-add_executable( main main.cpp basler_cam.cpp basler_cam.h)
 target_link_libraries(main ${OpenCV_LIBS} ${Pylon_LIBRARIES})
 target_link_libraries(main pthread)
