@@ -39,17 +39,13 @@ bool basler_cam::start()
         current_time = std::chrono::high_resolution_clock::now();
 
         if (running){
-            break;
+            return 1;
         }
-        if (std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count() > 10 ||
-            baslerCamThread->joinable()){
+        if (std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count() > 10){
+            //|| baslerCamThread->joinable()){
             return 0;
         }
     }
-    if (!openCvImage.data) {
-        return 0;
-    }
-    return 1;
 }
 
 
@@ -90,7 +86,7 @@ void basler_cam::calibrate()
         frame = cv::imread(images[i]);
         cv::cvtColor(frame,frame,cv::COLOR_BGR2GRAY);
         //find corners
-        success = cv::findChessboardCorners(frame, cv::Size(CHECKERBOARD[0], CHECKERBOARD[1]), corner_pts, CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FAST_CHECK | CV_CALIB_CB_NORMALIZE_IMAGE);
+        success = cv::findChessboardCorners(frame, cv::Size(CHECKERBOARD[0], CHECKERBOARD[1]), corner_pts, cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_FAST_CHECK | cv::CALIB_CB_NORMALIZE_IMAGE);
         if(success)
         {
             cv::TermCriteria criteria(CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, 30, 0.001);
@@ -121,7 +117,7 @@ cv::Mat basler_cam::getImage()
     std::lock_guard<std::mutex> lock(*PicsMtx);
     //get pic and remap
     if (!openCvImage.data || !running) {
-    openCvImage = cv::imread("../src/testImg.png", CV_LOAD_IMAGE_COLOR);
+    openCvImage = cv::imread("../src/testImg.png", cv::IMREAD_COLOR);
 
     //fjern hvis billede skal gennem remapping
     return openCvImage;
@@ -276,8 +272,5 @@ void basler_cam::GrabPictures()
         std::cerr << "An exception occurred." << std::endl
                   << e.GetDescription() << std::endl;
         running = false;
-        cv::Mat warningImg;
-        warningImg = cv::imread("../src/warning.jpg", CV_LOAD_IMAGE_COLOR);
-        cv::imshow( "warning", warningImg);
     }
 }

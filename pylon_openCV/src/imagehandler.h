@@ -26,7 +26,7 @@ public:
     cv::Mat getTable();
 
 private:
-    bool debug = false;
+    bool debug = true;
     cv::Rect ROI;
     cv::Mat table;
     cv::Mat inputImage;
