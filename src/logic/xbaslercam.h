@@ -39,6 +39,7 @@ private:
     int frame = 1;
     bool exit = false;
     bool isRectified = false;
+    bool running = false;
     int CHECKERBOARD[2]{9,6};
 
     std::vector<cv::Mat> caliPics;
