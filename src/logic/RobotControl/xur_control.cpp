@@ -1,4 +1,4 @@
-#include "ur_control.h"
+#include "xur_control.h"
 
 #include <iostream>
 #include <math.h>
@@ -203,7 +203,7 @@ void UR_Control::initRobot()
     ur_rtde::ScriptClient script("127.0.0.1",3,14);
     script.connect();
     if (script.isConnected()) {
-        script.sendScript("../src/startupScript.txt");
+        script.sendScript("../src/logic/startupScript.txt");
     }
 }
 

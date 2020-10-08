@@ -7,7 +7,7 @@
 #include <mutex>
 #include <ur_rtde/rtde_control_interface.h>
 #include <ur_rtde/rtde_receive_interface.h>
-#include "robotexceptions.h"
+#include "xrobotexceptions.h"
 
 class UR_Control
 {

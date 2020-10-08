@@ -10,7 +10,7 @@
 #include <ur_rtde/rtde_control_interface.h>
 
 //sub-class import
-#include "ur_control.h"
+#include "xur_control.h"
 
 int main() {
 
