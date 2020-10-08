@@ -1,19 +1,19 @@
 #include "gripperclient.h"
 
 GripperClient::GripperClient() {
-    this->mT1 = new std::thread(&GripperClient::EntryThread, this);
+    this->mT1 = new std::thread(&GripperClient::entryThread, this);
 }
 
 
-void GripperClient::EntryThread() {
+void GripperClient::entryThread() {
     std::cout << "Client Thread started" << std::endl;
+    // Make something to keep thread alive
 
 
 }
 
 
-void GripperClient::ConnectSocket(std::string ipAddress, int port) {
-
+void GripperClient::connectSocket(std::string ipAddress, int port) {
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     int mPort = port;
     std::string mIpAddress = ipAddress;
@@ -27,15 +27,15 @@ void GripperClient::ConnectSocket(std::string ipAddress, int port) {
     }
 
 
-std::string GripperClient::WriteRead(std::string command) {
+std::string GripperClient::writeRead(std::string command) {
     mCommand = command;
     char buf[32];
-    int bytesRecieved = -1; //Resetting response length
+    int bytesRecieved = 0; //Resetting response length
     int sendRes = send(mSock, mCommand.c_str(), mCommand.size() + 1, 0); // Sending command
 
     memset(buf, 0, 32);
     bytesRecieved = recv(mSock, buf, 32, 0); //Reading response
-        if (bytesRecieved == -1) {              //Waiting and retrying if no response
+        if (bytesRecieved == 0) {              //Waiting and retrying if no response
             bytesRecieved = recv(mSock, buf, 32, 0);
             usleep(250000);  //Microseconds; 0,25 second
         }
