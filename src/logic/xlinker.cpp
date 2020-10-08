@@ -2,15 +2,14 @@
 
 xLinker::xLinker()
 {
-
 }
-wxImage* xLinker::getCameraFrame() {
-    // NOTE: This is meant to be a dead end for now
-    // It should return a pointer to an already processed wxImage
-    return nullptr;
+void xLinker::addCamera(xBaslerCam *cam) {
+    camera = cam;
+}
+const cv::Mat& xLinker::getCameraFrame() {
+    return camera->getImage();
 }
 bool xLinker::hasCameraFrame() {
-    // NOTE: This is meant to be a dead end for now
-    // It should call the camera object about new images
+    // NOTE: This might not be required, we could just always go for the getCameraFrame
     return false;
 }

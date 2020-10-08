@@ -3,8 +3,8 @@
 #pragma once
 
 #include "../includeheader.h"
+#include "xbaslercam.h"
 
-class xCamera;
 class xRobot;
 class xController;
 class xGripper;
@@ -16,13 +16,13 @@ class xLinker
 {
 public:
     xLinker();
+    void addCamera(xBaslerCam *cam);
 
-
-    wxImage* getCameraFrame();
+    const cv::Mat& getCameraFrame();
     bool hasCameraFrame();
 
 private:
-    xCamera *camera;
+    xBaslerCam *camera;
 };
 
 #endif // XLINKER_H

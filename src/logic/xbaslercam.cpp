@@ -111,16 +111,17 @@ void xBaslerCam::updateCameraMatrix(cv::Mat NewCameraMatrix, cv::Mat NewCoeffs)
     isRectified = false;
 }
 
-cv::Mat xBaslerCam::getImage()
+const cv::Mat& xBaslerCam::getImage()
 {
     std::lock_guard<std::mutex> lock(*PicsMtx);
     //get pic and remap
-    if (!openCvImage.data) {
+    // NOTE: The .data is not really meant for boolean checks. Loading into gui fails if present (Not a valid matrix ..)
+    //if (!openCvImage.data) {
     openCvImage = cv::imread("../resources/pylonimgs/Image__2020-09-17__02-51-54.bmp", cv::IMREAD_COLOR);
 
     // NOTE: fjern hvis billede skal gennem remapping
     return openCvImage;
-    }
+    //}
 
     if (!isRectified){
         cv::initUndistortRectifyMap(cameraMatrix, distCoeffs, cv::Mat(), cameraMatrix, cv::Size(openCvImage.cols,openCvImage.rows), CV_32FC1, map1, map2);

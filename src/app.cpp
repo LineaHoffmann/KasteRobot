@@ -17,13 +17,25 @@ app::~app()
 
     thread->join();
     delete thread;
+    delete xLink;
+    delete cLink;
 }
 bool app::OnInit() {
+
+    cLink = new cLinker;
+    xLink = new xLinker;
+
+    cLink->addLogicLinker(xLink);
+
+    xBaslerCam *camera = new xBaslerCam("../resources/pylonimgs/*.bmp", 12500);
+    xLink->addCamera(camera);
+
     // Just has to be called
     wxInitAllImageHandlers();
     // cMain is derived from wxFrame
     // Everything is handled in there
     mFrame = new cMain();
+    mFrame->addLinker(cLink);
     // The privately defined default doesn't play well with my environment
     mFrame->SetSize(1280,1024);
     mFrame->Show();
@@ -34,22 +46,7 @@ bool app::OnInit() {
     return true;
 }
 void app::threadFunc() {
-    logstd("Thread trying out the camera!");
-
-    xBaslerCam camera("../resources/pylonimgs/*.bmp", 12500);
-    if (camera.start()) {
-        logstd("Camera started succesfully ..");
-    } else {
-        logerr("Camera failed to start! A test image will be displayed instead ..");
-    }
-
-    //cv::imshow("Test Image", camera.getImage());
-
-    if (camera.isConnected()) {
-        logstd("Camera connected succesfully ..");
-    } else {
-        logerr("Camera is not connecteed ..");
-    }
+    logstd("Thread started!");
 
     while (!mJoinThread) {
         std::this_thread::sleep_for(std::chrono::seconds(2));

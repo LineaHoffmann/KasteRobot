@@ -9,6 +9,7 @@ class cLinker
 {
 public:
     cLinker();
+    void addLogicLinker(xLinker* link);
 
     // Controller connections called from cMain
     void getCtrlState();
@@ -26,7 +27,7 @@ public:
 
     // Camera connections called from cMain
     void getCameraState();
-    wxImage* getCameraFrame();
+    const cv::Mat& getCameraFrame();
     bool hasCameraFrame();
     void setCameraConnect();
     void setCameraDisconnect();
@@ -47,12 +48,8 @@ public:
     void setDbConnect();
     void setDbDisconnect();
 
-    std::mutex* getMtx();
-
 private:
-
-    xLinker *_linker;
-    std::mutex mMtx;
+    xLinker *xLink = nullptr;
 
 };
 

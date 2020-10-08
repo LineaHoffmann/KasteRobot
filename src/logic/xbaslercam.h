@@ -21,7 +21,7 @@ public:
     void calibrate(); //run calibration on pictures in path
     void updateCameraMatrix(cv::Mat NewCameraMatrix, cv::Mat NewCoeffs); //changing calibration manually use with care
 
-    cv::Mat getImage(); //get newest cv:Mat image (remapped)
+    const cv::Mat& getImage(); //get newest cv:Mat image (remapped)
 
 
     std::thread *baslerCamThread; //skal muligvis senere flyttes til private.

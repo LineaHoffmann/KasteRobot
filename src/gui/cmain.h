@@ -8,6 +8,8 @@
 
 
 enum FUNCTION_BINDING_IDS {
+    ID_TIMER_CAMERA_UPDATE,
+
     ID_MENU_SAVE_LOG,
     ID_MENU_SAVE_SNAPSHOT,
     ID_MENU_EXIT,
@@ -30,12 +32,14 @@ public:
     cMain();
     ~cMain();
 
+    void addLinker(cLinker* linker);
 
 
-    // Pointer to the logic layer interface class
-    cLinker *mLinker = nullptr;
+
 private:
     // GUI event handler functions, linked in top of cMain.cpp
+    // They get to keep uppercase first letter
+    void OnTimerCameraUpdate(wxTimerEvent &evt);
     // Main window top bar functions
     void OnMenuSaveLog(wxCommandEvent &evt);
     void OnMenuSaveSnap(wxCommandEvent &evt);
@@ -145,9 +149,13 @@ private:
 
     // Viewing area for camera feed
     cImagePanel *mCameraPanel = nullptr;
+    wxTimer mTimerCamera;
 
     // Viewing area for robot orientation
     cImagePanel *mRobotPanel = nullptr;
+
+    // Pointer to the layer interface class
+    cLinker *mLinker = nullptr;
 
     // Just a macro to enable wxWidgets events
     wxDECLARE_EVENT_TABLE();
