@@ -1,1 +1,1 @@
-/usr/bin/g++     CMakeFiles/DB_conn.dir/DB_conn.cpp.o  -o DB_conn -lmysqlclient 
+/usr/bin/g++     CMakeFiles/DB_conn.dir/DB_conn.cpp.o CMakeFiles/DB_conn.dir/qdatabase.cpp.o  -o DB_conn -lmysqlclient 

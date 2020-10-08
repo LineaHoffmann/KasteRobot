@@ -11,4 +11,16 @@ iostream
 -
 mysql/mysql.h
 -
+qdatabase.h
+/home/lineah/workspace/SemProject /KasteRobot/DB_conn/src/qdatabase.h
+
+/home/lineah/workspace/SemProject /KasteRobot/DB_conn/src/qdatabase.cpp
+qdatabase.h
+/home/lineah/workspace/SemProject /KasteRobot/DB_conn/src/qdatabase.h
+mysql/mysql.h
+-
+
+/home/lineah/workspace/SemProject /KasteRobot/DB_conn/src/qdatabase.h
+mysql/mysql.h
+-
 

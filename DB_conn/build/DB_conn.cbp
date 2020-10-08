@@ -87,6 +87,12 @@
 		<Unit filename="/home/lineah/workspace/SemProject /KasteRobot/DB_conn/src/DB_conn.cpp">
 			<Option target="DB_conn"/>
 		</Unit>
+		<Unit filename="/home/lineah/workspace/SemProject /KasteRobot/DB_conn/src/qdatabase.cpp">
+			<Option target="DB_conn"/>
+		</Unit>
+		<Unit filename="/home/lineah/workspace/SemProject /KasteRobot/DB_conn/src/qdatabase.h">
+			<Option target="DB_conn"/>
+		</Unit>
 		<Unit filename="/home/lineah/workspace/SemProject /KasteRobot/DB_conn/src/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>
