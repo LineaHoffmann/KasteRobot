@@ -7,9 +7,24 @@ GripperClient::GripperClient() {
 
 void GripperClient::entryThread() {
     std::cout << "Client Thread started" << std::endl;
-    // Make something to keep thread alive
+    // Use thread inhere
+    connectSocket("192.168.0.1", 1000);
+    // Use mutex to keep variables in thread safe
 
+    //Check if new incoming data from gripper in a queue
+    char buf[32];
+    int bytesRecieved;
+    memset(buf, 0, 32);
+    bytesRecieved = recv(mSock, buf, 32, 0);
+    std::string answer(buf);
+    bool readBool = true;
 
+    while (readBool = true) {
+        if (bytesRecieved == 0 || answer == mAnswer) {
+            usleep(25000);
+            }
+            else mAnswer = answer;
+        }
 }
 
 
@@ -42,3 +57,5 @@ std::string GripperClient::writeRead(std::string command) {
      std::string mAnswer(buf);
      return mAnswer;
 }
+
+// Make functions for gripper functionality (Set grip, width, open, home, release etc.)
