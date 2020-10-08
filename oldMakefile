@@ -1,0 +1,5 @@
+KasteRobot: src/gui/capp.cpp src/gui/cmain.cpp src/gui/cimagepanel.cpp
+	g++ -c `wx-config --cxxflags --libs` -I/usr/include/opencv4 src/gui/capp.cpp -o build/capp.o 
+	g++ -c `wx-config --cxxflags --libs` -I/usr/include/opencv4 src/gui/cmain.cpp -o build/cmain.o 
+	g++ -c `wx-config --cxxflags --libs` -I/usr/include/opencv4 src/gui/cimagepanel.cpp -o build/cimagepanel.o
+	g++ -o build/KasteRobot build/capp.o build/cmain.o build/cimagepanel.o `wx-config --cxxflags --libs` -Wall
