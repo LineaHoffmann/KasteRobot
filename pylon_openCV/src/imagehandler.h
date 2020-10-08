@@ -13,15 +13,21 @@ class imageHandler
 {
 public:
     imageHandler();
+    imageHandler(cv::Mat cleanImg);
 
     void loadImage(cv::Mat image);
     bool cutOutTable();
 
+    void dectectBall();
+    void transformCoordinates();
+
 
     cv::Mat getInputImage() const;
+    cv::Mat getTable();
 
 private:
-
+    bool debug = false;
+    cv::Rect ROI;
     cv::Mat table;
     cv::Mat inputImage;
 

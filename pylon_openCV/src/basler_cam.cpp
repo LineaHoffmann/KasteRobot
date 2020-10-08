@@ -23,7 +23,6 @@ basler_cam::~basler_cam()
 bool basler_cam::isConnected()
 {
     if(running) {
-        //baslerCamThread->join();
         return 1;
     }
     return 0;
@@ -40,9 +39,10 @@ bool basler_cam::start()
         current_time = std::chrono::high_resolution_clock::now();
 
         if (running){
-            return 1;
+            break;
         }
-        if (std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count() > 10){
+        if (std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count() > 10 ||
+            baslerCamThread->joinable()){
             return 0;
         }
     }
@@ -51,6 +51,7 @@ bool basler_cam::start()
     }
     return 1;
 }
+
 
 void basler_cam::shutdown()
 {
@@ -119,11 +120,11 @@ cv::Mat basler_cam::getImage()
 {
     std::lock_guard<std::mutex> lock(*PicsMtx);
     //get pic and remap
-    if (!openCvImage.data) {
-    openCvImage = cv::imread("../imgs/Image__2020-09-17__02-52-03.bmp", CV_LOAD_IMAGE_COLOR);
+    if (!openCvImage.data || !running) {
+    openCvImage = cv::imread("../src/testImg.png", CV_LOAD_IMAGE_COLOR);
 
     //fjern hvis billede skal gennem remapping
-    //return openCvImage;
+    return openCvImage;
     }
 
     if (!isRectified){
@@ -274,7 +275,7 @@ void basler_cam::GrabPictures()
         // Error handling.
         std::cerr << "An exception occurred." << std::endl
                   << e.GetDescription() << std::endl;
-
+        running = false;
         cv::Mat warningImg;
         warningImg = cv::imread("../src/warning.jpg", CV_LOAD_IMAGE_COLOR);
         cv::imshow( "warning", warningImg);
