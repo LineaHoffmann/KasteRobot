@@ -30,6 +30,9 @@ find_package(RobWork REQUIRED)
 link_directories(${ROBWORK_LIBRARY_DIRS})
 include_directories(${ROBWORK_INCLUDE_DIRS})
 
+# UR_RTDE library
+find_package(ur_rtde REQUIRED)
+
 # USE EXPLICIT GLOBBING! please ..
 file(GLOB SRC
     ${PROJECT_SOURCE_DIR}/app.cpp
@@ -59,6 +62,11 @@ file(GLOB LOGIC_FILES
 
     ${PROJECT_SOURCE_DIR}/logic/xlinker.cpp
     ${PROJECT_SOURCE_DIR}/logic/xlinker.h
+
+    ${PROJECT_SOURCE_DIR}/logic/xrobotexceptions.h
+
+    ${PROJECT_SOURCE_DIR}/logic/xur_control.cpp
+    ${PROJECT_SOURCE_DIR}/logic/xur_control.h
     )
 
 # Database layer source files GLOB
@@ -77,4 +85,5 @@ target_link_libraries(${PROJECT_NAME} ${Pylon_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
 target_link_libraries(${PROJECT_NAME} ${ROBWORK_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${wxWidgets_LIBRARIES}) # Not doing enough, next line corrects that (from wx-config --libs)
+target_link_libraries(${PROJECT_NAME} ur_rtde::rtde)
 target_link_libraries(${PROJECT_NAME} -L/usr/local/lib -pthread   -lwx_gtk3u_xrc-3.0 -lwx_gtk3u_html-3.0 -lwx_gtk3u_qa-3.0 -lwx_gtk3u_adv-3.0 -lwx_gtk3u_core-3.0 -lwx_baseu_xml-3.0 -lwx_baseu_net-3.0 -lwx_baseu-3.0)
