@@ -21,7 +21,7 @@ public:
     void calibrate(); //run calibration on pictures in path
     void updateCameraMatrix(cv::Mat NewCameraMatrix, cv::Mat NewCoeffs); //changing calibration manually use with care
 
-    cv::Mat getImage(); //get newest cv:Mat image (remapped)
+    const cv::Mat& getImage(); //get newest cv:Mat image (remapped)
 
 
     std::thread *baslerCamThread; //skal muligvis senere flyttes til private.
@@ -39,6 +39,7 @@ private:
     int frame = 1;
     bool exit = false;
     bool isRectified = false;
+    bool running = false;
     int CHECKERBOARD[2]{9,6};
 
     std::vector<cv::Mat> caliPics;

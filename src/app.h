@@ -7,6 +7,8 @@
 // NOTE: cMain and xBaslerCam should be encapsulated by cLinker and xLinker
 #include "gui/cmain.h"
 #include "logic/xbaslercam.h"
+#include "logic/xlinker.h"
+#include "gui/clinker.h"
 
 class app : public wxApp
 {
@@ -18,6 +20,10 @@ public:
     virtual bool OnInit();
 
 private:
+
+    cLinker* cLink;
+    xLinker* xLink;
+
     cMain* mFrame = nullptr;
     
     // Treat this thread as the main program loop for now ..

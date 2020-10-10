@@ -3,6 +3,8 @@
 // Event -> Function binding table
 // Event binding name enum is in the header
 wxBEGIN_EVENT_TABLE(cMain, wxFrame)
+    // Timer bindings
+    EVT_TIMER(ID_TIMER_CAMERA_UPDATE, cMain::OnTimerCameraUpdate)
     // Menu bindings
     EVT_MENU(ID_MENU_SAVE_LOG, cMain::OnMenuSaveLog)
     EVT_MENU(ID_MENU_SAVE_SNAPSHOT, cMain::OnMenuSaveSnap)
@@ -22,7 +24,8 @@ wxEND_EVENT_TABLE()
 /**
  * @brief Builds the GUI as a wxFrame to be run by a parent wxApp (see capp.*)
  */
-cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxPoint(30,30), wxSize(1280,1024))
+cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxPoint(30,30), wxSize(1280,1024)),
+                 mTimerCamera(this, ID_TIMER_CAMERA_UPDATE)
 {
     // Icon for the window
     wxIcon icon(wxT("../resources/icon.png"), wxBITMAP_TYPE_PNG);
@@ -34,12 +37,43 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxPoint(
     initSizers();
     initMainWindow();
     initMenu();
-}
 
+    // Starting the timer for the view update
+    // Loads cv::Mat from camera, converts to wxImage, and updates view
+    mTimerCamera.Start(50);
+}
 cMain::~cMain()
 {
 }
+void cMain::addLinker(cLinker* linker) {
+    mLinker = linker;
+}
 // This will be handler functions galore
+void cMain::OnTimerCameraUpdate(wxTimerEvent &evt) {
+    // NOTE: Maybe cLinker should get a bool cLinker::isOK() to check pointers in
+    if (mLinker == nullptr) return;
+    cv::Mat input = mLinker->getCameraFrame();
+    cv::Mat im2;
+    if (input.channels() == 1) {
+        // Probably grayscale
+        cv::cvtColor(input, im2, cv::COLOR_GRAY2RGB);
+    } else if (input.channels() == 4) {
+        // Probably BGR with alpha channel
+        cv::cvtColor(input, im2, cv::COLOR_BGRA2RGB);
+    } else {
+        // Probably BGR without alpha channel
+        cv::cvtColor(input, im2, cv::COLOR_BGR2RGB);
+    }
+    long imgSize = im2.rows * im2.cols * im2.channels();
+    wxImage output(im2.cols, im2.rows, imgSize);
+    unsigned char* source = im2.data;
+    unsigned char* destination = output.GetData();
+    for (long i = 0; i < imgSize; i++) {
+        destination[i] = source[i];
+    }
+    mCameraPanel->setNewImage(output);
+    evt.Skip();
+}
 void cMain::OnMenuSaveLog(wxCommandEvent &evt) {
     logstd("Menu->Save Log clicked");
     evt.Skip();

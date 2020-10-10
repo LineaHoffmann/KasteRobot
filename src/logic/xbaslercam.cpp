@@ -26,18 +26,32 @@ xBaslerCam::~xBaslerCam()
 
 bool xBaslerCam::isConnected()
 {
-    if(baslerCamThread->joinable()) {
-        baslerCamThread->join();
-        return 0;
+    if(running) {
+        return 1;
     }
-    return 1;
+    return 0;
 }
 
 bool xBaslerCam::start()
 {
-    // NOTE: husk at tilføje calibrate igen
-    //calibrate();
+    calibrate();
     baslerCamThread = new std::thread(&xBaslerCam::GrabPictures,this);
+
+    // Note: Should use the steady_clock, hish_resolution_clock isn't defined for all systems
+    auto start_time = std::chrono::high_resolution_clock::now();
+    auto current_time = std::chrono::high_resolution_clock::now();
+    while(true) {
+        current_time = std::chrono::high_resolution_clock::now();
+
+        if (running){
+            return 1;
+        }
+        if (std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count() > 10) {
+
+            return 0;
+        }
+    }
+
     if (!openCvImage.data) {
         return 0;
     }
@@ -111,16 +125,20 @@ void xBaslerCam::updateCameraMatrix(cv::Mat NewCameraMatrix, cv::Mat NewCoeffs)
     isRectified = false;
 }
 
-cv::Mat xBaslerCam::getImage()
+const cv::Mat& xBaslerCam::getImage()
 {
+    // WARNING: Jonas, this does not work from outside calls
+    // Returns an invalid matrix for later use, so I've commented out some stuff ..
     std::lock_guard<std::mutex> lock(*PicsMtx);
     //get pic and remap
-    if (!openCvImage.data) {
-    openCvImage = cv::imread("../resources/pylonimgs/Image__2020-09-17__02-51-54.bmp", cv::IMREAD_COLOR);
+    // NOTE: The .data is not really meant for boolean checks. Loading into gui fails if present (Not a valid matrix ..)
+    //if (!openCvImage.data || !running) {
+        // NOTE: TestImg not included in resources folder yet
+        openCvImage = cv::imread("../resources/warning.jpeg", cv::IMREAD_COLOR);
 
     // NOTE: fjern hvis billede skal gennem remapping
     return openCvImage;
-    }
+    //}
 
     if (!isRectified){
         cv::initUndistortRectifyMap(cameraMatrix, distCoeffs, cv::Mat(), cameraMatrix, cv::Size(openCvImage.cols,openCvImage.rows), CV_32FC1, map1, map2);
@@ -233,11 +251,6 @@ void xBaslerCam::GrabPictures()
             // Wait for an image and then retrieve it. A timeout of 5000 ms is used.
             camera.RetrieveResult( 5000, ptrGrabResult, Pylon::TimeoutHandling_ThrowException);
 
-            if(exit) {
-                camera.Close();
-                return;
-            }
-
             // Image grabbed successfully?
             if (ptrGrabResult->GrabSucceeded())
             { // Convert the grabbed buffer to openCV image
@@ -247,10 +260,17 @@ void xBaslerCam::GrabPictures()
 
                     // Create an OpenCV image from a pylon image.
                     std::lock_guard<std::mutex> lock(*PicsMtx);
-                    openCvImage= cv::Mat(ptrGrabResult->GetHeight(), ptrGrabResult->GetWidth(), CV_8UC3, (uint8_t *) pylonImage.GetBuffer());
+                    openCvImage = cv::Mat(ptrGrabResult->GetHeight(), ptrGrabResult->GetWidth(), CV_8UC3, (uint8_t *) pylonImage.GetBuffer());
+                    running = true; //NOTE: Is this really the right place to set that flag?
                 }
 
                 frame++;
+
+                if(exit) {
+                    camera.Close();
+                    running = false;
+                    return;
+                }
 
             }
             else
@@ -259,18 +279,12 @@ void xBaslerCam::GrabPictures()
                 return;
             }
         }
-
     }
     catch (GenICam::GenericException &e)
     {
         // Error handling.
         std::cerr << "An exception occurred." << std::endl
                   << e.GetDescription() << std::endl;
-
-        cv::Mat warningImg;
-        warningImg = cv::imread("../resources/warning.jpeg", cv::IMREAD_COLOR);
-        // No calls to imshow, pretty please
-        //cv::imshow( "warning", warningImg);
+        running = false;
     }
-
 }
