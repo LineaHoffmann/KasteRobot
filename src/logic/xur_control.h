@@ -1,12 +1,7 @@
 #ifndef UR_CONTROL_H
 #define UR_CONTROL_H
 
-#include <string>
-#include <thread>
-#include <vector>
-#include <mutex>
-#include <ur_rtde/rtde_control_interface.h>
-#include <ur_rtde/rtde_receive_interface.h>
+#include "../includeheader.h"
 #include "xrobotexceptions.h"
 
 class UR_Control
@@ -34,10 +29,12 @@ public:
     bool move(std::vector<std::vector<double>> &q, double &acc, double &speed, UR_Control::moveEnum moveMode);
 
     //read current pose in rads or deg
+    // TODO: Should probably return const references
     std::vector<double> getCurrentPose();
     std::vector<double> getCurrentPoseDeg();
 
     //Getter setter for defining IP addres of host server AKA the UR5 robot
+    // TODO: Should probably return const reference
     std::string getIP() const;
     void setIP(const std::string &value);
 
@@ -45,6 +42,7 @@ public:
     void startPolling();
     void stopPolling();
 
+    // NOTE: Really should probably be returned as const reference
     std::vector<double> getLastPose();
 
     int getPollingRate() const;

@@ -1,9 +1,4 @@
 #include "xbaslercam.h"
-/*
- * FIXME: All uses from types_c.h and calib3d_c.h should be replaced with the modern C++ versions.
- *        The definitions have been renamed, but it shouldn't be too much work. Very old OpenCV indeed.
- *        Also not C++ ಠ_ಠ
-*/
 
 xBaslerCam::xBaslerCam()
 {
@@ -99,10 +94,10 @@ void xBaslerCam::calibrate()
         frame = cv::imread(images[i]);
         cv::cvtColor(frame,frame,cv::COLOR_BGR2GRAY);
         //find corners
-        success = cv::findChessboardCorners(frame, cv::Size(CHECKERBOARD[0], CHECKERBOARD[1]), corner_pts, CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FAST_CHECK | CV_CALIB_CB_NORMALIZE_IMAGE);
+        success = cv::findChessboardCorners(frame, cv::Size(CHECKERBOARD[0], CHECKERBOARD[1]), corner_pts, cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_FAST_CHECK | cv::CALIB_CB_NORMALIZE_IMAGE);
         if(success)
         {
-            cv::TermCriteria criteria(CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, 30, 0.001);
+            cv::TermCriteria criteria(cv::TermCriteria::EPS | cv::TermCriteria::MAX_ITER, 30, 0.001);
             cv::cornerSubPix(frame,corner_pts,cv::Size(11,11), cv::Size(-1,-1),criteria);
             std::cout << "." << std::flush;
             cv::drawChessboardCorners(frame, cv::Size(CHECKERBOARD[0], CHECKERBOARD[1]), corner_pts, success);

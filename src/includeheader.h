@@ -22,6 +22,8 @@
 #include <mutex>
 #include <chrono>
 #include <iostream>
+#include <cmath>
+#include <exception>
 
 // wxWidgets includes
 #include "wx/wx.h"
@@ -44,11 +46,13 @@
 // OpenCV includes
 #include "opencv2/opencv.hpp"
 #include "opencv2/core.hpp"
-#include "opencv2/core/types_c.h"
-#include "opencv2/calib3d/calib3d_c.h"
 
 // Pylon includes
 #include "pylon/PylonIncludes.h"
 
+// UR RTDE includes
+#include "ur_rtde/script_client.h"
+#include "ur_rtde/rtde_control_interface.h"
+#include "ur_rtde/rtde_receive_interface.h"
 
 #endif // INCLUDEHEADER_H

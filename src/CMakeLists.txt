@@ -74,6 +74,8 @@ file (GLOB DB_FILES
     )
 
 # Creating executable, linked with source files
+# CMake complains here: Files in some directories may conflict with implicit libraries (librtde.so.1.3 in /usr/lib/x86_64-linux-gnu hidden by /usr/local/lib)
+# Might be a local mistake on my machine due to multiples of the same lib
 add_executable(${PROJECT_NAME} ${SRC} ${GUI_FILES} ${LOGIC_FILES} ${DB_FILES})
 
 # Some more wxWidgets compiling stuff (wx-config --cxxflags)

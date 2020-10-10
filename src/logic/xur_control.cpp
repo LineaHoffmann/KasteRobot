@@ -1,13 +1,7 @@
 #include "xur_control.h"
 
-#include <iostream>
-#include <math.h>
-#include <chrono>
-#include <mutex>
-
-#include <exception>
-
-#include <ur_rtde/script_client.h>
+// WARNING: To-do plugin doesn't see the headers .. There are a few notes in there
+// TODO: Should be renamed to xUrControl for conformity
 
 UR_Control::UR_Control()
 {
@@ -110,6 +104,8 @@ bool UR_Control::move(std::vector<std::vector<double>> &q, double &speed, double
         }
     return false;
     }
+        // WARNING: Should return something here?
+        // The above switch and if statements look a bit .. Wrong? Default is inside if-statement from case MOVE_LFK
 }
 
 /**
@@ -162,6 +158,7 @@ void UR_Control::getData()
 {
 
     //preparing timers
+    // TODO: Use steady_clock instead, system_clock might not be as steady as one would think
     std::chrono::system_clock::time_point timePoint;
     long waitTime = 1000 / mPollingRate; //polling rate in millis
 
@@ -171,6 +168,8 @@ void UR_Control::getData()
         //lock Scope
         {
         std::unique_lock<std::mutex> dataLock(urMutex); //NOTE: unique lock applied, check type when merging programs.
+        // SRP: unique_lock is good here, but should be used in a single instantiation and use lock/unlock inside the while loop
+        // See this: https://stackoverflow.com/questions/20516773/stdunique-lockstdmutex-or-stdlock-guardstdmutex
 
         //get values from RTDE
         // TODO: define the struct and get the remaining struct members
