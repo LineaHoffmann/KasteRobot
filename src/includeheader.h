@@ -40,7 +40,7 @@
 
 // A few sample images for wxWidgets
 #ifndef wxHAS_IMAGES_IN_RESOURCES
-    #include "gui/sample.xpm"
+    #include "../resources/sample.xpm"
 #endif
 
 // OpenCV includes
