@@ -25,6 +25,7 @@ xUR_Control::xUR_Control(std::string IP)
     } catch(std::exception &e){
         std::rethrow_exception(mEptr);
     }
+
 }
 
 xUR_Control::~xUR_Control()
@@ -57,6 +58,7 @@ void xUR_Control::connect(std::string IP){
     if(!mUrRecieve){
         try {
             mUrRecieve = new ur_rtde::RTDEReceiveInterface(IP);
+            mURStruct->IP = IP;
             logstd("UR_Control: connect: RTDE Recieve connected");
 
         } catch (std::exception &e) {

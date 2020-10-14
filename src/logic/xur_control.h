@@ -16,6 +16,7 @@ class xUR_Control
 
         std::vector<double> pose{0};
         bool isConnected = false;
+        std::string IP;
 
     };
 
