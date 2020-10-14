@@ -30,6 +30,9 @@ bool app::OnInit() {
     xBaslerCam *camera = new xBaslerCam("../resources/pylonimgs/*.bmp", 12500);
     xLink->addCamera(camera);
 
+    //xUR_Control *robot = new xUR_Control();
+    //xLink->addRobot(robot);
+
     // Just has to be called
     wxInitAllImageHandlers();
     // cMain is derived from wxFrame

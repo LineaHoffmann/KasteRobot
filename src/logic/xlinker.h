@@ -4,6 +4,7 @@
 
 #include "../includeheader.h"
 #include "xbaslercam.h"
+#include "xur_control.h"
 
 class xRobot;
 class xController;
@@ -17,12 +18,17 @@ class xLinker
 public:
     xLinker();
     void addCamera(xBaslerCam *cam);
+    void addRobot(xUR_Control *rob);
 
     const cv::Mat& getCameraFrame();
     bool hasCameraFrame();
 
+
+
 private:
     xBaslerCam *camera;
+    xUR_Control *robot;
+
 };
 
 #endif // XLINKER_H
