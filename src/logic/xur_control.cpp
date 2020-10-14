@@ -9,12 +9,12 @@
 
 #include <ur_rtde/script_client.h>
 
-UR_Control::UR_Control()
+xUR_Control::xUR_Control()
 {
     init();
 }
 
-UR_Control::UR_Control(std::string IP)
+xUR_Control::xUR_Control(std::string IP)
 {
     init();
     initRobot();
@@ -26,7 +26,7 @@ UR_Control::UR_Control(std::string IP)
     }
 }
 
-UR_Control::~UR_Control()
+xUR_Control::~xUR_Control()
 {
     stopPolling();
     mUrControl->disconnect();
@@ -43,7 +43,7 @@ UR_Control::~UR_Control()
  * @brief connect tries to connect to robot meanwhile constructing the objects of ur_RTDE
  * @param IP
  */
-void UR_Control::connect(std::string IP){
+void xUR_Control::connect(std::string IP){
 
     if(isConnected){    return; }
 
@@ -71,7 +71,7 @@ void UR_Control::connect(std::string IP){
     }
 }
 
-bool UR_Control::move(std::vector<std::vector<double>> &q, double &speed, double &acc, UR_Control::moveEnum moveMode)
+bool xUR_Control::move(std::vector<std::vector<double>> &q, double &speed, double &acc, xUR_Control::moveEnum moveMode)
 {
     if (!isConnected) {
         std::cerr << "UR_Control::move: Host not connected!" << std::endl;
@@ -116,7 +116,7 @@ bool UR_Control::move(std::vector<std::vector<double>> &q, double &speed, double
  * @brief UR_Control::getCurrentPose
  * @return
  */
-std::vector<double> UR_Control::getCurrentPose()
+std::vector<double> xUR_Control::getCurrentPose()
 {
     if(!isConnected){   return std::vector<double>(0); }
 
@@ -129,7 +129,7 @@ std::vector<double> UR_Control::getCurrentPose()
  * @brief UR_Control::getCurrentPoseDeg
  * @return
  */
-std::vector<double> UR_Control::getCurrentPoseDeg()
+std::vector<double> xUR_Control::getCurrentPoseDeg()
 {
     if(!isConnected){   return std::vector<double>(0); }
 
@@ -142,7 +142,7 @@ std::vector<double> UR_Control::getCurrentPoseDeg()
  * @brief UR_Control::getIP
  * @return string with stored IP address
  */
-std::string UR_Control::getIP() const
+std::string xUR_Control::getIP() const
 {
     return mIP;
 }
@@ -150,7 +150,7 @@ std::string UR_Control::getIP() const
  * @brief UR_Control::setIP
  * @param value
  */
-void UR_Control::setIP(const std::string &value)
+void xUR_Control::setIP(const std::string &value)
 {
     mIP = value;
 }
@@ -158,7 +158,7 @@ void UR_Control::setIP(const std::string &value)
 /**
  * @brief UR_Control::getData private function to poll data from the robot at the given polling rate. used by "startPolling()"
  */
-void UR_Control::getData()
+void xUR_Control::getData()
 {
 
     //preparing timers
@@ -188,7 +188,7 @@ void UR_Control::getData()
 /**
  * @brief UR_Control::init private function to initialize and allocate memory, to be used in contructors.
  */
-void UR_Control::init()
+void xUR_Control::init()
 {
     //datasharing struct
     mURStruct = new UR_STRUCT;
@@ -198,7 +198,7 @@ void UR_Control::init()
 /**
  * @brief UR_Control::initRobot send scriptfile to robot, to init TCP ect.
  */
-void UR_Control::initRobot()
+void xUR_Control::initRobot()
 {
     ur_rtde::ScriptClient script("127.0.0.1",3,14);
     script.connect();
@@ -212,7 +212,7 @@ void UR_Control::initRobot()
  * @brief UR_Control::getURStruct
  * @return pointer to the URStruct, for data exchange
  */
-UR_Control::UR_STRUCT *UR_Control::getURStruct() const
+xUR_Control::UR_STRUCT *xUR_Control::getURStruct() const
 {
     return mURStruct;
 }
@@ -220,18 +220,18 @@ UR_Control::UR_STRUCT *UR_Control::getURStruct() const
 /**
  * @brief UR_Control::startPolling starts a new thread, to poll data from the robot via UR RTDE recieve interface.
  */
-void UR_Control::startPolling()
+void xUR_Control::startPolling()
 {
     if(!isConnected){   return; }
 
     std::cout << "starting polling thread" << std::endl;
-    mThread = new std::thread(&UR_Control::getData, this);
+    mThread = new std::thread(&xUR_Control::getData, this);
 }
 
 /**
  * @brief UR_Control::stopPolling stopping the polling thread, to poll realtime data from the robot
  */
-void UR_Control::stopPolling()
+void xUR_Control::stopPolling()
 {
     mContinue = false;
 
@@ -247,7 +247,7 @@ void UR_Control::stopPolling()
  * @brief UR_Control::getLastPose getting last postion stored in the URStruct
  * @return return vector with latest saved position from the URStruct
  */
-std::vector<double> UR_Control::getLastPose()
+std::vector<double> xUR_Control::getLastPose()
 {
     return mURStruct->pose;
 }
@@ -256,7 +256,7 @@ std::vector<double> UR_Control::getLastPose()
  * @brief UR_Control::getPollingRate getting pollingrate in hz
  * @return pollingrate as integer representing polling rate in [Hz]
  */
-int UR_Control::getPollingRate() const
+int xUR_Control::getPollingRate() const
 {
     return mPollingRate;
 }
@@ -265,7 +265,7 @@ int UR_Control::getPollingRate() const
  * @brief UR_Control::setPollingRate setting private parameter "pollingRate", and checking if its within limits of the robots pollingrate
  * @param pollingRate int in hertz [Hz] between 0 and 125 [Hz]
  */
-void UR_Control::setPollingRate(int pollingRate)
+void xUR_Control::setPollingRate(int pollingRate)
 {
     if(pollingRate <= 125 && pollingRate > 0){
         mPollingRate = pollingRate;

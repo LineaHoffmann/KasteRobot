@@ -6,6 +6,11 @@ xLinker::xLinker()
 void xLinker::addCamera(xBaslerCam *cam) {
     camera = cam;
 }
+
+void xLinker::addRobot(xUR_Control *rob)
+{
+    robot = rob;
+}
 const cv::Mat& xLinker::getCameraFrame() {
     return camera->getImage();
 }
