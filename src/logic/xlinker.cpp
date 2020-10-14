@@ -18,3 +18,13 @@ bool xLinker::hasCameraFrame() {
     // NOTE: This might not be required, we could just always go for the getCameraFrame
     return false;
 }
+
+void xLinker::robotConnect(std::string IP)
+{
+    robot->connect(IP);
+}
+
+void xLinker::robotDisconnect()
+{
+    robot->disconnect();
+}

@@ -26,6 +26,7 @@ public:
     ~xUR_Control();
 
     void connect(std::string IP);
+    void disconnect();
 
     //move ENUM
     enum moveEnum {MOVE_JLIN, MOVE_JPATH, MOVE_LFK, MOVE_TLIN, SERVOJ, SPEEDJ}; // WARNING: Update Enums to fit code, before final export:

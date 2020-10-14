@@ -1,4 +1,5 @@
 #include "xur_control.h"
+#include "../includeheader.h"
 
 #include <iostream>
 #include <math.h>
@@ -47,9 +48,16 @@ void xUR_Control::connect(std::string IP){
 
     if(isConnected){    return; }
 
+    if(mUrRecieve && mUrControl && !isConnected){
+        mUrControl->reconnect();
+        mUrRecieve->reconnect();
+        logstd("Robot->Reconnected!");
+    }
+
     if(!mUrRecieve){
         try {
             mUrRecieve = new ur_rtde::RTDEReceiveInterface(IP);
+            logstd("UR_Control: connect: RTDE Recieve connected");
 
         } catch (std::exception &e) {
             mEptr = std::current_exception();
@@ -62,12 +70,22 @@ void xUR_Control::connect(std::string IP){
     if(!mUrControl){
         try {
             mUrControl = new ur_rtde::RTDEControlInterface(IP);
+            logstd("UR_Control: connect: RTDE control connected");
 
         } catch (std::exception &e) {
             mEptr = std::current_exception();
             std::cout << "ur_rtde Control exception: " << e.what() << std::endl;
             std::rethrow_exception(mEptr);
         };
+    }
+}
+
+void xUR_Control::disconnect()
+{
+    if(isConnected){
+        mUrControl->disconnect();
+        mUrRecieve->disconnect();
+        isConnected = false;
     }
 }
 

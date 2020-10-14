@@ -23,6 +23,9 @@ public:
     const cv::Mat& getCameraFrame();
     bool hasCameraFrame();
 
+    void robotConnect(std::string IP);
+    void robotDisconnect();
+
 
 
 private:
