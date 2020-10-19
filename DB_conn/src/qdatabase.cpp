@@ -1,37 +1,46 @@
 #include "qdatabase.h"
+#include <stdio.h>
 #include <mysql/mysql.h>
 
- MYSQL *qDatabase::connectDB()
+
+/**
+  * @brief qDatabase::connectDB
+  * @return MySQL connection, Pointer.
+  */
+ bool qDatabase::connectDB()
 {
-     //Connection details
-     // IDEA: Make in qDatabase constructor ??
-     char *sever = "localhost";
-     char *user = "root";
-     char *password = "vrg77pkh";
-     char *database = "testDB";
+     mMysql = mysql_init(NULL); // initialisere mySQL pointer til null.
 
-     MYSQL *connection = mysql_init(NULL);
-
-     // TODO Should be changed from GUI Input.
-     if(!mysql_real_connect(connection,"localhost","root", "vrg77pkh", "testDB", 0, NULL, 0))
+     if(!mysql_real_connect(mMysql,mServer,mUser, mPassword, mDatabase, 0, NULL, 0))
      {
-         printf("Connection to database failed: %s\n", mysql_error(connection));
-         exit(1);
+         printf("Connection to database failed: %s\n", mysql_error(mMysql));
+         return(1);
      }
+     mMysql = mysql_real_connect(mMysql, mServer,mUser, mPassword,mDatabase,0,NULL,0);
+     isConnected = true;
+     return true;
+ }
 
-     connection = mysql_real_connect(connection, sever,user, password,
-                                     database,0,NULL,0);
+ /**
+  * @brief qDatabase::disconnectDB
+  * @return
+  */
+ bool qDatabase::disconnectDB()
+{
+     if(!isConnected)
+     {
+         printf("Database is already disconnected\n");
+     }
+     else
+     {
+         //Aware that we do not know it reacts if already disconnected
+         mysql_close(mMysql);
+         isConnected = false;
+         return true;
 
 
-     //Test:
-
-
+     }
 }
-
-//bool qDatabase::disconnectDB()
-//{
-
-//}
 
 //void qDatabase::addEntry(qEntry)
 //{
@@ -47,3 +56,74 @@
 //{
 
 //}
+
+
+ /**
+  * @brief qDatabase::qDatabase
+  * @param server
+  * @param user
+  * @param password
+  * @param database
+  */
+ qDatabase::qDatabase(char *server, char *user, char *password, char *database)
+     :mServer{server}, mUser{user}, mPassword{password}, mDatabase{database}  //init list of DB details
+ {
+
+
+
+ }
+
+ qDatabase::~qDatabase()
+ {
+     if(!mServer)
+         delete mServer;
+     if(!mUser)
+         delete mUser;
+     if(!mPassword)
+         delete mPassword;
+     if(!mDatabase)
+         delete mDatabase;
+     if(!mMysql)
+         delete mMysql;
+ }
+
+ char *qDatabase::getServer() const
+ {
+     return mServer;
+ }
+
+ void qDatabase::setServer(char *value)
+ {
+     mServer = value;
+ }
+
+ char *qDatabase::getUser() const
+ {
+     return mUser;
+ }
+
+ void qDatabase::setUser(char *value)
+ {
+     mUser = value;
+ }
+
+ char *qDatabase::getPassword() const
+ {
+     return mPassword;
+ }
+
+ void qDatabase::setPassword(char *value)
+ {
+     mPassword = value;
+ }
+
+ char *qDatabase::getDatabase() const
+ {
+     return mDatabase;
+ }
+
+ void qDatabase::setDatabase(char *value)
+ {
+     mDatabase = value;
+ }
+

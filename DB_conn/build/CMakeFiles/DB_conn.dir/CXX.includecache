@@ -17,6 +17,8 @@ qdatabase.h
 /home/lineah/workspace/SemProject /KasteRobot/DB_conn/src/qdatabase.cpp
 qdatabase.h
 /home/lineah/workspace/SemProject /KasteRobot/DB_conn/src/qdatabase.h
+stdio.h
+-
 mysql/mysql.h
 -
 
