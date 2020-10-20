@@ -5,7 +5,7 @@
 #include <pylon/PylonIncludes.h>
 #include <iostream>
 #include "basler_cam.h"
-#include "imagehandler.h"
+#include "ximagehandler.h"
 
 int main(int argc, char* argv[])
 {
@@ -25,27 +25,37 @@ int main(int argc, char* argv[])
 
 
     //if called with a image it will automagically load the image and perform table detection.
-    imageHandler imgHandler(cv::imread("../src/testImg.png"));
-    cv::imshow("table", imgHandler.getTable());
+    ximageHandler imgHandler(cv::imread("../src/testImg.png"));
+    imgHandler.showResult = true;
 
+
+    //setup search crits
+    imgHandler.ballColor(10, 20); //set what color ball we are looking for
+    imgHandler.setMinMaxRadius(3, 4);
+    imgHandler.setRobotBase(42.2, 8.8);
+
+    //load img and find ball
     imgHandler.loadImage(cv::imread("../balls/remappedBall1.png"));
-    cv::imshow("table", imgHandler.getTable());
-    imgHandler.dectectBall();
+    if (imgHandler.dectectBall()) { //find the ball
+    std::cout << "position: " << imgHandler.getPositionCM() << " || ball radius: " << imgHandler.getRadiusCM() << std::endl;
     cv::waitKey();
+    }
 
     imgHandler.loadImage(cv::imread("../balls/remappedBall2.png"));
-    cv::imshow("table", imgHandler.getTable());
-    imgHandler.dectectBall();
+    if (imgHandler.dectectBall()) {
+    std::cout << "position: " << imgHandler.getPositionCM() << " || ball radius: " << imgHandler.getRadiusCM() << std::endl;
+    cv::waitKey();
+    }
+
+
+
+    std::cout << "position: " << imgHandler.findBallAndPosition(cv::imread("../balls/remappedBall3.png")).first
+              << " || ball radius: " << imgHandler.findBallAndPosition(cv::imread("../balls/remappedBall3.png")).second << std::endl;
     cv::waitKey();
 
-    imgHandler.loadImage(cv::imread("../balls/remappedBall3.png"));
-    cv::imshow("table", imgHandler.getTable());
-    imgHandler.dectectBall();
-    cv::waitKey();
-
-    imgHandler.loadImage(cv::imread("../balls/remappedBall4.png"));
-    cv::imshow("table", imgHandler.getTable());
-    imgHandler.dectectBall();
+    std::pair<cv::Point2f, float> ball = imgHandler.findBallAndPosition(cv::imread("../balls/remappedBall4.png"));
+    std::cout << "position: " << ball.first
+              << " || ball radius: " << ball.second << std::endl;
     cv::waitKey();
 
 
