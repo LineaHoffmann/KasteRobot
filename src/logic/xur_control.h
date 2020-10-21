@@ -4,29 +4,32 @@
 #include "../includeheader.h"
 #include "xrobotexceptions.h"
 
-class UR_Control
+//definition of data struct
+struct UR_STRUCT {
+
+    std::vector<double> pose{0};
+    bool isConnected = false;
+    std::string IP;
+
+};
+
+class xUR_Control
 {
-    //definition of data struct
-    struct UR_STRUCT {
-
-        std::vector<double> pose{0};
-        bool isConnected = false;
-
-    };
 
 public:
-    UR_Control();
-    UR_Control(std::string IP);
+    xUR_Control();
+    xUR_Control(std::string IP);
 
-    ~UR_Control();
+    ~xUR_Control();
 
     void connect(std::string IP);
+    void disconnect();
 
     //move ENUM
     enum moveEnum {MOVE_JLIN, MOVE_JPATH, MOVE_LFK, MOVE_TLIN, SERVOJ, SPEEDJ}; // WARNING: Update Enums to fit code, before final export:
 
     //move function to access private move functions of UR_RTDE
-    bool move(std::vector<std::vector<double>> &q, double &acc, double &speed, UR_Control::moveEnum moveMode);
+    bool move(std::vector<std::vector<double>> &q, double &acc, double &speed, xUR_Control::moveEnum moveMode);
 
     //read current pose in rads or deg
     // TODO: Should probably return const references
