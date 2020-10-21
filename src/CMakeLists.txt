@@ -74,6 +74,8 @@ file(GLOB LOGIC_FILES
 
 # Database layer source files GLOB
 file (GLOB DB_FILES
+     ${PROJECT_SOURCE_DIR}/database/qdatabasehandler.cpp
+     ${PROJECT_SOURCE_DIR}/database/qdatabasehandler.h
     )
 
 # Creating executable, linked with source files
