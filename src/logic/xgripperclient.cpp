@@ -15,8 +15,10 @@ void xGripperClient::entryThread() {
     memset(buf, 0, 32);
     bytesRecieved = recv(mSock, buf, 32, 0);
     std::string answer(buf);
-    bool readBool = true;
 
+    send(mSock, mCommand.c_str(), mCommand.size() + 1, 0);
+
+    bool readBool = true;
     while (readBool == true) {
         if (bytesRecieved == 0 || answer == mAnswer) {
             usleep(25000);
