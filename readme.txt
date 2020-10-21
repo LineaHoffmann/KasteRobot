@@ -6,7 +6,7 @@ INSTALLING WXWIDGETS
 		cd wxWidgets-3.0.5
 		mkdir gtkbuild
 		cd gtkbuild
-		../configure --enable-unicode  --with-gtk=3 --enable-debug
+		../configure --enable-unicode --with-gtk=3 --enable-debug
 		make (evt med -jN, hvor N er antal cores, det tager ret lang tid med kun 1)
 		sudo make install
 		make clean
@@ -57,9 +57,9 @@ INSTALLING ROBWORKS
 INSTALLING OPENCV AND PYLON
 	In terminal, run
 		sudo apt-get install libopencv-dev
- 	download deb package from:
-		https://www.baslerweb.com/en/sales-support/downloads/software-downloads/pylon-6-1-3-linux-arm-64-bit-debian/
+ 	download deb (Linux x64 .deb) package from:
+		https://www.baslerweb.com/en/sales-support/downloads/software-downloads/
 	Install using EITHER the package manager interface or the following
-		sudo dpkg -i ~/Downloads/pylon_X.X.X.XXXXX-deb0_arm64.deb
+		sudo dpkg -i ~/Downloads/pylon_X.X.X.XXXXX-deb0_amd64.deb
 	Where the X's are the version you downloaded
 

@@ -152,7 +152,6 @@ void cMain::initSizers()
     mSizerLeftGripper = new wxBoxSizer(wxHORIZONTAL);
     mSizerLeftCamera = new wxBoxSizer(wxHORIZONTAL);
     mSizerLeftDatabase = new wxBoxSizer(wxHORIZONTAL);
-    return;
 }
 /**
  * @brief Initializes the split main window
@@ -227,7 +226,11 @@ void cMain::initLeftPanel()
 void cMain::initRightPanel()
 {
     //Right side panel for two wxPanel image feeds (cImagePanel)
-    mRightSplitpanel = new wxSplitterWindow(mSplitterMain, wxID_ANY);
+    mRightSplitpanel = new wxSplitterWindow(mSplitterMain, wxID_ANY,
+                                            wxDefaultPosition,
+                                            wxDefaultSize,
+                                            wxSP_3D, "Splitter"
+                                            );
 
     // Camera viewing area
     mCameraPanel = new cImagePanel(mRightSplitpanel, wxID_ANY);

@@ -34,8 +34,6 @@ public:
 
     void addLinker(cLinker* linker);
 
-
-
 private:
     // GUI event handler functions, linked in top of cMain.cpp
     // They get to keep uppercase first letter
