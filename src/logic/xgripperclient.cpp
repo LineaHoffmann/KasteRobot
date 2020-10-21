@@ -21,9 +21,9 @@ void xGripperClient::entryThread() {
         if (bytesRecieved == 0 || answer == mAnswer) {
             usleep(25000);
             }
-            else mMtx.lock(mAnswer);
+            else
                  mAnswer = answer;
-                 mMtx.unlock(mAnswer);
+
         answer = "N/A";
         }
 }
