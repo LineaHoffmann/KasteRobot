@@ -1,11 +1,11 @@
 #include "ximagehandler.h"
 
-xImageHandler::xImageHandler()
+ximageHandler::ximageHandler()
 {
 
 }
 
-xImageHandler::xImageHandler(cv::Mat cleanImg)
+ximageHandler::ximageHandler(cv::Mat cleanImg)
 {
     loadImage(cleanImg);
 
@@ -16,15 +16,15 @@ xImageHandler::xImageHandler(cv::Mat cleanImg)
     }
 }
 
-void xImageHandler::loadImage(cv::Mat image)
+void ximageHandler::loadImage(cv::Mat image)
 {
     image.copyTo(inputImage);
 }
 
-bool xImageHandler::cutOutTable()
+bool ximageHandler::cutOutTable()
 {
-
     cv::Mat grey;
+    if (debug) cv::imshow( "input", inputImage);
     cv::cvtColor( inputImage, grey, cv::COLOR_BGR2GRAY ); //Convert to gray
     cv::Mat kernell(5,5, CV_8U, cv::Scalar(1));
     cv::morphologyEx(grey, grey, cv::MORPH_GRADIENT, kernell); //det smart
@@ -34,12 +34,10 @@ bool xImageHandler::cutOutTable()
 
     //remove noice
     cv::Mat kernel (2, 2, CV_8U, cv::Scalar(1));
-
     cv::dilate(grey, grey, kernel);
     cv::erode(grey, grey, kernel);
     cv::medianBlur(grey, grey, 5);
     cv::bitwise_not ( grey, grey );
-
     if (debug) cv::imshow( "filtering and convert to bin", grey);
 
     // find contours. Makes it easier to sort for what we want.
@@ -53,11 +51,13 @@ bool xImageHandler::cutOutTable()
         if (it->size()<150)
             it=contours.erase(it);
         else
+
             ++it;
     }
+
     //draw filled contours of whats left.
     cv::Mat drawing = cv::Mat::zeros( grey.size(), CV_8UC3 );
-    for( uint i = 0; i< contours.size(); i++ )
+    for( int i = 0; i< contours.size(); i++ )
     {
         cv::drawContours(drawing, contours, i, cv::Scalar(255, 255, 255), cv::FILLED);
     }
@@ -87,8 +87,6 @@ bool xImageHandler::cutOutTable()
         }
         lastCount = thisCount;
     }
-
-
     for (int i = grey.cols; i > 0; i--){
         thisCount = 0;
         topRightCorner = cv::Point(i,0);
@@ -111,28 +109,66 @@ bool xImageHandler::cutOutTable()
 
     if (debug) cv::imshow("where it found table egdes", drawing);
 
+
+
+
     // Crop the full image to that image contained by the rectangle myROI
     // Note that this doesn't copy the data
     ROI = cv::Rect(topLeftCorner, botRightCorner);
-
     table = inputImage(ROI);
     if (table.cols - inputImage.cols < 0){
+        //pixel to cm hackerway
+        pixToCm = table.cols / tableWidth;
+
+        if (showResult) cv::imshow("table", table);
         return 1;
     } else {
         return 0;
     }
 }
 
-void xImageHandler::dectectBall() {
+std::pair<cv::Point2f, float> ximageHandler::findBallAndPosition(cv::Mat image)
+{
+    loadImage(image);
+    if(dectectBall()) {
+        return std::pair<cv::Point2f, float>(getPositionCM(),getRadiusCM());
+
+    } else {
+        return std::pair<cv::Point2f, float>(cv::Point2f(NULL), NULL);
+    }
+}
+
+
+void ximageHandler::ballColor(int hue, int spread)
+{
+    //std::vector<int> colorRange = {0,30,170,180};
+    colorRange.clear();
+    if (hue-spread > 0){
+        colorRange.push_back(0);
+        colorRange.push_back(hue+spread);
+        colorRange.push_back(180-(hue-spread));
+        colorRange.push_back(180);
+
+    } else {
+        colorRange.push_back(hue-spread);
+        colorRange.push_back(hue);
+        colorRange.push_back(hue+1);
+        colorRange.push_back(hue+spread);
+    }
+}
+
+bool ximageHandler::dectectBall()
+{
     cv::Mat hsv_image;
     cv::cvtColor(table, hsv_image, cv::COLOR_BGR2HLS);
+
 
     // Threshold the HSV image, keep only the red pixels
     cv::Mat lower_red_hue_range;
     cv::Mat upper_red_hue_range;
     cv::Mat bin;
-    cv::inRange(hsv_image, cv::Scalar(0, 100, 120), cv::Scalar(30, 240, 255), lower_red_hue_range);
-    cv::inRange(hsv_image, cv::Scalar(170, 100, 120), cv::Scalar(179, 240, 255), upper_red_hue_range);
+    cv::inRange(hsv_image, cv::Scalar(colorRange[0], 100, 120), cv::Scalar(colorRange[1], 240, 255), lower_red_hue_range);
+    cv::inRange(hsv_image, cv::Scalar(colorRange[2], 100, 120), cv::Scalar(colorRange[3], 240, 255), upper_red_hue_range);
     cv::addWeighted(lower_red_hue_range, 1, upper_red_hue_range, 1, 0, bin);
 
     //remove noice
@@ -144,17 +180,14 @@ void xImageHandler::dectectBall() {
 
     //find contours
     std::vector<std::vector<cv::Point>> contours;
-    std::vector<cv::Point2f> centers;
-    std::vector<float> radius;
 
-    cv::Point2f ctest;
-    float rtest;
+    radius;
     cv::findContours(bin,contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
     //remove small contours
     for (std::vector<std::vector<cv::Point> >::iterator it = contours.begin(); it!=contours.end(); )
     {
-        if (it->size()<20) {
+        if (it->size()<(20)) {
             it=contours.erase(it);
         } else {
             ++it;
@@ -162,30 +195,63 @@ void xImageHandler::dectectBall() {
     }
 
     //draw filled contours of whats left.
-    cv::Mat drawing = cv::Mat::zeros( bin.size(), CV_8UC3 );
-    for( uint i = 0; i< contours.size(); i++ )
+    cv::Mat drawing = table;
+    for( int i = 0; i< contours.size(); i++ )
     {
-        cv::minEnclosingCircle(contours[i], ctest, rtest);
-        cv::circle(drawing, ctest, rtest, cv::Scalar(0, 255, 0), 2 );
+        cv::minEnclosingCircle(contours[i], centerPixel, radius);
+        cv::circle(drawing, centerPixel, radius, cv::Scalar(0, 255, 0), 2 );
+        cv::circle(drawing, robotBase, 85, cv::Scalar(255, 255, 255), 2 );
     }
 
 
-    cv::imshow("filted", drawing);
+    if (showResult) cv::imshow("ball", drawing);
+    if (debug) std::cout << radius << std::endl;
+    if (debug) std::cout << contours.size() << std::endl;
+
+    if (minMaxRadius.first < radius && minMaxRadius.second > radius  && contours.size() == 1){
+        return true;
+    } else {
+        return false;
+    }
+
 }
 
-void xImageHandler::transformCoordinates()
-{
-
-}
-
-cv::Mat xImageHandler::getInputImage() const
+cv::Mat ximageHandler::getInputImage() const
 {
     return inputImage;
 }
 
-cv::Mat xImageHandler::getTable()
+cv::Mat ximageHandler::getTable()
 {
-
     table = inputImage(ROI);
     return table;
+}
+
+void ximageHandler::setMinMaxRadius(float minCM, float maxCM)
+{
+    minMaxRadius.first = minCM*pixToCm;
+    minMaxRadius.second = maxCM*pixToCm;
+}
+
+cv::Point2f ximageHandler::getPositionCM() const
+{
+    cv::Point2f baseToCenter = centerPixel - robotBase;
+    return baseToCenter/pixToCm;
+}
+
+void ximageHandler::setRobotBase(float xcm, float ycm)
+{
+
+    robotBase.x = xcm * pixToCm;
+    robotBase.y = ycm * pixToCm;
+    if (debug){
+        cv::Mat drawing = table;
+        cv::circle(drawing, robotBase, 85, cv::Scalar(0, 255, 0), 2 );
+        if (debug) cv::imshow("Robot Base", drawing);
+    }
+}
+
+float ximageHandler::getRadiusCM() const
+{
+    return radius/pixToCm;
 }
