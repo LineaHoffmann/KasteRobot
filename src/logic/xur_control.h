@@ -9,16 +9,17 @@
 #include <ur_rtde/rtde_receive_interface.h>
 #include "xrobotexceptions.h"
 
+//definition of data struct
+struct UR_STRUCT {
+
+    std::vector<double> pose{0};
+    bool isConnected = false;
+    std::string IP;
+
+};
+
 class xUR_Control
 {
-    //definition of data struct
-    struct UR_STRUCT {
-
-        std::vector<double> pose{0};
-        bool isConnected = false;
-        std::string IP;
-
-    };
 
 public:
     xUR_Control();

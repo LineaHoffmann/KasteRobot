@@ -4,7 +4,7 @@
 
 #include "../includeheader.h"
 #include "xbaslercam.h"
-#include "xur_control.h"
+
 
 class xRobot;
 class xController;
@@ -25,6 +25,7 @@ public:
 
     void robotConnect(std::string IP);
     void robotDisconnect();
+    UR_STRUCT* getRobotStruct();
 
 
 

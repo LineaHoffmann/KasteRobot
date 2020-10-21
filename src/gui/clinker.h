@@ -20,10 +20,11 @@ public:
     void getRobotState();
     std::vector<double> getRobotTCP();
     std::vector<double> getRobotJointValues();
-    void setRobotConnect();
+    void setRobotConnect(std::string ip);
     void setRobotDisconnect();
     void setRobotNewTCP();
     void setRobotNewJointValues();
+    UR_STRUCT* getRobotStruct();
 
     // Camera connections called from cMain
     void getCameraState();

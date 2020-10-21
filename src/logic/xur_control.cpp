@@ -88,6 +88,7 @@ void xUR_Control::disconnect()
         mUrControl->disconnect();
         mUrRecieve->disconnect();
         isConnected = false;
+        logstd("UR_Control: disconnect: robot disconnected!");
     }
 }
 
@@ -232,7 +233,7 @@ void xUR_Control::initRobot()
  * @brief UR_Control::getURStruct
  * @return pointer to the URStruct, for data exchange
  */
-xUR_Control::UR_STRUCT *xUR_Control::getURStruct() const
+UR_STRUCT *xUR_Control::getURStruct() const
 {
     return mURStruct;
 }

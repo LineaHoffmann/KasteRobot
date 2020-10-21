@@ -28,3 +28,8 @@ void xLinker::robotDisconnect()
 {
     robot->disconnect();
 }
+
+UR_STRUCT* xLinker::getRobotStruct()
+{
+    return robot->getURStruct();
+}

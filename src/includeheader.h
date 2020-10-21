@@ -50,5 +50,8 @@
 // Pylon includes
 #include "pylon/PylonIncludes.h"
 
+// URStruct include
+#include "logic/xur_control.h"
+
 
 #endif // INCLUDEHEADER_H
