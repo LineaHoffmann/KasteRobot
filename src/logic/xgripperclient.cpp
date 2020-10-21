@@ -29,7 +29,7 @@ void xGripperClient::entryThread() {
 }
 
 
-void GripperClient::connectSocket(std::string ipAddress, int port) {
+void xGripperClient::connectSocket(std::string ipAddress, int port) {
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     int mPort = port;
     std::string mIpAddress = ipAddress;
@@ -43,7 +43,7 @@ void GripperClient::connectSocket(std::string ipAddress, int port) {
     }
 
 
-std::string GripperClient::writeRead(std::string command) {
+std::string xGripperClient::writeRead(std::string command) {
     mCommand = command;
     char buf[32];
     int bytesRecieved = 0; //Resetting response length
