@@ -17,7 +17,7 @@ void xGripperClient::entryThread() {
     std::string answer(buf);
     bool readBool = true;
 
-    while (readBool = true) {
+    while (readBool == true) {
         if (bytesRecieved == 0 || answer == mAnswer) {
             usleep(25000);
             }
@@ -30,7 +30,7 @@ void xGripperClient::entryThread() {
 
 
 void xGripperClient::connectSocket(std::string ipAddress, int port) {
-    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    int mSock = socket(AF_INET, SOCK_STREAM, 0);
     int mPort = port;
     std::string mIpAddress = ipAddress;
 
@@ -47,7 +47,7 @@ std::string xGripperClient::writeRead(std::string command) {
     mCommand = command;
     char buf[32];
     int bytesRecieved = 0; //Resetting response length
-    int sendRes = send(mSock, mCommand.c_str(), mCommand.size() + 1, 0); // Sending command
+    send(mSock, mCommand.c_str(), mCommand.size() + 1, 0); // Sending command
 
     memset(buf, 0, 32);
     bytesRecieved = recv(mSock, buf, 32, 0); //Reading response
