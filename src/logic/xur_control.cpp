@@ -119,14 +119,12 @@ bool xUR_Control::move(std::vector<std::vector<double>> &q, double &speed, doubl
                 std::cout << "MOVE_LFK: move completed!" << std::endl;
                 return true;
             break;
+        }
         default:
             std::cerr << "Wrong mode set!" << std::endl;
             break;
-        }
-    return false;
     }
-        // WARNING: Should return something here?
-        // The above switch and if statements look a bit .. Wrong? Default is inside if-statement from case MOVE_LFK
+    return false;
 }
 
 /**
