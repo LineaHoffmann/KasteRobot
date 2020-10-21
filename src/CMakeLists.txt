@@ -67,6 +67,9 @@ file(GLOB LOGIC_FILES
 
     ${PROJECT_SOURCE_DIR}/logic/xur_control.cpp
     ${PROJECT_SOURCE_DIR}/logic/xur_control.h
+
+    ${PROJECT_SOURCE_DIR}/logic/xgripperclient.h
+    ${PROJECT_SOURCE_DIR}/logic/xgripperclient.cpp
     )
 
 # Database layer source files GLOB

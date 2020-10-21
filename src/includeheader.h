@@ -24,6 +24,11 @@
 #include <iostream>
 #include <cmath>
 #include <exception>
+#include <sys/types.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <arpa/inet.h>
 
 // wxWidgets includes
 #include "wx/wx.h"
