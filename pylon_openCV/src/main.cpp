@@ -26,12 +26,12 @@ int main(int argc, char* argv[])
 
     //if called with a image it will automagically load the image and perform table detection.
     ximageHandler imgHandler(cv::imread("../src/testImg.png"));
-    imgHandler.showResult = true;
+    //imgHandler.showResult = true;
 
 
     //setup search crits
     imgHandler.ballColor(10, 20); //set what color ball we are looking for
-    imgHandler.setMinMaxRadius(3, 4);
+    imgHandler.setMinMaxRadius(1.2, 3);
     imgHandler.setRobotBase(42.2, 8.8);
 
     //load img and find ball
