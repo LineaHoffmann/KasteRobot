@@ -63,3 +63,18 @@ INSTALLING OPENCV AND PYLON
 		sudo dpkg -i ~/Downloads/pylon_X.X.X.XXXXX-deb0_amd64.deb
 	Where the X's are the version you downloaded
 
+INSTALLING URSIM
+	download package from:
+		https://www.universal-robots.com/download/?option=89457#section16632
+	Install java openjdk:
+		sudo apt.get install openjdk-8-jre
+		sudo update-alternatives --config java
+			select open jdk just installed. 
+	run in terminal:
+		cd ~
+		tar xvzf [FILE NAME]
+		cd ursim-3.X.X.XXXXX
+		./install.sh
+	to run URSim run in terminal:
+		cd ..
+		sudo ursim-3.X.X.XXXXX/start-ursim.sh UR5

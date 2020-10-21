@@ -2,7 +2,6 @@
 #define UR_CONTROL_H
 
 #include "../includeheader.h"
-#include "xrobotexceptions.h"
 
 //definition of data struct
 struct UR_STRUCT {
