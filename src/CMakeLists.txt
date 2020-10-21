@@ -70,6 +70,9 @@ file(GLOB LOGIC_FILES
 
     ${PROJECT_SOURCE_DIR}/logic/xgripperclient.h
     ${PROJECT_SOURCE_DIR}/logic/xgripperclient.cpp
+
+    ${PROJECT_SOURCE_DIR}/logic/xdetectcollision.h
+    ${PROJECT_SOURCE_DIR}/logic/xdetectcollision.cpp
     )
 
 # Database layer source files GLOB
