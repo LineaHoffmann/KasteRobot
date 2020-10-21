@@ -9,6 +9,8 @@
 #include "logic/xbaslercam.h"
 #include "logic/xlinker.h"
 #include "gui/clinker.h"
+#include "logic/xur_control.h"
+#include "logic/xrobotexceptions.h"
 
 class app : public wxApp
 {

@@ -60,4 +60,8 @@
 #include "ur_rtde/rtde_control_interface.h"
 #include "ur_rtde/rtde_receive_interface.h"
 
+// URStruct include
+#include "logic/xur_control.h"
+
+
 #endif // INCLUDEHEADER_H

@@ -105,10 +105,15 @@ void cMain::OnMenuAbout(wxCommandEvent &evt) {
 }
 void cMain::OnBtnRobotConnect(wxCommandEvent &evt) {
     logstd("Robot->Connect clicked");
+    std::string ip = std::string(mTabRobotIpEntryTxtCtrl->GetValue().mb_str());
+    //TODO: make regex check and maybe fill with zeroes.
+    mLinker->setRobotConnect(ip);
+    mTabGeneralTreeList->SetItemText(*mTabGeneralSubRobotIP, 1, mLinker->getRobotStruct()->IP);
     evt.Skip();
 }
 void cMain::OnBtnRobotDisconnect(wxCommandEvent &evt) {
     logstd("Robot->Disconnect clicked");
+    mLinker->setRobotDisconnect();
     evt.Skip();
 }
 void cMain::OnBtnGripperConnect(wxCommandEvent &evt) {
