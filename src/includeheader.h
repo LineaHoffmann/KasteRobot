@@ -63,5 +63,8 @@
 // URStruct include
 #include "logic/xur_control.h"
 
+//Exceptions
+#include "logic/xrobotexceptions.h"
+
 
 #endif // INCLUDEHEADER_H
