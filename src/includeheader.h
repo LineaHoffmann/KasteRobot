@@ -63,5 +63,8 @@
 // URStruct include
 #include "logic/xur_control.h"
 
+// MYSQL includes
+#include <mysql/mysql.h>
+
 
 #endif // INCLUDEHEADER_H
