@@ -1,13 +1,13 @@
-#ifndef GRIPPERCLIENT_H
-#define GRIPPERCLIENT_H
+#ifndef XGRIPPERCLIENT_H
+#define XGRIPPERCLIENT_H
 
 #include "../includeheader.h"
 
 
-class GripperClient
+class xGripperClient
 {
 public:
-    GripperClient();
+    xGripperClient();
     void connectSocket(std::string ipAddress, int port);
     std::string writeRead(std::string mCommand);
     void entryThread();
@@ -25,4 +25,4 @@ private:
 };
 
 
-#endif // GRIPPERCLIENT_H
+#endif // XGRIPPERCLIENT_H

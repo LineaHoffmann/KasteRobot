@@ -28,10 +28,10 @@ bool xBaslerCam::isConnected()
     return 0;
 }
 
-bool xbasler_cam::start()
+bool xBaslerCam::start()
 {
     calibrate();
-    baslerCamThread = new std::thread(&xbasler_cam::GrabPictures,this);
+    baslerCamThread = new std::thread(&xBaslerCam::GrabPictures,this);
 
     auto start_time = std::chrono::high_resolution_clock::now();
     auto current_time = std::chrono::high_resolution_clock::now();
@@ -48,7 +48,7 @@ bool xbasler_cam::start()
     }
 }
 
-void xbasler_cam::shutdown()
+void xBaslerCam::shutdown()
 {
     exit = true;
 }
@@ -111,7 +111,7 @@ void xBaslerCam::updateCameraMatrix(cv::Mat NewCameraMatrix, cv::Mat NewCoeffs)
     isRectified = false;
 }
 
-cv::Mat xbasler_cam::getImage()
+cv::Mat& xBaslerCam::getImage()
 {
     std::lock_guard<std::mutex> lock(*PicsMtx);
     //get pic and remap
@@ -132,7 +132,7 @@ cv::Mat xbasler_cam::getImage()
 }
 
 
-void xbasler_cam::GrabPictures()
+void xBaslerCam::GrabPictures()
 {
     // Automagically call PylonInitialize and PylonTerminate to ensure the pylon runtime system
     // is initialized during the lifetime of this object.

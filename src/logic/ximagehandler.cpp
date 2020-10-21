@@ -57,7 +57,7 @@ bool ximageHandler::cutOutTable()
 
     //draw filled contours of whats left.
     cv::Mat drawing = cv::Mat::zeros( grey.size(), CV_8UC3 );
-    for( int i = 0; i< contours.size(); i++ )
+    for(unsigned int i = 0; i< contours.size(); i++ )
     {
         cv::drawContours(drawing, contours, i, cv::Scalar(255, 255, 255), cv::FILLED);
     }
@@ -134,7 +134,7 @@ std::pair<cv::Point2f, float> ximageHandler::findBallAndPosition(cv::Mat image)
         return std::pair<cv::Point2f, float>(getPositionCM(),getRadiusCM());
 
     } else {
-        return std::pair<cv::Point2f, float>(cv::Point2f(NULL), NULL);
+        return std::pair<cv::Point2f, float>(cv::Point2f(), 0);
     }
 }
 
@@ -181,7 +181,6 @@ bool ximageHandler::dectectBall()
     //find contours
     std::vector<std::vector<cv::Point>> contours;
 
-    radius;
     cv::findContours(bin,contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
     //remove small contours
@@ -196,7 +195,7 @@ bool ximageHandler::dectectBall()
 
     //draw filled contours of whats left.
     cv::Mat drawing = table;
-    for( int i = 0; i< contours.size(); i++ )
+    for(unsigned int i = 0; i< contours.size(); i++ )
     {
         cv::minEnclosingCircle(contours[i], centerPixel, radius);
         cv::circle(drawing, centerPixel, radius, cv::Scalar(0, 255, 0), 2 );
