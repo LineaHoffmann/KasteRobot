@@ -1,7 +1,28 @@
 #ifndef UR_CONTROL_H
 #define UR_CONTROL_H
+#pragma once
 
-#include "../includeheader.h"
+#ifndef LOG_DEFINES
+#define LOG_DEFINES 1
+#define logstd wxLogMessage
+#define logwar wxLogWarning
+#define logerr wxLogError
+#endif
+
+#include <vector>
+#include <string>
+#include <thread>
+#include <mutex>
+#include <exception>
+#include <iostream>
+
+#include "ur_rtde/rtde_control_interface.h"
+#include "ur_rtde/rtde_receive_interface.h"
+#include "ur_rtde/script_client.h"
+
+#include "wx/log.h"
+
+#include "xrobotexceptions.h"
 
 //definition of data struct
 struct UR_STRUCT {
@@ -83,7 +104,7 @@ private:
 
     //threads
     std::thread *mThread = nullptr;
-    std::mutex urMutex;
+    std::mutex mMtx;
 };
 
 #endif // UR_CONTROL_H

@@ -2,14 +2,24 @@
 #define CLINKER_H
 #pragma once
 
-#include "../includeheader.h"
-#include "../logic/xlinker.h"
+#include <utility>
 
+#include "opencv2/opencv.hpp"
+//#include "opencv2/core.hpp"
+
+#include "../logic/xlinker.h"
+#include "../logic/xur_control.h"
+
+class xLinker;
 class cLinker
 {
 public:
     cLinker();
-    void addLogicLinker(xLinker* link);
+    void addLogicLinker(std::shared_ptr<xLinker> link);
+
+    // Public functions for checking pointer integrity
+    bool cIsOk() const; // Calls from GUI classes
+    bool xIsOk() const; // Calls from xLinker
 
     // Controller connections called from cMain
     void getCtrlState();
@@ -27,9 +37,8 @@ public:
     UR_STRUCT* getRobotStruct();
 
     // Camera connections called from cMain
-    void getCameraState();
+    int getCameraState();
     const cv::Mat& getCameraFrame();
-    bool hasCameraFrame();
     void setCameraConnect();
     void setCameraDisconnect();
 
@@ -50,8 +59,8 @@ public:
     void setDbDisconnect();
 
 private:
-    xLinker *xLink = nullptr;
-
+    std::shared_ptr<xLinker> xLink;
+    std::mutex mMtx;
 };
 
 #endif // CLINKER_H

@@ -3,33 +3,44 @@
 xLinker::xLinker()
 {
 }
-void xLinker::addCamera(xBaslerCam *cam) {
-    camera = cam;
+void xLinker::addCamera(std::shared_ptr<xBaslerCam> camera) {
+    mCamera = camera;
 }
 
-void xLinker::addRobot(xUR_Control *rob)
+void xLinker::addRobot(std::shared_ptr<xUR_Control> robot)
 {
-    robot = rob;
+    mRobot = robot;
+}
+bool xLinker::cIsOk() {
+    // TODO: When ready, also add the robot pointer to this
+    if (mCamera) return true;
+    else return false;
 }
 const cv::Mat& xLinker::getCameraFrame() {
-    return camera->getImage();
+    std::lock_guard<std::mutex> lock(mMtx);
+    return mCamera->getImage();
 }
-bool xLinker::hasCameraFrame() {
-    // NOTE: This might not be required, we could just always go for the getCameraFrame
-    return false;
+int xLinker::getCameraState() {
+    std::lock_guard<std::mutex> lock(mMtx);
+    return -1; // TODO: Link to camera object
 }
 
 void xLinker::robotConnect(std::string IP)
 {
-    robot->connect(IP);
+    std::lock_guard<std::mutex> lock(mMtx);
+    mRobot->connect(IP);
 }
 
 void xLinker::robotDisconnect()
 {
-    robot->disconnect();
+    std::lock_guard<std::mutex> lock(mMtx);
+    mRobot->disconnect();
 }
 
 UR_STRUCT* xLinker::getRobotStruct()
 {
-    return robot->getURStruct();
+    std::lock_guard<std::mutex> lock(mMtx);
+    // Is a pointer a good idea?
+    // I'm guessing some other thread manages it
+    return mRobot->getURStruct();
 }

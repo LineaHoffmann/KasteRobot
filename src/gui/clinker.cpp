@@ -1,8 +1,12 @@
 #include "clinker.h"
 
 cLinker::cLinker() {}
+bool cLinker::cIsOk() const {
+    if (xLink && xLink->cIsOk()) return true;
+    else return false;
+}
 
-void cLinker::addLogicLinker(xLinker *link) {
+void cLinker::addLogicLinker(std::shared_ptr<xLinker> link) {
     xLink = link;
 }
 
@@ -13,6 +17,7 @@ void cLinker::setRobotConnect(std::string ip)
 
 void cLinker::setRobotDisconnect()
 {
+    std::lock_guard<std::mutex> lock(mMtx);
     xLink->robotDisconnect();
 }
 
@@ -21,11 +26,10 @@ UR_STRUCT *cLinker::getRobotStruct()
     return xLink->getRobotStruct();
 }
 
-void cLinker::getCameraState() {}
-const cv::Mat& cLinker::getCameraFrame() {
-    return xLink->getCameraFrame();
-
+int cLinker::getCameraState() {
+    return xLink->getCameraState();
 }
-bool cLinker::hasCameraFrame() {
-    return xLink->hasCameraFrame();
+const cv::Mat& cLinker::getCameraFrame() {
+    std::lock_guard<std::mutex> lock(mMtx);
+    return xLink->getCameraFrame();
 }

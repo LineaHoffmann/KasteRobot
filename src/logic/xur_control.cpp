@@ -1,5 +1,6 @@
+
 #include "xur_control.h"
-#include "../includeheader.h"
+//#include "../includeheader.h"
 
 // WARNING: To-do plugin doesn't see the headers .. There are a few notes in there
 // TODO: Should be renamed to xUrControl for conformity
@@ -78,6 +79,8 @@ void xUR_Control::connect(std::string IP){
 
 void xUR_Control::disconnect()
 {
+    // Lock the mutex, the other threads thread come in through xLinker
+    std::lock_guard<std::mutex> lock(mMtx);
     if(isConnected){
         mUrControl->disconnect();
         mUrRecieve->disconnect();
@@ -90,7 +93,8 @@ bool xUR_Control::move(std::vector<std::vector<double>> &q, double &speed, doubl
 {
     if (!isConnected) {
         std::cerr << "UR_Control::move: Host not connected!" << std::endl;
-        throw(UR_NotConnected());
+        throw x_err::error(x_err::what::ROBOT_NOT_CONNECTED);
+        //throw(UR_NotConnected());
         return false;
     }
 
@@ -186,7 +190,7 @@ void xUR_Control::getData()
 
         //lock Scope
         {
-        std::unique_lock<std::mutex> dataLock(urMutex); //NOTE: unique lock applied, check type when merging programs.
+        std::unique_lock<std::mutex> dataLock(mMtx); //NOTE: unique lock applied, check type when merging programs.
         // SRP: unique_lock is good here, but should be used in a single instantiation and use lock/unlock inside the while loop
         // See this: https://stackoverflow.com/questions/20516773/stdunique-lockstdmutex-or-stdlock-guardstdmutex
 

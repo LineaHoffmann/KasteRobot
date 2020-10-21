@@ -2,26 +2,27 @@
 #define XLINKER_H
 #pragma once
 
-#include "../includeheader.h"
+#include <string>
+#include <utility>
+#include <mutex>
+
+#include "../gui/clinker.h"
+
 #include "xbaslercam.h"
-
-
-class xRobot;
-class xController;
-class xGripper;
+#include "xur_control.h"
 
 class cLinker;
-class dbLinker;
-
 class xLinker
 {
 public:
     xLinker();
-    void addCamera(xBaslerCam *cam);
-    void addRobot(xUR_Control *rob);
+    void addCamera(std::shared_ptr<xBaslerCam> cam);
+    void addRobot(std::shared_ptr<xUR_Control> robot);
+
+    bool cIsOk();
 
     const cv::Mat& getCameraFrame();
-    bool hasCameraFrame();
+    int getCameraState();
 
     void robotConnect(std::string IP);
     void robotDisconnect();
@@ -30,8 +31,12 @@ public:
 
 
 private:
-    xBaslerCam *camera;
-    xUR_Control *robot;
+    std::shared_ptr<xBaslerCam> mCamera;
+    std::shared_ptr<xUR_Control> mRobot;
+
+    std::shared_ptr<cLinker> cLink;
+
+    std::mutex mMtx;
 
 };
 

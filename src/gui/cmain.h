@@ -2,10 +2,35 @@
 #define CMAIN_H
 #pragma once
 
-#include "../includeheader.h"
+#ifndef LOG_DEFINES
+#define LOG_DEFINES 1
+#define logstd wxLogMessage
+#define logwar wxLogWarning
+#define logerr wxLogError
+#endif
+
+#include <string>
+#include <vector>
+#include <utility>
+#include <thread>
+#include <mutex>
+
+#include "wx/wx.h"
+#include "wx/app.h"
+#include "wx/frame.h"
+#include "wx/menu.h"
+#include "wx/sizer.h"
+#include "wx/splitter.h"
+#include "wx/textctrl.h"
+#include "wx/notebook.h"
+#include "wx/treelist.h"
+#include "wx/aboutdlg.h"
+#include "wx/artprov.h"
+
 #include "clinker.h"
 #include "cimagepanel.h"
 
+#include "../logic/xrobotexceptions.h"
 
 enum FUNCTION_BINDING_IDS {
     ID_TIMER_CAMERA_UPDATE,
@@ -32,7 +57,7 @@ public:
     cMain();
     ~cMain();
 
-    void addLinker(cLinker* linker);
+    void addLinker(std::shared_ptr<cLinker> linker);
 
 private:
     // GUI event handler functions, linked in top of cMain.cpp
@@ -153,7 +178,9 @@ private:
     cImagePanel *mRobotPanel = nullptr;
 
     // Pointer to the layer interface class
-    cLinker *mLinker = nullptr;
+    std::shared_ptr<cLinker> mLinker;
+
+    std::mutex mMtx;
 
     // Just a macro to enable wxWidgets events
     wxDECLARE_EVENT_TABLE();

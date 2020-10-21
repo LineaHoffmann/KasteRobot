@@ -6,6 +6,9 @@
  *  collected here for readability's sake.
  */
 
+#include "gui/clinker.h"
+#include "logic/xlinker.h"
+
 // Redefining logging function names
 // cout is still legal, but will only show in terminal
 #ifndef LOG_DEFINES
@@ -24,6 +27,7 @@
 #include <iostream>
 #include <cmath>
 #include <exception>
+#include <utility>
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/socket.h>

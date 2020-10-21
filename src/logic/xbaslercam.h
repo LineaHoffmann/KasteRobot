@@ -1,7 +1,24 @@
 #ifndef XBASLERCAM_H
 #define XBASLERCAM_H
 
-#include "../includeheader.h"
+#ifndef LOG_DEFINES
+#define LOG_DEFINES 1
+#define logstd wxLogMessage
+#define logwar wxLogWarning
+#define logerr wxLogError
+#endif
+
+#include <thread>
+#include <mutex>
+#include <string>
+#include <vector>
+#include <chrono>
+#include <iostream>
+
+#include "pylon/PylonIncludes.h"
+#include "opencv2/opencv.hpp"
+#include "opencv2/core.hpp"
+#include "wx/log.h"
 
 class xBaslerCam
 {
@@ -52,7 +69,7 @@ private:
     cv::Mat R;
     cv::Mat T;
 
-    std::mutex *PicsMtx = nullptr;
+    std::mutex PicsMtx;
 
 };
 

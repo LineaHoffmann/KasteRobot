@@ -1,10 +1,7 @@
 #include "xbaslercam.h"
 #include <chrono>
 
-xBaslerCam::xBaslerCam()
-{
-    PicsMtx = new std::mutex();
-}
+xBaslerCam::xBaslerCam(){}
 
 xBaslerCam::xBaslerCam(std::string calibrationPath) : xBaslerCam()
 {path = calibrationPath;}
@@ -13,12 +10,7 @@ xBaslerCam::xBaslerCam(std::string calibrationPath, int exposure) : xBaslerCam(c
 xBaslerCam::xBaslerCam(std::string calibrationPath, int exposure, int maxFrameRate) : xBaslerCam(calibrationPath, exposure)
 {frameRate = maxFrameRate;}
 
-
-
-xBaslerCam::~xBaslerCam()
-{
-    delete PicsMtx;
-}
+xBaslerCam::~xBaslerCam(){}
 
 bool xBaslerCam::isConnected()
 {
@@ -113,10 +105,10 @@ void xBaslerCam::updateCameraMatrix(cv::Mat NewCameraMatrix, cv::Mat NewCoeffs)
 
 cv::Mat& xBaslerCam::getImage()
 {
-    std::lock_guard<std::mutex> lock(*PicsMtx);
+    std::lock_guard<std::mutex> lock(PicsMtx);
     //get pic and remap
     if (!openCvImage.data || !running) {
-    openCvImage = cv::imread("../src/testImg.png", cv::IMREAD_COLOR);
+    openCvImage = cv::imread("../resources/testImg.png", cv::IMREAD_COLOR);
 
     //fjern hvis billede skal gennem remapping
     return openCvImage;
@@ -244,7 +236,7 @@ void xBaslerCam::GrabPictures()
                     formatConverter.Convert(pylonImage, ptrGrabResult);
 
                     // Create an OpenCV image from a pylon image.
-                    std::lock_guard<std::mutex> lock(*PicsMtx);
+                    std::lock_guard<std::mutex> lock(PicsMtx);
                     openCvImage = cv::Mat(ptrGrabResult->GetHeight(), ptrGrabResult->GetWidth(), CV_8UC3, (uint8_t *) pylonImage.GetBuffer());
                 running = true;
                 }
