@@ -6,16 +6,19 @@
 
 class qDatabase
 {
-    bool connectDB();
+
     bool disconnectDB();
 //    void addEntry(qEntry);
 //    void addQLinker(qLinker*);
 
 public:
+
     qDatabase(); // Default constructor
-    qDatabase(char *server, char *user, char *password, char *database); //Constructor overloading
+    qDatabase(std::string *server, std::string *user, std::string *password, std::string *database); //Constructor overloading
 
     ~qDatabase(); // Destructor
+
+    bool connectDB();
 
     char *getServer() const;
     void setServer(char *value);
@@ -29,6 +32,8 @@ public:
     char *getDatabase() const;
     void setDatabase(char *value);
 
+    bool isConnected; //flag to check
+
 private:
     //    std::thread *mThread = nullptr;
     //    qLinker *mQLinker;
@@ -39,12 +44,10 @@ private:
 //Pointers becuase long inputs, and can check if empty.
 // Able to use for GUI input.
     // TODO Why char ?? Can we use something else ?
-    char *mServer = nullptr;
-    char *mUser = nullptr;
-    char *mPassword = nullptr;
-    char *mDatabase = nullptr;
-
-    bool isConnected; //flag to check
+    std::string *mServer = nullptr;
+    std::string *mUser = nullptr;
+    std::string *mPassword = nullptr;
+    std::string *mDatabase = nullptr;
 
 };
 

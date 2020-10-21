@@ -65,10 +65,13 @@
   * @param password
   * @param database
   */
- qDatabase::qDatabase(char *server, char *user, char *password, char *database)
-     :mServer{server}, mUser{user}, mPassword{password}, mDatabase{database}  //init list of DB details
+ qDatabase::qDatabase(std::string *server, std::string *user, std::string *password, std::string *database)
+    /* :mServer{server}, mUser{user}, mPassword{password}, mDatabase{database}  */ //init list of DB details
  {
-
+    mServer=new std::string(server);
+    mUser = new std::string(user);
+    mPassword = new std::string(password);
+    mDatabase = new std::string(database);
 
 
  }
