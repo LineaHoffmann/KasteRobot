@@ -1,15 +1,13 @@
-#include "gripperclient.h"
+#include "xgripperclient.h"
 
-GripperClient::GripperClient() {
-    this->mT1 = new std::thread(&GripperClient::entryThread, this);
+xGripperClient::xGripperClient() {
+    this->mT1 = new std::thread(&xGripperClient::entryThread, this);
 }
 
 
-void GripperClient::entryThread() {
+void xGripperClient::entryThread() {
     std::cout << "Client Thread started" << std::endl;
-    // Use thread inhere
-    connectSocket("192.168.0.1", 1000);
-    // Use mutex to keep variables in thread safe
+    xGripperClient::connectSocket("192.168.0.1", 1000);
 
     //Check if new incoming data from gripper in a queue
     char buf[32];
@@ -23,7 +21,10 @@ void GripperClient::entryThread() {
         if (bytesRecieved == 0 || answer == mAnswer) {
             usleep(25000);
             }
-            else mAnswer = answer;
+            else mMtx.lock(mAnswer);
+                 mAnswer = answer;
+                 mMtx.unlock(mAnswer);
+        answer = "N/A";
         }
 }
 
