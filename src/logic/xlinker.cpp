@@ -37,7 +37,7 @@ void xLinker::robotDisconnect()
     mRobot->disconnect();
 }
 
-UR_STRUCT* xLinker::getRobotStruct()
+UR_STRUCT xLinker::getRobotStruct()
 {
     std::lock_guard<std::mutex> lock(mMtx);
     // Is a pointer a good idea?

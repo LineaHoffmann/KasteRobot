@@ -21,7 +21,7 @@ void cLinker::setRobotDisconnect()
     xLink->robotDisconnect();
 }
 
-UR_STRUCT *cLinker::getRobotStruct()
+UR_STRUCT cLinker::getRobotStruct()
 {
     return xLink->getRobotStruct();
 }

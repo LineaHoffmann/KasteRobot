@@ -234,8 +234,9 @@ void xUR_Control::initRobot()
  * @brief UR_Control::getURStruct
  * @return pointer to the URStruct, for data exchange
  */
-UR_STRUCT *xUR_Control::getURStruct() const
+UR_STRUCT xUR_Control::getURStruct() const
 {
+    std::unique_lock<std::mutex> dataLock(mMtx);
     return mURStruct;
 }
 
