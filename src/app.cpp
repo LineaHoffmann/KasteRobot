@@ -66,22 +66,19 @@ void app::threadFunc() {
     //xUR_Control *robot = new xUR_Control();
     //xLink->addRobot(robot);
 
-
     struct rusage use;
     while (!mJoinThread) {
-        std::this_thread::sleep_for(std::chrono::seconds(5));
-
+        std::this_thread::sleep_for(std::chrono::seconds(1));
         // POSIX resource desctription
         if (getrusage(RUSAGE_SELF, &use) == 0) {
             std::string s = "Current App Thread Resource Use [MB]: ";
             s.append(std::to_string(use.ru_maxrss / 1048576.0f));
-            logstd(s.c_str());
+            guiMain->pushStrToStatus(s);
             if (use.ru_maxrss / 1048576.0f > 10) {
                 std::cout << "WARNING: Memory use exceeds 10 MB! This is where my system [srp] starts to chug. Closing program .. " << std::endl;
                 this->Exit();
             }
         }
-
     }
     std::cout << "App thread is dying now .." << std::endl;
 }

@@ -30,16 +30,27 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxPoint(
     // Icon for the window
     wxIcon icon(wxT("../resources/icon.png"), wxBITMAP_TYPE_PNG);
 
-    // Init of sizers, window (+left/right side contents), and top menu
+    // Init of sizers, window (+left/right side contents), top menu, and bottom status bar
     initSizers();
     initMainWindow();
-    initMenu();
+    initMenuBar();
+    initStatusBar();
 }
 cMain::~cMain()
 {
 }
 void cMain::addLinker(std::shared_ptr<cLinker> linker) {
     mLinker = linker;
+}
+
+void cMain::pushStrToStatus(std::string &msg)
+{
+    mStatusBar->PushStatusText(msg.c_str(), 0);
+}
+
+void cMain::popStrFromStatus()
+{
+    mStatusBar->PopStatusText(0);
 }
 
 void cMain::startTimers(uint32_t delay) {
@@ -311,7 +322,7 @@ void cMain::initRightPanel()
     mRightSplitpanel->SetSashGravity(0.5);
     mSizerRight->SetSizeHints(mSplitterMain);
 }
-void cMain::initMenu()
+void cMain::initMenuBar()
 {
     // Menu bar creation
     mMenuBar = new wxMenuBar();
@@ -323,6 +334,15 @@ void cMain::initMenu()
     menuFile->Append(ID_MENU_ABOUT, "About");
     mMenuBar->Append(menuFile,"File");
 }
+
+void cMain::initStatusBar()
+{
+    // Status bar creation
+    mStatusBar = new wxStatusBar(this, wxID_ANY, wxSTB_DEFAULT_STYLE, "Status bar");
+    mStatusBar->PushStatusText("IN INIT", 0);
+    this->SetStatusBar(mStatusBar);
+}
+
 void cMain::initTabGeneral()
 {
     // Creation of GUI objects

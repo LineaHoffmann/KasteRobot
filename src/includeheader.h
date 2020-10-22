@@ -1,6 +1,10 @@
 #ifndef INCLUDEHEADER_H
 #define INCLUDEHEADER_H
 
+//************************//
+//** THIS IS DEPRECATED **//
+//************************//
+
 /*
  *  All libraries and definitions can be
  *  collected here for readability's sake.

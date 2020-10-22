@@ -24,7 +24,8 @@
 #include "wx/textctrl.h"
 #include "wx/notebook.h"
 #include "wx/treelist.h"
-#include "wx/aboutdlg.h"
+#include "wx/statusbr.h"
+//#include "wx/aboutdlg.h" // TODO: Make a proper about box
 #include "wx/artprov.h"
 
 #include "clinker.h"
@@ -58,6 +59,8 @@ public:
     ~cMain();
 
     void addLinker(std::shared_ptr<cLinker> linker);
+    void pushStrToStatus(std::string& msg);
+    void popStrFromStatus();
     void startTimers(uint32_t delay = 0);
 private:
     // GUI event handler functions, linked in top of cMain.cpp
@@ -81,7 +84,8 @@ private:
     // Functions for keeping the main constructor readable
     void initSizers();
     void initMainWindow();
-    void initMenu();
+    void initMenuBar();
+    void initStatusBar();
 
     // Functions for keeping the fuctions for keeping the main constructor readable, readable ...
     void initLeftPanel();
@@ -169,6 +173,9 @@ private:
 
     // Top menu bar
     wxMenuBar *mMenuBar = nullptr;
+
+    // Bottom status bar
+    wxStatusBar *mStatusBar = nullptr;
 
     // Viewing area for camera feed
     cImagePanel *mCameraPanel = nullptr;
