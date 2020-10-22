@@ -1,5 +1,5 @@
-#ifndef UR_CONTROL_H
-#define UR_CONTROL_H
+#ifndef XURCONTROL_H
+#define XURCONTROL_H
 #pragma once
 
 #ifndef LOG_DEFINES
@@ -33,14 +33,14 @@ struct UR_STRUCT {
 
 };
 
-class xUR_Control
+class xUrControl
 {
 
 public:
-    xUR_Control();
-    xUR_Control(std::string IP);
+    xUrControl();
+    xUrControl(std::string IP);
 
-    ~xUR_Control();
+    ~xUrControl();
 
     void connect(std::string IP);
     void disconnect();
@@ -49,7 +49,7 @@ public:
     enum moveEnum {MOVE_JLIN, MOVE_JPATH, MOVE_LFK, MOVE_TLIN, SERVOJ, SPEEDJ}; // WARNING: Update Enums to fit code, before final export:
 
     //move function to access private move functions of UR_RTDE
-    bool move(std::vector<std::vector<double>> &q, double &acc, double &speed, xUR_Control::moveEnum moveMode);
+    bool move(std::vector<std::vector<double>> &q, double &acc, double &speed, xUrControl::moveEnum moveMode);
 
     //read current pose in rads or deg
     // TODO: Should probably return const references
@@ -107,4 +107,4 @@ private:
     std::mutex mMtx;
 };
 
-#endif // UR_CONTROL_H
+#endif // XURCONTROL_H

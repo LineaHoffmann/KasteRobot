@@ -65,8 +65,8 @@ file(GLOB LOGIC_FILES
 
     ${PROJECT_SOURCE_DIR}/logic/xexceptions.h
 
-    ${PROJECT_SOURCE_DIR}/logic/xur_control.cpp
-    ${PROJECT_SOURCE_DIR}/logic/xur_control.h
+    ${PROJECT_SOURCE_DIR}/logic/xurcontrol.cpp
+    ${PROJECT_SOURCE_DIR}/logic/xurcontrol.h
 
     ${PROJECT_SOURCE_DIR}/logic/xgripperclient.h
     ${PROJECT_SOURCE_DIR}/logic/xgripperclient.cpp
