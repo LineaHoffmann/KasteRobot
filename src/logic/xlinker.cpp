@@ -11,9 +11,13 @@ void xLinker::addRobot(std::shared_ptr<xUrControl> robot)
 {
     mRobot = robot;
 }
+/**
+ * @brief xLinker::cIsOk verifies the pointers for the GUI (called from cLinker!)
+ * @return True if xLinker is complete, false if not
+ */
 bool xLinker::cIsOk() {
-    // TODO: When ready, also add the robot pointer to this
-    if (mCamera) return true;
+    // TODO: Add gripper and qLinker->xIsOk() to this
+    if (mCamera && mRobot) return true;
     else return false;
 }
 const cv::Mat& xLinker::getCameraFrame() {

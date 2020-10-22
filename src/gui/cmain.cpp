@@ -42,17 +42,14 @@ cMain::~cMain()
 void cMain::addLinker(std::shared_ptr<cLinker> linker) {
     mLinker = linker;
 }
-
 void cMain::pushStrToStatus(std::string &msg)
 {
     mStatusBar->PushStatusText(msg.c_str(), 0);
 }
-
 void cMain::popStrFromStatus()
 {
     mStatusBar->PopStatusText(0);
 }
-
 void cMain::startTimers(uint32_t delay) {
     std::this_thread::sleep_for(std::chrono::seconds(delay));
     // Starting the timer for the view update
@@ -134,12 +131,6 @@ void cMain::OnBtnRobotConnect(wxCommandEvent &evt) {
     } else {
         logstd("Robot->Connect clicked, but ignored .. ");
     }
-
-
-    std::string ip = std::string(mTabRobotIpEntryTxtCtrl->GetValue().mb_str());
-    //TODO: make regex check and maybe fill with zeroes.
-    mLinker->setRobotConnect(ip);
-    mTabGeneralTreeList->SetItemText(*mTabGeneralSubRobotIP, 1, mLinker->getRobotStruct().IP);
     evt.Skip();
 }
 void cMain::OnBtnRobotDisconnect(wxCommandEvent &evt) {
@@ -159,27 +150,99 @@ void cMain::OnBtnRobotDisconnect(wxCommandEvent &evt) {
     evt.Skip();
 }
 void cMain::OnBtnGripperConnect(wxCommandEvent &evt) {
-    logstd("Gripper->Connect clicked");
+    if (mLinker && mLinker->cIsOk())
+    {
+        logstd("Gripper->Connect clicked");
+        try {
+            //mLinker->setGripperConnect();
+        } catch (x_err::error &e) {
+            std::string s = "[GUI ERROR] ";
+            s.append(e.what());
+            logerr(s.c_str());
+        }
+    } else {
+        logstd("Gripper->Connect clicked, but ignored .. ");
+    }
     evt.Skip();
 }
 void cMain::OnBtnGripperDisconnect(wxCommandEvent &evt) {
-    logstd("Gripper->Disconnect clicked");
+    if (mLinker && mLinker->cIsOk())
+    {
+        logstd("Gripper->Disconnect clicked");
+        try {
+            //mLinker->setGripperDisconnect();
+        } catch (x_err::error &e) {
+            std::string s = "[GUI ERROR] ";
+            s.append(e.what());
+            logerr(s.c_str());
+        }
+    } else {
+        logstd("Gripper->Disconnect clicked, but ignored .. ");
+    }
     evt.Skip();
 }
 void cMain::OnBtnCameraConnect(wxCommandEvent &evt) {
-    logstd("Camera->Connect clicked");
+    if (mLinker && mLinker->cIsOk())
+    {
+        logstd("Camera->Connect clicked");
+        try {
+            //mLinker->setCameraConnect();
+        } catch (x_err::error &e) {
+            std::string s = "[GUI ERROR] ";
+            s.append(e.what());
+            logerr(s.c_str());
+        }
+    } else {
+        logstd("Camera->Connect clicked, but ignored .. ");
+    }
     evt.Skip();
 }
 void cMain::OnBtnCameraDisconnect(wxCommandEvent &evt) {
-    logstd("Camera->Disconnect clicked");
+    if (mLinker && mLinker->cIsOk())
+    {
+        logstd("Camera->Disconnect clicked");
+        try {
+            //mLinker->setCameraDisconnect();
+        } catch (x_err::error &e) {
+            std::string s = "[GUI ERROR] ";
+            s.append(e.what());
+            logerr(s.c_str());
+        }
+    } else {
+        logstd("Camera->Disconnect clicked, but ignored .. ");
+    }
     evt.Skip();
 }
 void cMain::OnBtnDatabaseConnect(wxCommandEvent &evt) {
-    logstd("Database->Connect clicked");
+    if (mLinker && mLinker->cIsOk())
+    {
+        logstd("Database->Connect clicked");
+        try {
+            //mLinker->setDatabaseConnect();
+        } catch (x_err::error &e) {
+            std::string s = "[GUI ERROR] ";
+            s.append(e.what());
+            logerr(s.c_str());
+        }
+    } else {
+        logstd("Database->Connect clicked, but ignored .. ");
+    }
     evt.Skip();
 }
 void cMain::OnBtnDatabaseDisconnect(wxCommandEvent &evt) {
-    logstd("Database->Disconnect clicked");
+    if (mLinker && mLinker->cIsOk())
+    {
+        logstd("Database->Disconnect clicked");
+        try {
+            //mLinker->setDatabaseDisconnect();
+        } catch (x_err::error &e) {
+            std::string s = "[GUI ERROR] ";
+            s.append(e.what());
+            logerr(s.c_str());
+        }
+    } else {
+        logstd("Database->Disconnect clicked, but ignored .. ");
+    }
     evt.Skip();
 }
 /**
@@ -334,7 +397,6 @@ void cMain::initMenuBar()
     menuFile->Append(ID_MENU_ABOUT, "About");
     mMenuBar->Append(menuFile,"File");
 }
-
 void cMain::initStatusBar()
 {
     // Status bar creation
@@ -342,7 +404,6 @@ void cMain::initStatusBar()
     mStatusBar->PushStatusText("IN INIT", 0);
     this->SetStatusBar(mStatusBar);
 }
-
 void cMain::initTabGeneral()
 {
     // Creation of GUI objects
@@ -437,7 +498,6 @@ void cMain::initTabGeneral()
     mSizerLeftGeneral->Add(mTabGeneralTextCtrl, wxSizerFlags(1).Expand());
     mSizerLeftGeneral->Add(mTabGeneralTreeList, wxSizerFlags(1).Expand());
 }
-
 void cMain::initTabRobot()
 {
     // Creation of GUI objects

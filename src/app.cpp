@@ -41,8 +41,10 @@ void app::threadFunc() {
     logstd("App thread started!");
 
     //** Logic init **//
-    std::shared_ptr<xBaslerCam> camera = std::make_shared<xBaslerCam>("../resources/pylonimgs/*.bmp", 12500);
-    camera->start();
+    //std::shared_ptr<xBaslerCam> camera = std::make_shared<xBaslerCam>("../resources/pylonimgs/*.bmp", 12500);
+    //camera->start();
+    std::shared_ptr<xUrControl> robot = std::make_shared<xUrControl>();
+    //robot->connect();
     //** Database init **//
 
     //** Linking class creation **//
@@ -56,7 +58,8 @@ void app::threadFunc() {
     //xLink->addDatabaseLinker(qLink);
     //qLink->addDatabaseLinker(xLink);
 
-    xLink->addCamera(camera);
+    //xLink->addCamera(camera);
+    //xLink->addRobot(robot);
 
     guiMain->addLinker(cLink);
     //logicMain->addLinker(xLink);
