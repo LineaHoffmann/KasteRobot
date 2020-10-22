@@ -76,7 +76,7 @@ void app::threadFunc() {
         if (getrusage(RUSAGE_SELF, &use) == 0) {
             std::string s = "Current App Thread Resource Use [MB]: ";
             s.append(std::to_string(use.ru_maxrss / 1048576.0f));
-            guiMain->pushStrToStatus(s);
+            if (guiMain) guiMain->pushStrToStatus(s);
             if (use.ru_maxrss / 1048576.0f > 10) {
                 std::cout << "WARNING: Memory use exceeds 10 MB! This is where my system [srp] starts to chug. Closing program .. " << std::endl;
                 this->Exit();

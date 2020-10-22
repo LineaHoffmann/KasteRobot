@@ -44,11 +44,17 @@ void cMain::addLinker(std::shared_ptr<cLinker> linker) {
 }
 void cMain::pushStrToStatus(std::string &msg)
 {
-    mStatusBar->PushStatusText(msg.c_str(), 0);
+    std::lock_guard<std::mutex> lock(mMtx);
+    // If called during Close(), the push may fail because mStatusBar is destructing elsewhere
+    if (mStatusBar != NULL && mStatusBar->GetFieldsCount() == 3)
+        mStatusBar->PushStatusText(msg.c_str(), 2);
 }
 void cMain::popStrFromStatus()
 {
-    mStatusBar->PopStatusText(0);
+    std::lock_guard<std::mutex> lock(mMtx);
+    // If called during Close(), the pop may fail because mStatusBar is destructing elsewhere
+    if (mStatusBar != NULL && mStatusBar->GetFieldsCount() == 3)
+        mStatusBar->PopStatusText(2);
 }
 void cMain::startTimers(uint32_t delay) {
     std::this_thread::sleep_for(std::chrono::seconds(delay));
@@ -391,10 +397,10 @@ void cMain::initMenuBar()
     mMenuBar = new wxMenuBar();
     this->SetMenuBar(mMenuBar);
     wxMenu *menuFile = new wxMenu();
-    menuFile->Append(ID_MENU_SAVE_LOG, "Save Log");
-    menuFile->Append(ID_MENU_SAVE_SNAPSHOT, "Save Snapshot");
-    menuFile->Append(ID_MENU_EXIT, "Exit");
-    menuFile->Append(ID_MENU_ABOUT, "About");
+    menuFile->Append(ID_MENU_SAVE_LOG, "Save Log", "Save Log");
+    menuFile->Append(ID_MENU_SAVE_SNAPSHOT, "Save Snapshot", "Save Snapshot");
+    menuFile->Append(ID_MENU_EXIT, "Exit", "Exit");
+    menuFile->Append(ID_MENU_ABOUT, "About", "About");
     mMenuBar->Append(menuFile,"File");
 }
 void cMain::initStatusBar()
@@ -402,6 +408,7 @@ void cMain::initStatusBar()
     // Status bar creation
     mStatusBar = new wxStatusBar(this, wxID_ANY, wxSTB_DEFAULT_STYLE, "Status bar");
     mStatusBar->PushStatusText("IN INIT", 0);
+    mStatusBar->SetFieldsCount(3);
     this->SetStatusBar(mStatusBar);
 }
 void cMain::initTabGeneral()
