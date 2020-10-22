@@ -14,21 +14,4 @@ public:
 };
 }
 
-class UR_BadIP : public std::system_error{
-public:
-    const char* what() const throw()
-    {
-        return "Connection to host could not be resolved";
-    }
-};
-
-class UR_NotConnected : public std::system_error{
-public:
-    const char* what() const throw()
-    {
-        return "Robot connections have not been established!";
-    }
-};
-
-
 #endif // ROBOTEXCEPTIONS_H

@@ -29,6 +29,16 @@ bool app::OnInit() {
     guiMain->SetSize(1280,1024);
     guiMain->Show();
     logstd("Gui started .. ");
+    SetTopWindow(guiMain);
+    guiMain->startTimers(10);
+    thread = new std::thread(&app::threadFunc, this);
+    return true;
+}
+
+void app::threadFunc() {
+    //** For testing systemwide threaded updates **//
+    //** Dies on ~App **//
+    logstd("App thread started!");
 
     //** Logic init **//
     std::shared_ptr<xBaslerCam> camera = std::make_shared<xBaslerCam>("../resources/pylonimgs/*.bmp", 12500);
@@ -52,26 +62,22 @@ bool app::OnInit() {
     //logicMain->addLinker(xLink);
     //databaseMain->addLinker(qLink);
 
-    //** For testing basic inits **//
-    //xBaslerCam *camera = new xBaslerCam("../resources/pylonimgs/*.bmp", 12500);
-    //xLink->addCamera(camera);
     //UR_Control *robot = new xUR_Control("127.0.0.1");
     //xUR_Control *robot = new xUR_Control();
     //xLink->addRobot(robot);
 
-    thread = new std::thread(&app::threadFunc, this);
 
-    guiMain->startTimers();
-
-    return true;
-}
-void app::threadFunc() {
-    //** For testing systemwide threaded updates **//
-    //** Dies on ~App **//
-    logstd("App thread started!");
+    struct rusage use;
     while (!mJoinThread) {
         std::this_thread::sleep_for(std::chrono::seconds(5));
-        if (!xLink->isCameraConnected()) logerr("Camera not connected .. ");
+
+        // POSIX resource desctription
+        if (getrusage(RUSAGE_SELF, &use) == 0) {
+            std::string s = "Current App Thread Resource Use: ";
+            s.append(std::to_string(use.ru_maxrss));
+            logstd(s.c_str());
+        }
+
     }
     std::cout << "App thread is dying now .." << std::endl;
 }

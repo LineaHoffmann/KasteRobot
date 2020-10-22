@@ -25,6 +25,9 @@
 
 #include "wx/wx.h"
 
+#include <sys/time.h>
+#include <sys/resource.h>
+
 class app : public wxApp
 {
 public:
@@ -33,7 +36,6 @@ public:
 
 public:
     virtual bool OnInit();
-
 private:
     std::shared_ptr<cLinker> cLink;
     std::shared_ptr<xLinker> xLink;
