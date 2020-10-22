@@ -1,5 +1,5 @@
-#ifndef ROBOTEXCEPTIONS_H
-#define ROBOTEXCEPTIONS_H
+#ifndef XEXCEPTIONS
+#define XEXCEPTIONS
 
 #include <system_error>
 
@@ -14,4 +14,4 @@ public:
 };
 }
 
-#endif // ROBOTEXCEPTIONS_H
+#endif // XEXCEPTIONS

@@ -68,7 +68,7 @@
 #include "logic/xur_control.h"
 
 //Exceptions
-#include "logic/xrobotexceptions.h"
+#include "logic/xexceptions.h"
 
 
 #endif // INCLUDEHEADER_H

@@ -22,7 +22,7 @@
 
 #include "wx/log.h"
 
-#include "xrobotexceptions.h"
+#include "xexceptions.h"
 
 //definition of data struct
 struct UR_STRUCT {

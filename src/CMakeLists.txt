@@ -37,7 +37,7 @@ find_package(ur_rtde REQUIRED)
 file(GLOB SRC
     ${PROJECT_SOURCE_DIR}/app.cpp
     ${PROJECT_SOURCE_DIR}/app.h
-    ${PROJECT_SOURCE_DIR}/includeheader.h
+    #${PROJECT_SOURCE_DIR}/includeheader.h
     )
 
 # GUI layer source files GLOB
@@ -63,7 +63,7 @@ file(GLOB LOGIC_FILES
     ${PROJECT_SOURCE_DIR}/logic/xlinker.cpp
     ${PROJECT_SOURCE_DIR}/logic/xlinker.h
 
-    ${PROJECT_SOURCE_DIR}/logic/xrobotexceptions.h
+    ${PROJECT_SOURCE_DIR}/logic/xexceptions.h
 
     ${PROJECT_SOURCE_DIR}/logic/xur_control.cpp
     ${PROJECT_SOURCE_DIR}/logic/xur_control.h

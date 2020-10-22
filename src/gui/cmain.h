@@ -30,7 +30,7 @@
 #include "clinker.h"
 #include "cimagepanel.h"
 
-#include "../logic/xrobotexceptions.h"
+#include "../logic/xexceptions.h"
 
 enum FUNCTION_BINDING_IDS {
     ID_TIMER_CAMERA_UPDATE,
