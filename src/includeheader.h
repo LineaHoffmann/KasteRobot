@@ -65,7 +65,7 @@
 #include "ur_rtde/rtde_receive_interface.h"
 
 // URStruct include
-#include "logic/xur_control.h"
+#include "logic/xurcontrol.h"
 
 //Exceptions
 #include "logic/xexceptions.h"

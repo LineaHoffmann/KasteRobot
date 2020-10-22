@@ -8,7 +8,7 @@
 //#include "opencv2/core.hpp"
 
 #include "../logic/xlinker.h"
-#include "../logic/xur_control.h"
+#include "../logic/xurcontrol.h"
 
 class xLinker;
 class cLinker
@@ -34,7 +34,7 @@ public:
     void setRobotDisconnect();
     void setRobotNewTCP();
     void setRobotNewJointValues();
-    UR_STRUCT* getRobotStruct();
+    UR_STRUCT getRobotStruct();
 
     // Camera connections called from cMain
     bool isCameraConnected();

@@ -114,7 +114,7 @@ void cMain::OnBtnRobotConnect(wxCommandEvent &evt) {
             std::string ip = std::string(mTabRobotIpEntryTxtCtrl->GetValue().mb_str());
             //TODO: make regex check and maybe fill with zeroes.
             mLinker->setRobotConnect(ip);
-            mTabGeneralTreeList->SetItemText(*mTabGeneralSubRobotIP, 1, mLinker->getRobotStruct()->IP);
+            mTabGeneralTreeList->SetItemText(*mTabGeneralSubRobotIP, 1, mLinker->getRobotStruct().IP);
         } catch (x_err::error &e) {
             std::string s = "[GUI ERROR] ";
             s.append(e.what());
@@ -128,7 +128,7 @@ void cMain::OnBtnRobotConnect(wxCommandEvent &evt) {
     std::string ip = std::string(mTabRobotIpEntryTxtCtrl->GetValue().mb_str());
     //TODO: make regex check and maybe fill with zeroes.
     mLinker->setRobotConnect(ip);
-    mTabGeneralTreeList->SetItemText(*mTabGeneralSubRobotIP, 1, mLinker->getRobotStruct()->IP);
+    mTabGeneralTreeList->SetItemText(*mTabGeneralSubRobotIP, 1, mLinker->getRobotStruct().IP);
     evt.Skip();
 }
 void cMain::OnBtnRobotDisconnect(wxCommandEvent &evt) {

@@ -30,7 +30,7 @@ bool app::OnInit() {
     guiMain->Show();
     logstd("Gui started .. ");
     SetTopWindow(guiMain);
-    guiMain->startTimers(10);
+    guiMain->startTimers();
     thread = new std::thread(&app::threadFunc, this);
     return true;
 }
@@ -73,9 +73,13 @@ void app::threadFunc() {
 
         // POSIX resource desctription
         if (getrusage(RUSAGE_SELF, &use) == 0) {
-            std::string s = "Current App Thread Resource Use: ";
-            s.append(std::to_string(use.ru_maxrss));
+            std::string s = "Current App Thread Resource Use [MB]: ";
+            s.append(std::to_string(use.ru_maxrss / 1048576.0f));
             logstd(s.c_str());
+            if (use.ru_maxrss / 1048576.0f > 10) {
+                std::cout << "WARNING: Memory use exceeds 10 MB! This is where my system [srp] starts to chug. Closing program .. " << std::endl;
+                this->Exit();
+            }
         }
 
     }

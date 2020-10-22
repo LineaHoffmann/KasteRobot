@@ -9,7 +9,7 @@
 #include "../gui/clinker.h"
 
 #include "xbaslercam.h"
-#include "xur_control.h"
+#include "xurcontrol.h"
 
 class cLinker;
 class xLinker
@@ -17,7 +17,7 @@ class xLinker
 public:
     xLinker();
     void addCamera(std::shared_ptr<xBaslerCam> cam);
-    void addRobot(std::shared_ptr<xUR_Control> robot);
+    void addRobot(std::shared_ptr<xUrControl> robot);
 
     bool cIsOk();
 
@@ -26,13 +26,13 @@ public:
 
     void robotConnect(std::string IP);
     void robotDisconnect();
-    UR_STRUCT* getRobotStruct();
+    UR_STRUCT getRobotStruct();
 
 
 
 private:
     std::shared_ptr<xBaslerCam> mCamera;
-    std::shared_ptr<xUR_Control> mRobot;
+    std::shared_ptr<xUrControl> mRobot;
 
     std::shared_ptr<cLinker> cLink;
 

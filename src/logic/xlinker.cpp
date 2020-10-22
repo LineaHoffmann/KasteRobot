@@ -7,7 +7,7 @@ void xLinker::addCamera(std::shared_ptr<xBaslerCam> camera) {
     mCamera = camera;
 }
 
-void xLinker::addRobot(std::shared_ptr<xUR_Control> robot)
+void xLinker::addRobot(std::shared_ptr<xUrControl> robot)
 {
     mRobot = robot;
 }
