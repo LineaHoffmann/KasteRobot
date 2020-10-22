@@ -22,7 +22,7 @@ public:
     bool cIsOk();
 
     const cv::Mat& getCameraFrame();
-    int getCameraState();
+    bool isCameraConnected();
 
     void robotConnect(std::string IP);
     void robotDisconnect();

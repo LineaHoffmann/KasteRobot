@@ -37,7 +37,7 @@ public:
     UR_STRUCT* getRobotStruct();
 
     // Camera connections called from cMain
-    int getCameraState();
+    bool isCameraConnected();
     const cv::Mat& getCameraFrame();
     void setCameraConnect();
     void setCameraDisconnect();

@@ -34,16 +34,19 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxPoint(
     initSizers();
     initMainWindow();
     initMenu();
-
-    // Starting the timer for the view update
-    // Loads cv::Mat from camera, converts to wxImage, and updates view
-    mTimerCamera.Start(50);
 }
 cMain::~cMain()
 {
 }
 void cMain::addLinker(std::shared_ptr<cLinker> linker) {
     mLinker = linker;
+}
+
+void cMain::startTimers(uint32_t delay) {
+    std::this_thread::sleep_for(std::chrono::seconds(delay));
+    // Starting the timer for the view update
+    // Loads cv::Mat from camera, converts to wxImage, and updates view
+    mTimerCamera.Start(50); // 50ms
 }
 // This will be handler functions galore
 void cMain::OnTimerCameraUpdate(wxTimerEvent &evt) {

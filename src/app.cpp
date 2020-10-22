@@ -31,8 +31,8 @@ bool app::OnInit() {
     logstd("Gui started .. ");
 
     //** Logic init **//
-    std::shared_ptr<xBaslerCam> camera = std::make_shared<xBaslerCam>("../resources/pylonimgs/*.png", 12500);
-
+    std::shared_ptr<xBaslerCam> camera = std::make_shared<xBaslerCam>("../resources/pylonimgs/*.bmp", 12500);
+    camera->start();
     //** Database init **//
 
     //** Linking class creation **//
@@ -60,6 +60,9 @@ bool app::OnInit() {
     //xLink->addRobot(robot);
 
     thread = new std::thread(&app::threadFunc, this);
+
+    guiMain->startTimers();
+
     return true;
 }
 void app::threadFunc() {
@@ -67,7 +70,8 @@ void app::threadFunc() {
     //** Dies on ~App **//
     logstd("App thread started!");
     while (!mJoinThread) {
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+        if (!xLink->isCameraConnected()) logerr("Camera not connected .. ");
     }
     std::cout << "App thread is dying now .." << std::endl;
 }

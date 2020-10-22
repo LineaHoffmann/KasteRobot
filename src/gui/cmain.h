@@ -58,7 +58,7 @@ public:
     ~cMain();
 
     void addLinker(std::shared_ptr<cLinker> linker);
-
+    void startTimers(uint32_t delay = 0);
 private:
     // GUI event handler functions, linked in top of cMain.cpp
     // They get to keep uppercase first letter

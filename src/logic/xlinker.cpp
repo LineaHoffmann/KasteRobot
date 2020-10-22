@@ -20,9 +20,9 @@ const cv::Mat& xLinker::getCameraFrame() {
     std::lock_guard<std::mutex> lock(mMtx);
     return mCamera->getImage();
 }
-int xLinker::getCameraState() {
+bool xLinker::isCameraConnected() {
     std::lock_guard<std::mutex> lock(mMtx);
-    return -1; // TODO: Link to camera object
+    return mCamera->isConnected();
 }
 
 void xLinker::robotConnect(std::string IP)

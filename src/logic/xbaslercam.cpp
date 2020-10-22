@@ -25,11 +25,10 @@ bool xBaslerCam::start()
     calibrate();
     baslerCamThread = new std::thread(&xBaslerCam::GrabPictures,this);
 
-    auto start_time = std::chrono::high_resolution_clock::now();
-    auto current_time = std::chrono::high_resolution_clock::now();
+    auto start_time = std::chrono::steady_clock::now();
+    auto current_time = std::chrono::steady_clock::now();
     while(true) {
-        current_time = std::chrono::high_resolution_clock::now();
-
+        current_time = std::chrono::steady_clock::now();
         if (running){
             return 1;
         }

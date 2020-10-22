@@ -26,8 +26,8 @@ UR_STRUCT *cLinker::getRobotStruct()
     return xLink->getRobotStruct();
 }
 
-int cLinker::getCameraState() {
-    return xLink->getCameraState();
+bool cLinker::isCameraConnected() {
+    return xLink->isCameraConnected();
 }
 const cv::Mat& cLinker::getCameraFrame() {
     std::lock_guard<std::mutex> lock(mMtx);
