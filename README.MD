@@ -78,3 +78,10 @@ INSTALLING URSIM
 	to run URSim run in terminal:
 		cd ..
 		sudo ursim-3.X.X.XXXXX/start-ursim.sh UR5
+
+USING THE UML GENERATOR SCRIPT
+	Run in terminal (Beware of pip in first line, apt in second):
+		sudo pip install hpp2plantuml
+		sudo apt install plantuml
+	To run the script, enter the UML subfolder and run:
+		./hpp2uml_script.sh
