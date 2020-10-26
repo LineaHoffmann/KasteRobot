@@ -1,4 +1,4 @@
-#include "xgripperclient.h"
+#include "xgripperclient.hpp"
 
 xGripperClient::xGripperClient() {
     this->mT1 = new std::thread(&xGripperClient::entryThread, this);

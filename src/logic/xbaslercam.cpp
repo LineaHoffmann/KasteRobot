@@ -1,4 +1,4 @@
-#include "xbaslercam.h"
+#include "xbaslercam.hpp"
 #include <chrono>
 
 xBaslerCam::xBaslerCam(){

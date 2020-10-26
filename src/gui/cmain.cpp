@@ -1,4 +1,4 @@
-#include "cmain.h"
+#include "cmain.hpp"
 
 // Event -> Function binding table
 // Event binding name enum is in the header
@@ -291,7 +291,7 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
     switch (evt.GetId()) {
     case ID_MENU_SAVE_LOG:
         logstd("Menu->Save Log clicked");
-        // TODO: Pull this runs entries from database
+        // TODO: Pull current runs entries from database
         //       and dump to some .txt file
         evt.Skip();
         break;

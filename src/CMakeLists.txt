@@ -41,42 +41,42 @@ find_package(ur_rtde REQUIRED)
 # USE EXPLICIT GLOBBING! please ..
 file(GLOB SRC
     ${PROJECT_SOURCE_DIR}/app.cpp
-    ${PROJECT_SOURCE_DIR}/app.h
+    ${PROJECT_SOURCE_DIR}/app.hpp
     )
 
 # GUI layer source files GLOB
 file(GLOB GUI_FILES
     ${PROJECT_SOURCE_DIR}/gui/cmain.cpp
-    ${PROJECT_SOURCE_DIR}/gui/cmain.h
+    ${PROJECT_SOURCE_DIR}/gui/cmain.hpp
 
     ${PROJECT_SOURCE_DIR}/gui/cimagepanel.cpp
-    ${PROJECT_SOURCE_DIR}/gui/cimagepanel.h
+    ${PROJECT_SOURCE_DIR}/gui/cimagepanel.hpp
     )
 
 # Logic layer source files GLOB
 file(GLOB LOGIC_FILES
     ${PROJECT_SOURCE_DIR}/logic/xcontroller.cpp
-    ${PROJECT_SOURCE_DIR}/logic/xcontroller.h
+    ${PROJECT_SOURCE_DIR}/logic/xcontroller.hpp
 
     ${PROJECT_SOURCE_DIR}/logic/xbaslercam.cpp
-    ${PROJECT_SOURCE_DIR}/logic/xbaslercam.h
+    ${PROJECT_SOURCE_DIR}/logic/xbaslercam.hpp
 
     ${PROJECT_SOURCE_DIR}/logic/ximagehandler.cpp
-    ${PROJECT_SOURCE_DIR}/logic/ximagehandler.h
+    ${PROJECT_SOURCE_DIR}/logic/ximagehandler.hpp
 
     ${PROJECT_SOURCE_DIR}/logic/xurcontrol.cpp
-    ${PROJECT_SOURCE_DIR}/logic/xurcontrol.h
+    ${PROJECT_SOURCE_DIR}/logic/xurcontrol.hpp
 
     ${PROJECT_SOURCE_DIR}/logic/xgripperclient.h
     ${PROJECT_SOURCE_DIR}/logic/xgripperclient.cpp
 
-    ${PROJECT_SOURCE_DIR}/logic/xexceptions.h
+    ${PROJECT_SOURCE_DIR}/logic/xexceptions.hpp
     )
 
 # Database layer source files GLOB
 file (GLOB DB_FILES
      ${PROJECT_SOURCE_DIR}/database/qdatabasehandler.cpp
-     ${PROJECT_SOURCE_DIR}/database/qdatabasehandler.h
+     ${PROJECT_SOURCE_DIR}/database/qdatabasehandler.hpp
     )
 
 # Creating executable, linked with source files

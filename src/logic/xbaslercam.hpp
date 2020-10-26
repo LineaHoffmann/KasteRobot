@@ -21,7 +21,7 @@
 #include "opencv2/core.hpp"
 #include "wx/log.h"
 
-#include "xexceptions.h"
+#include "xexceptions.hpp"
 
 class xBaslerCam
 {

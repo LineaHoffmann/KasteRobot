@@ -34,9 +34,9 @@
 #include "opencv2/core.hpp"
 #include "opencv2/opencv.hpp"
 
-#include "cimagepanel.h"
+#include "cimagepanel.hpp"
 
-#include "../logic/xcontroller.h"
+#include "../logic/xcontroller.hpp"
 
 enum FUNCTION_BINDING_ID {
     ID_TIMER_VIEW1_UPDATE,      // Updating for view 1

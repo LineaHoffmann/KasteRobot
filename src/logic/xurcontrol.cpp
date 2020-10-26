@@ -1,5 +1,4 @@
-
-#include "xurcontrol.h"
+#include "xurcontrol.hpp"
 //#include "../includeheader.h"
 
 // WARNING: To-do plugin doesn't see the headers .. There are a few notes in there

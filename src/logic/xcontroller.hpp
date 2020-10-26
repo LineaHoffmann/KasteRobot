@@ -16,10 +16,10 @@
 
 #include "wx/wx.h"
 
-#include "xbaslercam.h"
-#include "xurcontrol.h"
-#include "xgripperclient.h"
-#include "xexceptions.h"
+#include "xbaslercam.hpp"
+#include "xurcontrol.hpp"
+#include "xgripperclient.hpp"
+#include "xexceptions.hpp"
 
 // Not sure where to place this, both xController and cMain need access
 enum GUI_BUTTONS {

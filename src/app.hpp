@@ -12,8 +12,8 @@
 #include <utility>
 #include <thread>
 
-#include "gui/cmain.h"
-#include "logic/xcontroller.h"
+#include "gui/cmain.hpp"
+#include "logic/xcontroller.hpp"
 
 #include "wx/wx.h"
 

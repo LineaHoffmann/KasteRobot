@@ -1,4 +1,4 @@
-#include "app.h"
+#include "app.hpp"
 
 wxIMPLEMENT_APP(app);
 

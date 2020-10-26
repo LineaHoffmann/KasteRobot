@@ -1,4 +1,4 @@
-#include "cimagepanel.h"
+#include "cimagepanel.hpp"
 
 // Local event table
 wxBEGIN_EVENT_TABLE(cImagePanel, wxPanel)
