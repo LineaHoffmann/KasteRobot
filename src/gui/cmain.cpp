@@ -30,49 +30,66 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxPoint(
     // Icon for the window
     wxIcon icon(wxT("../resources/icon.png"), wxBITMAP_TYPE_PNG);
 
-    // Init of the layer linker
-    mLinker = new cLinker();
-
-    // Init of sizers, window (+left/right side contents), and top menu
+    // Init of sizers, window (+left/right side contents), top menu, and bottom status bar
     initSizers();
     initMainWindow();
-    initMenu();
-
-    // Starting the timer for the view update
-    // Loads cv::Mat from camera, converts to wxImage, and updates view
-    mTimerCamera.Start(50);
+    initMenuBar();
+    initStatusBar();
 }
 cMain::~cMain()
 {
 }
-void cMain::addLinker(cLinker* linker) {
+void cMain::addLinker(std::shared_ptr<cLinker> linker) {
     mLinker = linker;
+}
+void cMain::pushStrToStatus(std::string &msg)
+{
+    std::lock_guard<std::mutex> lock(mMtx);
+    // If called during Close(), the push may fail because mStatusBar is destructing elsewhere
+    if (mStatusBar != NULL && mStatusBar->GetFieldsCount() == 3)
+        mStatusBar->PushStatusText(msg.c_str(), 2);
+}
+void cMain::popStrFromStatus()
+{
+    std::lock_guard<std::mutex> lock(mMtx);
+    // If called during Close(), the pop may fail because mStatusBar is destructing elsewhere
+    if (mStatusBar != NULL && mStatusBar->GetFieldsCount() == 3)
+        mStatusBar->PopStatusText(2);
+}
+void cMain::startTimers(uint32_t delay) {
+    std::this_thread::sleep_for(std::chrono::seconds(delay));
+    // Starting the timer for the view update
+    // Loads cv::Mat from camera, converts to wxImage, and updates view
+    mTimerCamera.Start(50); // 50ms
 }
 // This will be handler functions galore
 void cMain::OnTimerCameraUpdate(wxTimerEvent &evt) {
-    // NOTE: Maybe cLinker should get a bool cLinker::isOK() to check pointers in
-    if (mLinker == nullptr) return;
-    cv::Mat input = mLinker->getCameraFrame();
-    cv::Mat im2;
-    if (input.channels() == 1) {
-        // Probably grayscale
-        cv::cvtColor(input, im2, cv::COLOR_GRAY2RGB);
-    } else if (input.channels() == 4) {
-        // Probably BGR with alpha channel
-        cv::cvtColor(input, im2, cv::COLOR_BGRA2RGB);
-    } else {
-        // Probably BGR without alpha channel
-        cv::cvtColor(input, im2, cv::COLOR_BGR2RGB);
+    std::lock_guard<std::mutex> lock(mMtx);
+    // No output, it would be too much
+    if (mLinker && mLinker->cIsOk()) {
+        cv::Mat input = mLinker->getCameraFrame();
+        cv::Mat im2;
+        if (input.channels() == 1) {
+            // Probably grayscale
+            cv::cvtColor(input, im2, cv::COLOR_GRAY2RGB);
+        } else if (input.channels() == 4) {
+            // Probably BGR with alpha channel
+            cv::cvtColor(input, im2, cv::COLOR_BGRA2RGB);
+        } else {
+            // Probably BGR without alpha channel
+            cv::cvtColor(input, im2, cv::COLOR_BGR2RGB);
+        }
+        long imgSize = im2.rows * im2.cols * im2.channels();
+        wxImage output(im2.cols, im2.rows, imgSize);
+        unsigned char* source = im2.data;
+        unsigned char* destination = output.GetData();
+        for (long i = 0; i < imgSize; i++) {
+            destination[i] = source[i];
+        }
+        mCameraPanel->setNewImage(output);
     }
-    long imgSize = im2.rows * im2.cols * im2.channels();
-    wxImage output(im2.cols, im2.rows, imgSize);
-    unsigned char* source = im2.data;
-    unsigned char* destination = output.GetData();
-    for (long i = 0; i < imgSize; i++) {
-        destination[i] = source[i];
-    }
-    mCameraPanel->setNewImage(output);
     evt.Skip();
+    return;
 }
 void cMain::OnMenuSaveLog(wxCommandEvent &evt) {
     logstd("Menu->Save Log clicked");
@@ -104,35 +121,134 @@ void cMain::OnMenuAbout(wxCommandEvent &evt) {
     evt.Skip();
 }
 void cMain::OnBtnRobotConnect(wxCommandEvent &evt) {
-    logstd("Robot->Connect clicked");
+    if (mLinker && mLinker->cIsOk())
+    {
+        logstd("Robot->Connect clicked");
+        try {
+            std::string ip = std::string(mTabRobotIpEntryTxtCtrl->GetValue().mb_str());
+            //TODO: make regex check and maybe fill with zeroes.
+            mLinker->setRobotConnect(ip);
+            mTabGeneralTreeList->SetItemText(*mTabGeneralSubRobotIP, 1, mLinker->getRobotStruct().IP);
+        } catch (x_err::error &e) {
+            std::string s = "[GUI ERROR] ";
+            s.append(e.what());
+            logerr(s.c_str());
+        }
+    } else {
+        logstd("Robot->Connect clicked, but ignored .. ");
+    }
     evt.Skip();
 }
 void cMain::OnBtnRobotDisconnect(wxCommandEvent &evt) {
-    logstd("Robot->Disconnect clicked");
+    if (mLinker && mLinker->cIsOk())
+    {
+        logstd("Robot->Disconnect clicked");
+        try {
+            mLinker->setRobotDisconnect();
+        } catch (x_err::error &e) {
+            std::string s = "[GUI ERROR] ";
+            s.append(e.what());
+            logerr(s.c_str());
+        }
+    } else {
+        logstd("Robot->Disconnect clicked, but ignored .. ");
+    }
     evt.Skip();
 }
 void cMain::OnBtnGripperConnect(wxCommandEvent &evt) {
-    logstd("Gripper->Connect clicked");
+    if (mLinker && mLinker->cIsOk())
+    {
+        logstd("Gripper->Connect clicked");
+        try {
+            //mLinker->setGripperConnect();
+        } catch (x_err::error &e) {
+            std::string s = "[GUI ERROR] ";
+            s.append(e.what());
+            logerr(s.c_str());
+        }
+    } else {
+        logstd("Gripper->Connect clicked, but ignored .. ");
+    }
     evt.Skip();
 }
 void cMain::OnBtnGripperDisconnect(wxCommandEvent &evt) {
-    logstd("Gripper->Disconnect clicked");
+    if (mLinker && mLinker->cIsOk())
+    {
+        logstd("Gripper->Disconnect clicked");
+        try {
+            //mLinker->setGripperDisconnect();
+        } catch (x_err::error &e) {
+            std::string s = "[GUI ERROR] ";
+            s.append(e.what());
+            logerr(s.c_str());
+        }
+    } else {
+        logstd("Gripper->Disconnect clicked, but ignored .. ");
+    }
     evt.Skip();
 }
 void cMain::OnBtnCameraConnect(wxCommandEvent &evt) {
-    logstd("Camera->Connect clicked");
+    if (mLinker && mLinker->cIsOk())
+    {
+        logstd("Camera->Connect clicked");
+        try {
+            //mLinker->setCameraConnect();
+        } catch (x_err::error &e) {
+            std::string s = "[GUI ERROR] ";
+            s.append(e.what());
+            logerr(s.c_str());
+        }
+    } else {
+        logstd("Camera->Connect clicked, but ignored .. ");
+    }
     evt.Skip();
 }
 void cMain::OnBtnCameraDisconnect(wxCommandEvent &evt) {
-    logstd("Camera->Disconnect clicked");
+    if (mLinker && mLinker->cIsOk())
+    {
+        logstd("Camera->Disconnect clicked");
+        try {
+            //mLinker->setCameraDisconnect();
+        } catch (x_err::error &e) {
+            std::string s = "[GUI ERROR] ";
+            s.append(e.what());
+            logerr(s.c_str());
+        }
+    } else {
+        logstd("Camera->Disconnect clicked, but ignored .. ");
+    }
     evt.Skip();
 }
 void cMain::OnBtnDatabaseConnect(wxCommandEvent &evt) {
-    logstd("Database->Connect clicked");
+    if (mLinker && mLinker->cIsOk())
+    {
+        logstd("Database->Connect clicked");
+        try {
+            //mLinker->setDatabaseConnect();
+        } catch (x_err::error &e) {
+            std::string s = "[GUI ERROR] ";
+            s.append(e.what());
+            logerr(s.c_str());
+        }
+    } else {
+        logstd("Database->Connect clicked, but ignored .. ");
+    }
     evt.Skip();
 }
 void cMain::OnBtnDatabaseDisconnect(wxCommandEvent &evt) {
-    logstd("Database->Disconnect clicked");
+    if (mLinker && mLinker->cIsOk())
+    {
+        logstd("Database->Disconnect clicked");
+        try {
+            //mLinker->setDatabaseDisconnect();
+        } catch (x_err::error &e) {
+            std::string s = "[GUI ERROR] ";
+            s.append(e.what());
+            logerr(s.c_str());
+        }
+    } else {
+        logstd("Database->Disconnect clicked, but ignored .. ");
+    }
     evt.Skip();
 }
 /**
@@ -159,7 +275,11 @@ void cMain::initSizers()
 void cMain::initMainWindow()
 {
     // Main split window
-    mSplitterMain = new wxSplitterWindow(this, wxID_ANY);
+    mSplitterMain = new wxSplitterWindow(this, wxID_ANY,
+                                         wxDefaultPosition,
+                                         wxDefaultSize,
+                                         wxSP_3D,
+                                         "Main Splitter");
     mSplitterMain->SetSashGravity(0.5);
     mSplitterMain->SetMinimumPaneSize(20);
     mSizerMain->Add(mSplitterMain, 1, wxEXPAND, 0);
@@ -169,6 +289,7 @@ void cMain::initMainWindow()
 
     // Splitting into right/left sides (left and right panel inits has to be before this)
     mSplitterMain->SplitVertically(mLeftBookPanel, mRightSplitpanel);
+    mSplitterMain->SetSashGravity(0.5);
     this->SetSizer(mSizerMain);
     mSizerMain->SetSizeHints(this);
 }
@@ -178,14 +299,38 @@ void cMain::initMainWindow()
 void cMain::initLeftPanel()
 {
     // Left side panel for numeric information and the like
-    mLeftBookPanel = new wxNotebook(mSplitterMain, wxID_ANY);
+    mLeftBookPanel = new wxNotebook(mSplitterMain, wxID_ANY,
+                                    wxDefaultPosition,
+                                    wxDefaultSize,
+                                    0,
+                                    "Notebook");
 
     // Sub-panels for left side
-    mLeftSubPanelGeneral = new wxPanel(mLeftBookPanel, wxID_ANY);
-    mLeftSubPanelRobot = new wxPanel(mLeftBookPanel, wxID_ANY);
-    mLeftSubPanelGripper = new wxPanel(mLeftBookPanel, wxID_ANY);
-    mLeftSubPanelCamera = new wxPanel(mLeftBookPanel, wxID_ANY);
-    mLeftSubPanelDatabase = new wxPanel(mLeftBookPanel, wxID_ANY);
+    mLeftSubPanelGeneral = new wxPanel(mLeftBookPanel, wxID_ANY,
+                                       wxDefaultPosition,
+                                       wxDefaultSize,
+                                       0,
+                                       "subPanel1");
+    mLeftSubPanelRobot = new wxPanel(mLeftBookPanel, wxID_ANY,
+                                     wxDefaultPosition,
+                                     wxDefaultSize,
+                                     0,
+                                     "subPanel2");
+    mLeftSubPanelGripper = new wxPanel(mLeftBookPanel, wxID_ANY,
+                                       wxDefaultPosition,
+                                       wxDefaultSize,
+                                       0,
+                                       "subPanel3");
+    mLeftSubPanelCamera = new wxPanel(mLeftBookPanel, wxID_ANY,
+                                      wxDefaultPosition,
+                                      wxDefaultSize,
+                                      0,
+                                      "subPanel4");
+    mLeftSubPanelDatabase = new wxPanel(mLeftBookPanel, wxID_ANY,
+                                        wxDefaultPosition,
+                                        wxDefaultSize,
+                                        0,
+                                        "subPanel5");
 
     // Inserting sub pages/panels into left side book
     mLeftBookPanel->InsertPage(0,mLeftSubPanelGeneral, "General");
@@ -246,17 +391,25 @@ void cMain::initRightPanel()
     mRightSplitpanel->SetSashGravity(0.5);
     mSizerRight->SetSizeHints(mSplitterMain);
 }
-void cMain::initMenu()
+void cMain::initMenuBar()
 {
     // Menu bar creation
     mMenuBar = new wxMenuBar();
     this->SetMenuBar(mMenuBar);
     wxMenu *menuFile = new wxMenu();
-    menuFile->Append(ID_MENU_SAVE_LOG, "Save Log");
-    menuFile->Append(ID_MENU_SAVE_SNAPSHOT, "Save Snapshot");
-    menuFile->Append(ID_MENU_EXIT, "Exit");
-    menuFile->Append(ID_MENU_ABOUT, "About");
+    menuFile->Append(ID_MENU_SAVE_LOG, "Save Log", "Save Log");
+    menuFile->Append(ID_MENU_SAVE_SNAPSHOT, "Save Snapshot", "Save Snapshot");
+    menuFile->Append(ID_MENU_EXIT, "Exit", "Exit");
+    menuFile->Append(ID_MENU_ABOUT, "About", "About");
     mMenuBar->Append(menuFile,"File");
+}
+void cMain::initStatusBar()
+{
+    // Status bar creation
+    mStatusBar = new wxStatusBar(this, wxID_ANY, wxSTB_DEFAULT_STYLE, "Status bar");
+    mStatusBar->PushStatusText("IN INIT", 0);
+    mStatusBar->SetFieldsCount(3);
+    this->SetStatusBar(mStatusBar);
 }
 void cMain::initTabGeneral()
 {
@@ -352,7 +505,6 @@ void cMain::initTabGeneral()
     mSizerLeftGeneral->Add(mTabGeneralTextCtrl, wxSizerFlags(1).Expand());
     mSizerLeftGeneral->Add(mTabGeneralTreeList, wxSizerFlags(1).Expand());
 }
-
 void cMain::initTabRobot()
 {
     // Creation of GUI objects

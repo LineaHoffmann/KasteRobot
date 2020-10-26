@@ -15,13 +15,13 @@ wxEND_EVENT_TABLE()
  * @param parent
  * @param id
  */
-cImagePanel::cImagePanel(wxWindow* parent, wxStandardID id) : wxPanel(parent, id)
+cImagePanel::cImagePanel(wxWindow* parent, wxStandardID id) : wxPanel(parent, id, wxDefaultPosition, wxDefaultSize, 0)
 {
     mDefaultImage = new wxImage("../resources/defaultImage.jpg", wxBITMAP_TYPE_ANY);
 }
 cImagePanel::~cImagePanel() {
 }
-void cImagePanel::addLinker(cLinker* linker) {
+void cImagePanel::addLinker(std::shared_ptr<cLinker> linker) {
     mLinker = linker;
 }
 void cImagePanel::setNewImage(wxImage img) {
@@ -119,6 +119,7 @@ void cImagePanel::Draw(wxDC &dc) {
 }
 void cImagePanel::CheckUpdate(wxCommandEvent &evt)
 {
+    std::lock_guard<std::mutex> lock(mMtx);
     mImage = new wxImage(mNewImage);
     Refresh(false);
     evt.Skip();

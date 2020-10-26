@@ -2,8 +2,11 @@
 #define CIMAGEPANEL_H
 #pragma once
 
-#include "../includeheader.h"
-#include "cimagepanel.h"
+#include <utility>
+#include <mutex>
+
+#include "wx/wx.h"
+
 #include "clinker.h"
 
 class cImagePanel : public wxPanel
@@ -11,7 +14,7 @@ class cImagePanel : public wxPanel
 public:
     cImagePanel(wxWindow* parent, wxStandardID id);
     ~cImagePanel();
-    void addLinker(cLinker* linker);
+    void addLinker(std::shared_ptr<cLinker> linker);
     void setNewImage(wxImage img);
 
 private:
@@ -30,7 +33,7 @@ private:
     bool mHasNewImage = false;
     wxImage *mImage = nullptr;
     wxImage *mDefaultImage = nullptr;
-    cLinker *mLinker = nullptr;
+    std::shared_ptr<cLinker> mLinker;
 
     std::mutex mMtx;
 

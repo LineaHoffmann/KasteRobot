@@ -1,7 +1,24 @@
 #ifndef XBASLERCAM_H
 #define XBASLERCAM_H
 
-#include "../includeheader.h"
+#ifndef LOG_DEFINES
+#define LOG_DEFINES 1
+#define logstd wxLogMessage
+#define logwar wxLogWarning
+#define logerr wxLogError
+#endif
+
+#include <thread>
+#include <mutex>
+#include <string>
+#include <vector>
+#include <chrono>
+#include <iostream>
+
+#include "pylon/PylonIncludes.h"
+#include "opencv2/opencv.hpp"
+#include "opencv2/core.hpp"
+#include "wx/log.h"
 
 class xBaslerCam
 {
@@ -21,7 +38,7 @@ public:
     void calibrate(); //run calibration on pictures in path
     void updateCameraMatrix(cv::Mat NewCameraMatrix, cv::Mat NewCoeffs); //changing calibration manually use with care
 
-    const cv::Mat& getImage(); //get newest cv:Mat image (remapped)
+    cv::Mat& getImage(); //get newest cv:Mat image (remapped)
 
 
     std::thread *baslerCamThread; //skal muligvis senere flyttes til private.
@@ -38,8 +55,8 @@ private:
     int frameRate  = 60;
     int frame = 1;
     bool exit = false;
-    bool isRectified = false;
     bool running = false;
+    bool isRectified = false;
     int CHECKERBOARD[2]{9,6};
 
     std::vector<cv::Mat> caliPics;
@@ -52,7 +69,7 @@ private:
     cv::Mat R;
     cv::Mat T;
 
-    std::mutex *PicsMtx = nullptr;
+    std::mutex PicsMtx;
 
 };
 

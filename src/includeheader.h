@@ -1,10 +1,17 @@
 #ifndef INCLUDEHEADER_H
 #define INCLUDEHEADER_H
 
+//************************//
+//** THIS IS DEPRECATED **//
+//************************//
+
 /*
  *  All libraries and definitions can be
  *  collected here for readability's sake.
  */
+
+#include "gui/clinker.h"
+#include "logic/xlinker.h"
 
 // Redefining logging function names
 // cout is still legal, but will only show in terminal
@@ -24,6 +31,7 @@
 #include <iostream>
 #include <cmath>
 #include <exception>
+#include <utility>
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/socket.h>
@@ -59,5 +67,12 @@
 #include "ur_rtde/script_client.h"
 #include "ur_rtde/rtde_control_interface.h"
 #include "ur_rtde/rtde_receive_interface.h"
+
+// URStruct include
+#include "logic/xurcontrol.h"
+
+//Exceptions
+#include "logic/xexceptions.h"
+
 
 #endif // INCLUDEHEADER_H
