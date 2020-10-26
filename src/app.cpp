@@ -22,16 +22,16 @@ bool app::OnInit() {
     //** GUI init **//
     // Just has to be called
     wxInitAllImageHandlers();
-    // cMain is derived from wxFrame
-    // Everything is handled in there
+
+    // GUI start
     guiMain = new cMain();
-    // The privately defined default doesn't play well with my environment
-    guiMain->SetSize(1280,1024);
     guiMain->Show();
     logstd("Gui started .. ");
     SetTopWindow(guiMain);
-    guiMain->startTimers();
+
     thread = new std::thread(&app::threadFunc, this);
+
+    guiMain->PushStatusText("Running .. ");
     return true;
 }
 
@@ -40,34 +40,8 @@ void app::threadFunc() {
     //** Dies on ~App **//
     logstd("App thread started!");
 
-    //** Logic init **//
-    //std::shared_ptr<xBaslerCam> camera = std::make_shared<xBaslerCam>("../resources/pylonimgs/*.bmp", 12500);
-    //camera->start();
-    std::shared_ptr<xUrControl> robot = std::make_shared<xUrControl>();
-    //robot->connect();
-    //** Database init **//
-
-    //** Linking class creation **//
-    cLink = std::make_shared<cLinker>();
-    xLink = std::make_shared<xLinker>();
-    //qLink = std::make_shared<qLinker>();
-
-    //** Class linking **//
-    cLink->addLogicLinker(xLink);
-    //xLink->addGuiLinker(cLink);
-    //xLink->addDatabaseLinker(qLink);
-    //qLink->addDatabaseLinker(xLink);
-
-    //xLink->addCamera(camera);
-    //xLink->addRobot(robot);
-
-    guiMain->addLinker(cLink);
-    //logicMain->addLinker(xLink);
-    //databaseMain->addLinker(qLink);
-
-    //UR_Control *robot = new xUR_Control("127.0.0.1");
-    //xUR_Control *robot = new xUR_Control();
-    //xLink->addRobot(robot);
+    std::shared_ptr<xController> controller = std::make_shared<xController>();
+    guiMain->setLogicControllerPointer(controller);
 
     struct rusage use;
     while (!mJoinThread) {
@@ -76,7 +50,8 @@ void app::threadFunc() {
         if (getrusage(RUSAGE_SELF, &use) == 0) {
             std::string s = "Current App Thread Resource Use [MB]: ";
             s.append(std::to_string(use.ru_maxrss / 1048576.0f));
-            if (guiMain) guiMain->pushStrToStatus(s);
+            guiMain->pushStrToStatus(s);
+            //std::cout << s << std::endl;
             if (use.ru_maxrss / 1048576.0f > 10) {
                 std::cout << "WARNING: Memory use exceeds 10 MB! This is where my system [srp] starts to chug. Closing program .. " << std::endl;
                 this->Exit();

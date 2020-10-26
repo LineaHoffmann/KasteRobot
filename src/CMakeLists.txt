@@ -4,9 +4,11 @@ project(KasteRobot)
 #set(CMAKE_COMPILER_GTK_FLAGS "-DWITH_GTK_3_X=ON")
 #set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${CMAKE_COMPILER_GTK_FLAGS}")
 
-# Using C++17 (used previously for inline const globals.. Probably unnecessary)
+# Using C++17 for header inline const defines
 # Jonas used C++11 for the camera, 17 should be good
-set(CMAKE_CXX_STANDARD 17)
+# Add 25/10/2020 SRP - 20 has added std::chrono calendar functions! Yes please
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 20)
 
 # Building as debug for now (my robworks is not though, may be a problem)
 set(CMAKE_BUILD_TYPE Debug)
@@ -37,7 +39,6 @@ find_package(ur_rtde REQUIRED)
 file(GLOB SRC
     ${PROJECT_SOURCE_DIR}/app.cpp
     ${PROJECT_SOURCE_DIR}/app.h
-    #${PROJECT_SOURCE_DIR}/includeheader.h
     )
 
 # GUI layer source files GLOB
@@ -47,29 +48,26 @@ file(GLOB GUI_FILES
 
     ${PROJECT_SOURCE_DIR}/gui/cimagepanel.cpp
     ${PROJECT_SOURCE_DIR}/gui/cimagepanel.h
-
-    ${PROJECT_SOURCE_DIR}/gui/clinker.cpp
-    ${PROJECT_SOURCE_DIR}/gui/clinker.h
     )
 
 # Logic layer source files GLOB
 file(GLOB LOGIC_FILES
+    ${PROJECT_SOURCE_DIR}/logic/xcontroller.cpp
+    ${PROJECT_SOURCE_DIR}/logic/xcontroller.h
+
     ${PROJECT_SOURCE_DIR}/logic/xbaslercam.cpp
     ${PROJECT_SOURCE_DIR}/logic/xbaslercam.h
 
     ${PROJECT_SOURCE_DIR}/logic/ximagehandler.cpp
     ${PROJECT_SOURCE_DIR}/logic/ximagehandler.h
 
-    ${PROJECT_SOURCE_DIR}/logic/xlinker.cpp
-    ${PROJECT_SOURCE_DIR}/logic/xlinker.h
-
-    ${PROJECT_SOURCE_DIR}/logic/xexceptions.h
-
     ${PROJECT_SOURCE_DIR}/logic/xurcontrol.cpp
     ${PROJECT_SOURCE_DIR}/logic/xurcontrol.h
 
     ${PROJECT_SOURCE_DIR}/logic/xgripperclient.h
     ${PROJECT_SOURCE_DIR}/logic/xgripperclient.cpp
+
+    ${PROJECT_SOURCE_DIR}/logic/xexceptions.h
     )
 
 # Database layer source files GLOB
@@ -82,6 +80,7 @@ file (GLOB DB_FILES
 # CMake complains here: Files in some directories may conflict with implicit libraries (librtde.so.1.3 in /usr/lib/x86_64-linux-gnu hidden by /usr/local/lib)
 # Might be a local mistake on my machine due to multiples of the same lib
 add_executable(${PROJECT_NAME} ${SRC} ${GUI_FILES} ${LOGIC_FILES} ${DB_FILES})
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
 
 # Some more wxWidgets compiling stuff (wx-config --cxxflags)
 set(GCC_COVERAGE_COMPILE_FLAGS "-I/usr/local/lib/wx/include/gtk3-unicode-3.0 -I/usr/local/include/wx-3.0 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread")

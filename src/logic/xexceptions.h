@@ -25,17 +25,18 @@
 
 namespace x_err {
 struct what {
-    inline static const std::string ROBOT_BAD_IP = "Connection to host could not be resolved!";
-    inline static const std::string ROBOT_NOT_CONNECTED = "Robot connections have not been established!";
+    inline static const std::string ROBOT_BAD_IP = "Connection to host could not be resolved! ";
+    inline static const std::string ROBOT_NOT_CONNECTED = "Robot connections have not been established! ";
 
-    inline static const std::string CAMERA_NOT_CONNECTED = "Camera is not connected!";
-    inline static const std::string CAMERA_NOT_STARTED = "Camera has not been started!";
-    inline static const std::string CAMERA_WRONG_PATH = "Camera path variable is faulty!";
+    inline static const std::string CAMERA_GRAB_ERROR = "Error in camera image grabbing loop! ";
+    inline static const std::string CAMERA_NOT_CONNECTED = "Camera is not connected! ";
+    inline static const std::string CAMERA_NOT_STARTED = "Camera has not been started! ";
+    inline static const std::string CAMERA_WRONG_PATH = "Camera path variable is faulty! ";
 
-    inline static const std::string GRIPPER_NOT_STARTED = "Gripper has not been started!";
-    inline static const std::string GRIPPER_NO_ACK = "Gripper did not respond with ACK!";
+    inline static const std::string GRIPPER_NOT_STARTED = "Gripper has not been started! ";
+    inline static const std::string GRIPPER_NO_ACK = "Gripper did not respond with ACK! ";
 
-    inline static const std::string ROBWORK_INVALID_DATA = "RobWork was given invalid data!";
+    inline static const std::string ROBWORK_INVALID_DATA = "RobWork was given invalid data! ";
 };
 class error : public std::runtime_error {
 public:

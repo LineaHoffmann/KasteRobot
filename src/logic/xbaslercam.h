@@ -14,11 +14,14 @@
 #include <vector>
 #include <chrono>
 #include <iostream>
+#include <atomic>
 
 #include "pylon/PylonIncludes.h"
 #include "opencv2/opencv.hpp"
 #include "opencv2/core.hpp"
 #include "wx/log.h"
+
+#include "xexceptions.h"
 
 class xBaslerCam
 {
@@ -38,8 +41,8 @@ public:
     void calibrate(); //run calibration on pictures in path
     void updateCameraMatrix(cv::Mat NewCameraMatrix, cv::Mat NewCoeffs); //changing calibration manually use with care
 
-    cv::Mat& getImage(); //get newest cv:Mat image (remapped)
-
+    bool hasNewImage(); // Checks if a new picture is available - THREADSAFE
+    const cv::Mat getImage(); // get newest cv:Mat image (remapped) - THREADSAFE
 
     std::thread *baslerCamThread; //skal muligvis senere flyttes til private.
 
@@ -51,11 +54,14 @@ private:
     cv::Mat openCvImage;    // Create an OpenCV image.
     std::string path = "../imgs/*.bmp";     // Path of the folder containing checkerboard images
 
+    // Atomics for thread safety
+    std::atomic<bool> mIsRunning;
+    std::atomic<bool> mExit;
+    std::atomic<bool> mHasNewImage; // New Image bool
+
     int myExposure = 12500;
     int frameRate  = 60;
     int frame = 1;
-    bool exit = false;
-    bool running = false;
     bool isRectified = false;
     int CHECKERBOARD[2]{9,6};
 
@@ -69,7 +75,7 @@ private:
     cv::Mat R;
     cv::Mat T;
 
-    std::mutex PicsMtx;
+    std::mutex mMtx;
 
 };
 

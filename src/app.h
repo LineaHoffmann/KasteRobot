@@ -12,16 +12,8 @@
 #include <utility>
 #include <thread>
 
-#include "gui/clinker.h"
 #include "gui/cmain.h"
-
-#include "logic/xlinker.h"
-//#include "logic/xbaslercam.h"
-//#include "logic/xur_control.h"
-//#include "logic/xrobotexceptions.h"
-
-//#include "database/qlinker.h"
-#include "database/qdatabasehandler.h"
+#include "logic/xcontroller.h"
 
 #include "wx/wx.h"
 
@@ -37,8 +29,6 @@ public:
 public:
     virtual bool OnInit();
 private:
-    std::shared_ptr<cLinker> cLink;
-    std::shared_ptr<xLinker> xLink;
 
     cMain* guiMain = nullptr;
 

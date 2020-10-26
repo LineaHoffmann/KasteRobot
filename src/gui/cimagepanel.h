@@ -4,40 +4,32 @@
 
 #include <utility>
 #include <mutex>
+#include <atomic>
 
 #include "wx/wx.h"
 
-#include "clinker.h"
-
 class cImagePanel : public wxPanel
 {
+    wxDECLARE_EVENT_TABLE();
 public:
-    cImagePanel(wxWindow* parent, wxStandardID id);
+    cImagePanel(wxWindow *parent,
+                wxStandardID id = wxID_ANY,
+                wxPoint position = wxDefaultPosition,
+                wxSize size = wxDefaultSize);
     ~cImagePanel();
-    void addLinker(std::shared_ptr<cLinker> linker);
-    void setNewImage(wxImage img);
+
+    void setNewImage(const wxImage& img);
 
 private:
-    // These functions get to keep uppercase first letter ..
-    void OnPaintNow();
-    void OnPaintEvt(wxPaintEvent &evt);
-    void OnSize(wxSizeEvent& evt);
-    void Draw(wxDC& dc);
-    void CheckUpdate(wxCommandEvent &evt);
+    void OnSizeEvent(wxSizeEvent& event); // Resizing event handler
+    void OnPaintEvent(wxPaintEvent& event); // Paint event handler
+    void Draw(wxDC& dc);    // Draws mCurrentImage to the view
 
-    bool mDrawing = false;
-
-    float mHScale{0}, mWScale{0};
-
-    wxImage mNewImage;
-    bool mHasNewImage = false;
-    wxImage *mImage = nullptr;
-    wxImage *mDefaultImage = nullptr;
-    std::shared_ptr<cLinker> mLinker;
-
-    std::mutex mMtx;
-
-    wxDECLARE_EVENT_TABLE();
+    float scale = 1.0f;
+    bool mHasNewImage; // For checking if a new image has been copied to mNewImage
+    bool mIsDrawing;   // For checking if we are currently drawing an image
+    wxImage mCurrentImage;          // Currently displayed image
+    wxImage mNewImage;              // New image loaded from setNewImage(..)
 };
 
 #endif // CIMAGEPANEL_H
