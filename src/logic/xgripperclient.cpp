@@ -7,6 +7,7 @@ xGripperClient::xGripperClient() {
 
 void xGripperClient::entryThread() {
     std::cout << "Client Thread started" << std::endl;
+    logstd("Gripper client thread started .. ");
     xGripperClient::connectSocket("192.168.0.1", 1000);
 
     //Check if new incoming data from gripper in a queue
@@ -15,22 +16,24 @@ void xGripperClient::entryThread() {
     memset(buf, 0, 32);
     bytesRecieved = recv(mSock, buf, 32, 0);
     std::string answer(buf);
-    bool readBool = true;
 
-    while (readBool = true) {
+    send(mSock, mCommand.c_str(), mCommand.size() + 1, 0);
+
+    bool readBool = true;
+    while (readBool == true) {
         if (bytesRecieved == 0 || answer == mAnswer) {
             usleep(25000);
             }
-            else mMtx.lock(mAnswer);
+            else
                  mAnswer = answer;
-                 mMtx.unlock(mAnswer);
+
         answer = "N/A";
         }
 }
 
 
 void xGripperClient::connectSocket(std::string ipAddress, int port) {
-    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    int mSock = socket(AF_INET, SOCK_STREAM, 0);
     int mPort = port;
     std::string mIpAddress = ipAddress;
 
@@ -47,7 +50,7 @@ std::string xGripperClient::writeRead(std::string command) {
     mCommand = command;
     char buf[32];
     int bytesRecieved = 0; //Resetting response length
-    int sendRes = send(mSock, mCommand.c_str(), mCommand.size() + 1, 0); // Sending command
+    send(mSock, mCommand.c_str(), mCommand.size() + 1, 0); // Sending command
 
     memset(buf, 0, 32);
     bytesRecieved = recv(mSock, buf, 32, 0); //Reading response

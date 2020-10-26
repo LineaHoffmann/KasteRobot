@@ -1,125 +1,94 @@
 #include "cimagepanel.h"
 
-// Custom event for updating image after extern call to SetNewImage(..)
-wxDEFINE_EVENT(CUSTOM_UPDATE_EVENT, wxCommandEvent);
-
 // Local event table
 wxBEGIN_EVENT_TABLE(cImagePanel, wxPanel)
-    EVT_COMMAND(wxID_ANY, CUSTOM_UPDATE_EVENT, cImagePanel::CheckUpdate)
-    EVT_PAINT(cImagePanel::OnPaintEvt)
-    EVT_SIZE(cImagePanel::OnSize)
+    EVT_PAINT(cImagePanel::OnPaintEvent) // When (re)painting the view
+    EVT_SIZE(cImagePanel::OnSizeEvent)   // When view is resized
 wxEND_EVENT_TABLE()
 
-/**
- * @brief Basic constructor
- * @param parent
- * @param id
- */
-cImagePanel::cImagePanel(wxWindow* parent, wxStandardID id) : wxPanel(parent, id)
-{
-    mDefaultImage = new wxImage("../resources/defaultImage.jpg", wxBITMAP_TYPE_ANY);
+cImagePanel::cImagePanel(wxWindow *parent,
+                         wxStandardID id,
+                         wxPoint position,
+                         wxSize size)
+    : wxPanel(parent, id, position, size, 0, "Camera View") {
+    // Load the default image as mCurrentImage, only valid images should overwrite it
+    mCurrentImage = wxImage("../resources/defaultImage.png", wxBITMAP_TYPE_ANY);
+    mNewImage = wxImage();
+    // Defaults for the bools
+    mHasNewImage = false;
+    mIsDrawing = false;
 }
 cImagePanel::~cImagePanel() {
+    mNewImage.Destroy();
+    mCurrentImage.Destroy();
 }
-void cImagePanel::addLinker(cLinker* linker) {
-    mLinker = linker;
+void cImagePanel::setNewImage(const wxImage &img) {
+    // This is called from a wxTimer, so driven by GUI eventloop
+    // Loads image into mNewImage and creates a paint event
+    // The reference should not origininate from outside the GUI thread
+    if (!img.IsOk()) return;
+    if (mNewImage.IsOk()) mNewImage.Clear();
+    mNewImage = img.Copy();
+    if (!mNewImage.IsOk()) return;
+    mHasNewImage = true;
+    // Lets post a resize event, then scale will also be re calc'ed
+    wxSizeEvent sizeEvent;
+    wxPostEvent(this, sizeEvent);
 }
-void cImagePanel::setNewImage(wxImage img) {
-    std::lock_guard<std::mutex> lock(mMtx);
-    if (img.IsOk() && !mDrawing) {
-        mDrawing = true;
-        mNewImage = img.Copy();
-        mHasNewImage = true;
-        mDrawing = false;
-        // This was not run from gui thread, so post an event for it later
-        wxCommandEvent evt(CUSTOM_UPDATE_EVENT);
-        wxPostEvent(this, evt);
+
+void cImagePanel::OnSizeEvent(wxSizeEvent& event) {
+    // Resize event handler
+    // Keep aspect ratio constant
+    // Painting the resized image depends on the wxPaintEvent
+    // No actual resizing happens, only calculation of draw scaling
+    int32_t viewHeight, viewWidth, imageHeight, imageWidth;
+    GetSize(&viewWidth, &viewHeight);
+    if (mHasNewImage && mNewImage.IsOk()) {
+        imageHeight = mNewImage.GetSize().GetWidth();
+        imageWidth = mNewImage.GetSize().GetWidth();
+    } else {
+        imageHeight = mCurrentImage.GetSize().GetWidth();
+        imageWidth = mCurrentImage.GetSize().GetWidth();
     }
+    if (!viewHeight || !viewWidth || !imageHeight || !imageWidth) {
+        event.Skip();
+        return;
+    }
+
+    // TODO: [srp] This doesn't handle enough edge cases
+    float wScale = (float) viewWidth / (float) imageWidth;
+    float hScale = (float) viewHeight / (float) imageHeight;
+    if (hScale > wScale) {
+        scale = hScale;
+    } else {
+        scale = wScale;
+    }
+
+    Refresh();
+    event.Skip();
 }
-/**
- * @brief wxPaintDC paint-event handler function
- * @param evt
- */
-void cImagePanel::OnPaintEvt(wxPaintEvent &evt)
-{
+void cImagePanel::OnPaintEvent(wxPaintEvent& event) {
+    // Paint event handler
+    // Just a matter of creating a DC and calling Draw
     wxPaintDC dc(this);
     Draw(dc);
-    evt.Skip();
+    event.Skip();
 }
-/**
- * @brief wxClientDC paint-event handler function
- */
-void cImagePanel::OnPaintNow()
-{
-    wxClientDC dc(this);
-    Draw(dc);
-}
-/**
- * @brief Handler function for resizing events
- * @param evt
- */
-void cImagePanel::OnSize(wxSizeEvent &evt) {
-    int nWidth, nHeight;
-    GetSize(&nWidth, &nHeight);
-    int iHeight, iWidth;
-    if (mImage == nullptr) {
-        iHeight = mDefaultImage->GetSize().GetHeight();
-        iWidth = mDefaultImage->GetSize().GetWidth();
-    } else {
-        iHeight = mImage->GetSize().GetHeight();
-        iWidth = mImage->GetSize().GetWidth();
-    }
-    if (iHeight > 0 && iWidth > 0) {
-        mHScale = (float) nWidth / (float) iWidth;
-        mWScale = (float) nHeight / (float) iHeight;
-        if (mHScale < mWScale) {
-            mWScale = mHScale;
-        } else {
-            mHScale = mWScale;
-        }
-    }
-    Refresh();
-    evt.Skip();
-}
-void cImagePanel::Draw(wxDC &dc) {
-    if( !dc.IsOk() || mDrawing == true ){ return; }
-    mDrawing = true;
-    int x,y,w,h;
-    dc.GetClippingBox(&x, &y, &w, &h);
-    if( mHasNewImage )
-    {
+void cImagePanel::Draw(wxDC& dc) {
+    // Drawing the mCurrentImage
+    if (!dc.IsOk()) {return;}
+    if (mHasNewImage) {
+        // There is a new image in mNewImage
+        // Load it into mCurrentImage
+        mCurrentImage = mNewImage.Copy();
         mHasNewImage = false;
-
-        int nWidth, nHeight;
-        GetSize(&nWidth, &nHeight);
-        int iHeight = mImage->GetSize().GetHeight();
-        int iWidth = mImage->GetSize().GetWidth();
-
-        if (iHeight > 0 && iWidth > 0) {
-            mHScale = (float) nWidth / (float) iWidth;
-            mWScale = (float) nHeight / (float) iHeight;
-            if (mHScale < mWScale) {
-                mWScale = mHScale;
-            } else {
-                mHScale = mWScale;
-            }
-        }
-
-        dc.SetUserScale(mHScale, mWScale);
-        dc.DrawBitmap(*mImage, x, y);
-    } else if (mImage == nullptr) {
-        dc.SetUserScale(mHScale, mWScale);
-        dc.DrawBitmap(*mDefaultImage, x, y);
-    } else {
-        dc.SetUserScale(mHScale, mWScale);
-        dc.DrawBitmap(*mImage, x, y);
     }
-    mDrawing = false;
-    return;
-}
-void cImagePanel::CheckUpdate(wxCommandEvent &evt)
-{
-    mImage = new wxImage(mNewImage);
-    Refresh(false);
-    evt.Skip();
+    if ((mCurrentImage.GetWidth() > 0 || mCurrentImage.GetHeight() > 0) && mCurrentImage.IsOk()) {
+        dc.SetUserScale(scale, scale);
+        int32_t y = (dc.GetSize().GetHeight() - mCurrentImage.GetHeight()) / 2;
+        if (y > 0)
+            dc.DrawBitmap(mCurrentImage, 0, y);
+        else
+            dc.DrawBitmap(mCurrentImage, 0, 0);
+    }
 }

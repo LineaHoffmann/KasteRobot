@@ -17,43 +17,46 @@ app::~app()
 
     thread->join();
     delete thread;
-    delete xLink;
-    delete cLink;
 }
 bool app::OnInit() {
-
-    cLink = new cLinker;
-    xLink = new xLinker;
-
-    cLink->addLogicLinker(xLink);
-
-    xBaslerCam *camera = new xBaslerCam("../resources/pylonimgs/*.bmp", 12500);
-    xLink->addCamera(camera);
-
-    xUR_Control *robot = new xUR_Control("127.0.0.1");
-    xLink->addRobot(robot);
-
+    //** GUI init **//
     // Just has to be called
     wxInitAllImageHandlers();
-    // cMain is derived from wxFrame
-    // Everything is handled in there
-    mFrame = new cMain();
-    mFrame->addLinker(cLink);
-    // The privately defined default doesn't play well with my environment
-    mFrame->SetSize(1280,1024);
-    mFrame->Show();
+
+    // GUI start
+    guiMain = new cMain();
+    guiMain->Show();
     logstd("Gui started .. ");
+    SetTopWindow(guiMain);
 
     thread = new std::thread(&app::threadFunc, this);
 
+    guiMain->PushStatusText("Running .. ");
     return true;
 }
+
 void app::threadFunc() {
-    logstd("Thread started!");
+    //** For testing systemwide threaded updates **//
+    //** Dies on ~App **//
+    logstd("App thread started!");
 
+    std::shared_ptr<xController> controller = std::make_shared<xController>();
+    guiMain->setLogicControllerPointer(controller);
+
+    struct rusage use;
     while (!mJoinThread) {
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        // POSIX resource desctription
+        if (getrusage(RUSAGE_SELF, &use) == 0) {
+            std::string s = "Current App Thread Resource Use [MB]: ";
+            s.append(std::to_string(use.ru_maxrss / 1048576.0f));
+            guiMain->pushStrToStatus(s);
+            //std::cout << s << std::endl;
+            if (use.ru_maxrss / 1048576.0f > 10) {
+                std::cout << "WARNING: Memory use exceeds 10 MB! This is where my system [srp] starts to chug. Closing program .. " << std::endl;
+                this->Exit();
+            }
+        }
     }
-
-    std::cout << "Thread is dying now .." << std::endl;
+    std::cout << "App thread is dying now .." << std::endl;
 }

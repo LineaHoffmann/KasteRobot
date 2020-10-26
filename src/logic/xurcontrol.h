@@ -1,8 +1,28 @@
-#ifndef UR_CONTROL_H
-#define UR_CONTROL_H
+#ifndef XURCONTROL_H
+#define XURCONTROL_H
+#pragma once
 
-#include "../includeheader.h"
-#include "xrobotexceptions.h"
+#ifndef LOG_DEFINES
+#define LOG_DEFINES 1
+#define logstd wxLogMessage
+#define logwar wxLogWarning
+#define logerr wxLogError
+#endif
+
+#include <vector>
+#include <string>
+#include <thread>
+#include <mutex>
+#include <exception>
+#include <iostream>
+
+#include "ur_rtde/rtde_control_interface.h"
+#include "ur_rtde/rtde_receive_interface.h"
+#include "ur_rtde/script_client.h"
+
+#include "wx/log.h"
+
+#include "xexceptions.h"
 
 //definition of data struct
 struct UR_STRUCT {
@@ -13,14 +33,14 @@ struct UR_STRUCT {
 
 };
 
-class xUR_Control
+class xUrControl
 {
 
 public:
-    xUR_Control();
-    xUR_Control(std::string IP);
+    xUrControl();
+    xUrControl(std::string IP);
 
-    ~xUR_Control();
+    ~xUrControl();
 
     void connect(std::string IP);
     void disconnect();
@@ -29,7 +49,7 @@ public:
     enum moveEnum {MOVE_JLIN, MOVE_JPATH, MOVE_LFK, MOVE_TLIN, SERVOJ, SPEEDJ}; // WARNING: Update Enums to fit code, before final export:
 
     //move function to access private move functions of UR_RTDE
-    bool move(std::vector<std::vector<double>> &q, double &acc, double &speed, xUR_Control::moveEnum moveMode);
+    bool move(std::vector<std::vector<double>> &q, double &acc, double &speed, xUrControl::moveEnum moveMode);
 
     //read current pose in rads or deg
     // TODO: Should probably return const references
@@ -52,7 +72,7 @@ public:
     void setPollingRate(int pollingRate);
 
     //returning pointer to the datastruct.
-    UR_STRUCT *getURStruct() const;
+    UR_STRUCT getURStruct();
 
 private:
 
@@ -84,7 +104,7 @@ private:
 
     //threads
     std::thread *mThread = nullptr;
-    std::mutex urMutex;
+    std::mutex mMtx;
 };
 
-#endif // UR_CONTROL_H
+#endif // XURCONTROL_H

@@ -1,68 +1,58 @@
 #include "xbaslercam.h"
 #include <chrono>
 
-xBaslerCam::xBaslerCam()
-{
-    PicsMtx = new std::mutex();
+xBaslerCam::xBaslerCam(){
+    // Atomic bool default values
+    mIsRunning.exchange(false);
+    mExit.exchange(false);
+    mHasNewImage.exchange(false);
 }
-
-xBaslerCam::xBaslerCam(std::string calibrationPath) : xBaslerCam()
-{path = calibrationPath;}
-xBaslerCam::xBaslerCam(std::string calibrationPath, int exposure) : xBaslerCam(calibrationPath)
-{myExposure = exposure;}
-xBaslerCam::xBaslerCam(std::string calibrationPath, int exposure, int maxFrameRate) : xBaslerCam(calibrationPath, exposure)
-{frameRate = maxFrameRate;}
-
-
-
-xBaslerCam::~xBaslerCam()
-{
-    delete PicsMtx;
+xBaslerCam::xBaslerCam(std::string calibrationPath)
+    : xBaslerCam() {
+    path = calibrationPath;
 }
-
-bool xBaslerCam::isConnected()
-{
-    if(running) {
-        return 1;
-    }
-    return 0;
+xBaslerCam::xBaslerCam(std::string calibrationPath, int exposure)
+    : xBaslerCam(calibrationPath) {
+    myExposure = exposure;
 }
-
+xBaslerCam::xBaslerCam(std::string calibrationPath, int exposure, int maxFrameRate)
+    : xBaslerCam(calibrationPath, exposure) {
+    frameRate = maxFrameRate;
+}
+xBaslerCam::~xBaslerCam(){}
+bool xBaslerCam::isConnected() {return mIsRunning.load();} // This must be thread safe
 bool xBaslerCam::start()
 {
     calibrate();
     baslerCamThread = new std::thread(&xBaslerCam::GrabPictures,this);
-
-    auto start_time = std::chrono::high_resolution_clock::now();
-    auto current_time = std::chrono::high_resolution_clock::now();
-    while(true) {
-        current_time = std::chrono::high_resolution_clock::now();
-
-        if (running){
-            return 1;
-        }
-        if (std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count() > 10){
-            //|| baslerCamThread->joinable()){
-            return 0;
-        }
-    }
+//    auto start_time = std::chrono::steady_clock::now();
+//    auto current_time = std::chrono::steady_clock::now();
+//    while(true) {
+//        current_time = std::chrono::steady_clock::now();
+//        if (running){
+//            return 1;
+//        }
+//        if (std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count() > 10){
+//            //|| baslerCamThread->joinable()){
+//            return 0;
+//        }
+//    }
+    return true;
 }
-
-void xBaslerCam::shutdown()
-{
-    exit = true;
-}
-
-
-
+void xBaslerCam::shutdown() {mExit.exchange(true);}
 void xBaslerCam::calibrate()
 {
     //calibrate
-    std::cout << "calibration started. Using pictures from folder: " + path << std::endl;
+    std::string print = "Calibration started using path: ";
+    print.append(path);
+    logstd(print.c_str());
+    //std::cout << "calibration started. Using pictures from folder: " + path << std::endl;
 
+    cv::Mat frame;
     std::vector<cv::String> images;
     cv::glob(path, images);
-    cv::Mat frame;
+    if (images.size() == 0) // If the vector is empty, it didn't get any images
+        throw x_err::error(x_err::what::CAMERA_WRONG_PATH);
 
     std::vector<std::vector<cv::Point3f> > objpoints;
     std::vector<std::vector<cv::Point2f> > imgpoints;
@@ -81,7 +71,7 @@ void xBaslerCam::calibrate()
     bool success;
     for(uint i{0}; i<images.size(); i++)
     {
-        std::cout << "." << std::flush;
+        //std::cout << "." << std::flush;
         frame = cv::imread(images[i]);
         cv::cvtColor(frame,frame,cv::COLOR_BGR2GRAY);
         //find corners
@@ -90,17 +80,29 @@ void xBaslerCam::calibrate()
         {
             cv::TermCriteria criteria(cv::TermCriteria::EPS | cv::TermCriteria::MAX_ITER, 30, 0.001);
             cv::cornerSubPix(frame,corner_pts,cv::Size(11,11), cv::Size(-1,-1),criteria);
-            std::cout << "." << std::flush;
+            //std::cout << "." << std::flush;
             cv::drawChessboardCorners(frame, cv::Size(CHECKERBOARD[0], CHECKERBOARD[1]), corner_pts, success);
             objpoints.push_back(objp);
             imgpoints.push_back(corner_pts);
         }
     }
     cv::calibrateCamera(objpoints, imgpoints, cv::Size(frame.rows,frame.cols), cameraMatrix, distCoeffs, R, T);
-    std::cout << "cameraMatrix : " << cameraMatrix << std::endl;
-    std::cout << "distCoeffs : " << distCoeffs << std::endl;
-    std::cout << "Rotation vector : " << R << std::endl;
-    std::cout << "Translation vector : " << T << std::endl;
+    print = "Camera Matric: ";
+    print << cameraMatrix;
+    logstd(print.c_str());
+    print = "Distortion Coefficients: ";
+    print << distCoeffs;
+    logstd(print.c_str());
+    print = "Rotation Vector: ";
+    print << R;
+    logstd(print.c_str());
+    print = "Translation Vector: ";
+    print << T;
+    logstd(print.c_str());
+    //std::cout << "cameraMatrix : " << cameraMatrix << std::endl;
+    //std::cout << "distCoeffs : " << distCoeffs << std::endl;
+    //std::cout << "Rotation vector : " << R << std::endl;
+    //std::cout << "Translation vector : " << T << std::endl;
     isRectified = false;
 }
 
@@ -111,35 +113,54 @@ void xBaslerCam::updateCameraMatrix(cv::Mat NewCameraMatrix, cv::Mat NewCoeffs)
     isRectified = false;
 }
 
-cv::Mat& xBaslerCam::getImage()
+/*
+ * THESE TWO CALLS MUST BE THREAD SAFE!
+*/
+bool xBaslerCam::hasNewImage() {return mHasNewImage.load();}
+const cv::Mat xBaslerCam::getImage()
 {
-    std::lock_guard<std::mutex> lock(*PicsMtx);
-    //get pic and remap
-    if (!openCvImage.data || !running) {
-    openCvImage = cv::imread("../src/testImg.png", cv::IMREAD_COLOR);
-
-    //fjern hvis billede skal gennem remapping
-    return openCvImage;
+    std::lock_guard<std::mutex> lock(mMtx);
+    if (openCvImage.data || mIsRunning.load()) {
+        // Returning a clone, not by reference, to ensure that the
+        // local data isn't accessed from caller after this function
+        return openCvImage.clone();
+    } else {
+        // Maybe a warning image should be allocated permanently ..
+        // We generally shouldn't end here
+        return cv::imread("../resources/testImg.png", cv::IMREAD_COLOR);
     }
 
-    if (!isRectified){
-        cv::initUndistortRectifyMap(cameraMatrix, distCoeffs, cv::Mat(), cameraMatrix, cv::Size(openCvImage.cols,openCvImage.rows), CV_32FC1, map1, map2);
-        isRectified  = true;
-    }
+    // TODO: [srp] Don't do remapping in here, do it in the worker thread
+    //       Remapping here would be much worse to make thread safe
 
-    cv::remap(openCvImage,remapped_image,map1,map2,cv::INTER_LINEAR);
-    return remapped_image;
+//    //get pic and remap
+//    if (!openCvImage.data || !mIsRunning.load()) {
+//    openCvImage = cv::imread("../resources/testImg.png", cv::IMREAD_COLOR);
+
+//    //fjern hvis billede skal gennem remapping
+//    return openCvImage;
+//    }
+
+//    if (!isRectified){
+//        cv::initUndistortRectifyMap(cameraMatrix, distCoeffs, cv::Mat(), cameraMatrix, cv::Size(openCvImage.cols,openCvImage.rows), CV_32FC1, map1, map2);
+//        isRectified  = true;
+//    }
+
+//    cv::remap(openCvImage,remapped_image,map1,map2,cv::INTER_LINEAR);
+//    return remapped_image;
 }
 
-
+/**
+ * @brief Worker thread function
+ */
 void xBaslerCam::GrabPictures()
 {
+    std::stringstream s; // For printing to the wxLog
     // Automagically call PylonInitialize and PylonTerminate to ensure the pylon runtime system
     // is initialized during the lifetime of this object.
     Pylon::PylonAutoInitTerm autoInitTerm;
     try
     {
-
         // Create an instant camera object with the camera device found first.
         Pylon::CInstantCamera camera( Pylon::CTlFactory::GetInstance().CreateFirstDevice());
 
@@ -161,63 +182,75 @@ void xBaslerCam::GrabPictures()
         // Specify the output pixel format.
         formatConverter.OutputPixelFormat= Pylon::PixelType_BGR8packed;
 
-
         // Set exposure to manual
         GenApi::CEnumerationPtr exposureAuto( nodemap.GetNode( "ExposureAuto"));
         if ( GenApi::IsWritable( exposureAuto)){
             exposureAuto->FromString("Off");
-            std::cout << "Exposure auto disabled." << std::endl;
+            logstd("Exposure auto disabled.");
+            //std::cout << "Exposure auto disabled." << std::endl;
         }
 
         // Set gain auto once
         GenApi::CEnumerationPtr gainAuto( nodemap.GetNode( "GainAuto"));
         if ( GenApi::IsWritable( gainAuto)){
             gainAuto->FromString("Once");
-            std::cout << "Auto gain once enabled." << std::endl;
+            logstd("Auto gain once enabled.");
+            //std::cout << "Auto gain once enabled." << std::endl;
         }
 
         // Set Balance White Auto once
         GenApi::CEnumerationPtr balanceWhiteAuto( nodemap.GetNode( "BalanceWhiteAuto"));
         if ( GenApi::IsWritable( balanceWhiteAuto)){
             balanceWhiteAuto->FromString("Once");
-            std::cout << "BalanceWhiteAuto once enabled." << std::endl;
+            logstd("BalanceWhiteAuto once enabled.");
+            //std::cout << "BalanceWhiteAuto once enabled." << std::endl;
         }
-
 
         // Set custom exposure
         GenApi::CFloatPtr exposureTime = nodemap.GetNode("ExposureTime");
-        std::cout << "Old exposure: " << exposureTime->GetValue() << std::endl;
+
+        s.str(std::string()); // Reset the stringstream
+        s << "Old exposure: " << exposureTime->GetValue();
+        logstd(s.str().c_str());
+        //std::cout << "Old exposure: " << exposureTime->GetValue() << std::endl;
         if(exposureTime.IsValid()) {
             if(myExposure >= exposureTime->GetMin() && myExposure <= exposureTime->GetMax()) {
                 exposureTime->SetValue(myExposure);
-            }else {
+            } else {
                 exposureTime->SetValue(exposureTime->GetMin());
-                std::cout << ">> Exposure has been set with the minimum available value." << std::endl;
-                std::cout << ">> The available exposure range is [" << exposureTime->GetMin() << " - " << exposureTime->GetMax() << "] (us)" << std::endl;
+                logstd(">> Exposure has been set with the minimum available value.");
+                s.str(std::string());
+                s << ">> The available exposure range is [" << exposureTime->GetMin() << " - " << exposureTime->GetMax() << "] (us)";
+                logstd(s.str().c_str());
+                //std::cout << ">> Exposure has been set with the minimum available value." << std::endl;
+                //std::cout << ">> The available exposure range is [" << exposureTime->GetMin() << " - " << exposureTime->GetMax() << "] (us)" << std::endl;
             }
-        }else {
-
-            std::cout << ">> Failed to set exposure value." << std::endl;
+        } else {
+            logstd(">> Failed to set exposure value.");
+            //std::cout << ">> Failed to set exposure value." << std::endl;
         }
-        std::cout << "New exposure: " << exposureTime->GetValue() << std::endl;
-
+        s.str(std::string());
+        s << "New exposure: " << exposureTime->GetValue();
+        logstd(s.str().c_str());
+        //std::cout << "New exposure: " << exposureTime->GetValue() << std::endl;
 
         //TEST FOR FRAMERATE CAP!! HAVE NOT BEEN TESTED LIVE YET!//
         // enable framerate cap
         GenApi::CEnumerationPtr AcquisitionFrameRateEnable( nodemap.GetNode( "AcquisitionFrameRateEnable"));
         if ( GenApi::IsWritable( AcquisitionFrameRateEnable)){
             AcquisitionFrameRateEnable->FromString("true");
-            std::cout << "AcquisitionFrameRateEnable enabled." << std::endl;
+            logstd("AcquisitionFrameRateEnable enabled.");
+            //std::cout << "AcquisitionFrameRateEnable enabled." << std::endl;
         }
         // set framerate cap
         GenApi::CEnumerationPtr AcquisitionFrameRate( nodemap.GetNode( "AcquisitionFrameRate"));
         if(AcquisitionFrameRate.IsValid()) {
             AcquisitionFrameRate->SetIntValue(frameRate);
-            std::cout << "AcquisitionFrameRate set to: " << frameRate << std::endl;
+            s.str(std::string());
+            s << "AcquisitionFrameRate set to: " << frameRate;
+            logstd(s.str().c_str());
+            //std::cout << "AcquisitionFrameRate set to: " << frameRate << std::endl;
         }
-
-
-
 
         // sets up free-running continuous acquisition.
         camera.StartGrabbing(Pylon::GrabStrategy_LatestImageOnly);
@@ -225,52 +258,52 @@ void xBaslerCam::GrabPictures()
         // This smart pointer will receive the grab result data.
         Pylon::CGrabResultPtr ptrGrabResult;
 
-
         // image grabbing loop
-
         while ( camera.IsGrabbing())
         {
+            mIsRunning.exchange(true);
+
             // Wait for an image and then retrieve it. A timeout of 5000 ms is used.
             camera.RetrieveResult( 5000, ptrGrabResult, Pylon::TimeoutHandling_ThrowException);
 
-
-
             // Image grabbed successfully?
-            if (ptrGrabResult->GrabSucceeded())
-            { // Convert the grabbed buffer to openCV image
+            if (ptrGrabResult->GrabSucceeded()) {
+                // Convert the grabbed buffer to a pylon image.
+                formatConverter.Convert(pylonImage, ptrGrabResult);
 
-                {
-                    // Convert the grabbed buffer to a pylon image.
-                    formatConverter.Convert(pylonImage, ptrGrabResult);
-
-                    // Create an OpenCV image from a pylon image.
-                    std::lock_guard<std::mutex> lock(*PicsMtx);
-                    openCvImage = cv::Mat(ptrGrabResult->GetHeight(), ptrGrabResult->GetWidth(), CV_8UC3, (uint8_t *) pylonImage.GetBuffer());
-                running = true;
-                }
+                // Create an OpenCV image from a pylon image.
+                std::lock_guard<std::mutex> lock(mMtx);
+                openCvImage = cv::Mat(ptrGrabResult->GetHeight(), ptrGrabResult->GetWidth(), CV_8UC3, (uint8_t *) pylonImage.GetBuffer());
+                mHasNewImage.exchange(true); // Set flag for new image
 
                 frame++;
-
-                if(exit) {
+                if(mExit.load()) {
                     camera.Close();
-                    running = false;
+                    mIsRunning.exchange(false);
                     return;
                 }
-
-            }
-            else
-            {
-                std::cout << "Error: " << ptrGrabResult->GetErrorCode() << " " << ptrGrabResult->GetErrorDescription() << std::endl;
+            } else {
+                s.str(std::string());
+                s  << "Error: " << ptrGrabResult->GetErrorCode() << " " << ptrGrabResult->GetErrorDescription();
+                logstd(s.str().c_str());
+                //std::cout << "Error: " << ptrGrabResult->GetErrorCode() << " " << ptrGrabResult->GetErrorDescription() << std::endl;
                 return;
             }
         }
-
     }
     catch (GenICam::GenericException &e)
     {
         // Error handling.
-        std::cerr << "An exception occurred." << std::endl
-                  << e.GetDescription() << std::endl;
-        running = false;
+
+        s.str(std::string());
+        s << "An exception occurred." << std::endl
+          << e.GetDescription();
+        logerr(s.str().c_str());
+
+//        std::cerr << "An exception occurred." << std::endl
+//                  << e.GetDescription() << std::endl;
+        mIsRunning.exchange(false);
+        // Rethrowing as logic error
+        //throw x_err::error(x_err::what::CAMERA_GRAB_ERROR + e.what());
     }
 }

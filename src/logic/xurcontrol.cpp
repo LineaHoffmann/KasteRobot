@@ -1,15 +1,16 @@
-#include "xur_control.h"
-#include "../includeheader.h"
+
+#include "xurcontrol.h"
+//#include "../includeheader.h"
 
 // WARNING: To-do plugin doesn't see the headers .. There are a few notes in there
 // TODO: Should be renamed to xUrControl for conformity
 
-xUR_Control::xUR_Control()
+xUrControl::xUrControl()
 {
     init();
 }
 
-xUR_Control::xUR_Control(std::string IP)
+xUrControl::xUrControl(std::string IP)
 {
     init();
     initRobot();
@@ -22,7 +23,7 @@ xUR_Control::xUR_Control(std::string IP)
 
 }
 
-xUR_Control::~xUR_Control()
+xUrControl::~xUrControl()
 {
     stopPolling();
     mUrControl->disconnect();
@@ -39,7 +40,7 @@ xUR_Control::~xUR_Control()
  * @brief connect tries to connect to robot meanwhile constructing the objects of ur_RTDE
  * @param IP
  */
-void xUR_Control::connect(std::string IP){
+void xUrControl::connect(std::string IP){
 
     if(isConnected){    return; }
 
@@ -56,9 +57,10 @@ void xUR_Control::connect(std::string IP){
             logstd("UR_Control: connect: RTDE Recieve connected");
 
         } catch (std::exception &e) {
-            mEptr = std::current_exception();
-            std::cout << "ur_rtde Recieve exception: " << e.what() << std::endl;
-            std::rethrow_exception(mEptr);
+            //mEptr = std::current_exception();
+            //std::cout << "ur_rtde Recieve exception: " << e.what() << std::endl;
+            throw x_err::error(e.what());
+            //std::rethrow_exception(mEptr);
             return;
         };
     }
@@ -69,15 +71,17 @@ void xUR_Control::connect(std::string IP){
             logstd("UR_Control: connect: RTDE control connected");
 
         } catch (std::exception &e) {
-            mEptr = std::current_exception();
-            std::cout << "ur_rtde Control exception: " << e.what() << std::endl;
-            std::rethrow_exception(mEptr);
+            throw x_err::error(e.what());
+//            mEptr = std::current_exception();
+//            std::cout << "ur_rtde Control exception: " << e.what() << std::endl;
+//            std::rethrow_exception(mEptr);
         };
     }
 }
 
-void xUR_Control::disconnect()
+void xUrControl::disconnect()
 {
+    std::lock_guard<std::mutex> lock(mMtx);
     if(isConnected){
         mUrControl->disconnect();
         mUrRecieve->disconnect();
@@ -86,11 +90,12 @@ void xUR_Control::disconnect()
     }
 }
 
-bool xUR_Control::move(std::vector<std::vector<double>> &q, double &speed, double &acc, xUR_Control::moveEnum moveMode)
+bool xUrControl::move(std::vector<std::vector<double>> &q, double &speed, double &acc, xUrControl::moveEnum moveMode)
 {
     if (!isConnected) {
-        std::cerr << "UR_Control::move: Host not connected!" << std::endl;
-        throw(UR_NotConnected());
+        //std::cerr << "UR_Control::move: Host not connected!" << std::endl;
+        throw x_err::error(x_err::what::ROBOT_NOT_CONNECTED);
+        //throw(UR_NotConnected());
         return false;
     }
 
@@ -119,21 +124,19 @@ bool xUR_Control::move(std::vector<std::vector<double>> &q, double &speed, doubl
                 std::cout << "MOVE_LFK: move completed!" << std::endl;
                 return true;
             break;
+        }
         default:
             std::cerr << "Wrong mode set!" << std::endl;
             break;
-        }
-    return false;
     }
-        // WARNING: Should return something here?
-        // The above switch and if statements look a bit .. Wrong? Default is inside if-statement from case MOVE_LFK
+    return false;
 }
 
 /**
  * @brief UR_Control::getCurrentPose
  * @return
  */
-std::vector<double> xUR_Control::getCurrentPose()
+std::vector<double> xUrControl::getCurrentPose()
 {
     if(!isConnected){   return std::vector<double>(0); }
 
@@ -146,7 +149,7 @@ std::vector<double> xUR_Control::getCurrentPose()
  * @brief UR_Control::getCurrentPoseDeg
  * @return
  */
-std::vector<double> xUR_Control::getCurrentPoseDeg()
+std::vector<double> xUrControl::getCurrentPoseDeg()
 {
     if(!isConnected){   return std::vector<double>(0); }
 
@@ -159,7 +162,7 @@ std::vector<double> xUR_Control::getCurrentPoseDeg()
  * @brief UR_Control::getIP
  * @return string with stored IP address
  */
-std::string xUR_Control::getIP() const
+std::string xUrControl::getIP() const
 {
     return mIP;
 }
@@ -167,7 +170,7 @@ std::string xUR_Control::getIP() const
  * @brief UR_Control::setIP
  * @param value
  */
-void xUR_Control::setIP(const std::string &value)
+void xUrControl::setIP(const std::string &value)
 {
     mIP = value;
 }
@@ -175,7 +178,7 @@ void xUR_Control::setIP(const std::string &value)
 /**
  * @brief UR_Control::getData private function to poll data from the robot at the given polling rate. used by "startPolling()"
  */
-void xUR_Control::getData()
+void xUrControl::getData()
 {
 
     //preparing timers
@@ -188,7 +191,7 @@ void xUR_Control::getData()
 
         //lock Scope
         {
-        std::unique_lock<std::mutex> dataLock(urMutex); //NOTE: unique lock applied, check type when merging programs.
+        std::unique_lock<std::mutex> dataLock(mMtx); //NOTE: unique lock applied, check type when merging programs.
         // SRP: unique_lock is good here, but should be used in a single instantiation and use lock/unlock inside the while loop
         // See this: https://stackoverflow.com/questions/20516773/stdunique-lockstdmutex-or-stdlock-guardstdmutex
 
@@ -208,7 +211,7 @@ void xUR_Control::getData()
 /**
  * @brief UR_Control::init private function to initialize and allocate memory, to be used in contructors.
  */
-void xUR_Control::init()
+void xUrControl::init()
 {
     //datasharing struct
     mURStruct = new UR_STRUCT;
@@ -218,7 +221,7 @@ void xUR_Control::init()
 /**
  * @brief UR_Control::initRobot send scriptfile to robot, to init TCP ect.
  */
-void xUR_Control::initRobot()
+void xUrControl::initRobot()
 {
     ur_rtde::ScriptClient script("127.0.0.1",3,14);
     script.connect();
@@ -232,26 +235,26 @@ void xUR_Control::initRobot()
  * @brief UR_Control::getURStruct
  * @return pointer to the URStruct, for data exchange
  */
-UR_STRUCT *xUR_Control::getURStruct() const
-{
-    return mURStruct;
+UR_STRUCT xUrControl::getURStruct() {
+    std::lock_guard<std::mutex> dataLock(mMtx);
+    return *mURStruct;
 }
 
 /**
  * @brief UR_Control::startPolling starts a new thread, to poll data from the robot via UR RTDE recieve interface.
  */
-void xUR_Control::startPolling()
+void xUrControl::startPolling()
 {
     if(!isConnected){   return; }
 
     std::cout << "starting polling thread" << std::endl;
-    mThread = new std::thread(&xUR_Control::getData, this);
+    mThread = new std::thread(&xUrControl::getData, this);
 }
 
 /**
  * @brief UR_Control::stopPolling stopping the polling thread, to poll realtime data from the robot
  */
-void xUR_Control::stopPolling()
+void xUrControl::stopPolling()
 {
     mContinue = false;
 
@@ -267,7 +270,7 @@ void xUR_Control::stopPolling()
  * @brief UR_Control::getLastPose getting last postion stored in the URStruct
  * @return return vector with latest saved position from the URStruct
  */
-std::vector<double> xUR_Control::getLastPose()
+std::vector<double> xUrControl::getLastPose()
 {
     return mURStruct->pose;
 }
@@ -276,7 +279,7 @@ std::vector<double> xUR_Control::getLastPose()
  * @brief UR_Control::getPollingRate getting pollingrate in hz
  * @return pollingrate as integer representing polling rate in [Hz]
  */
-int xUR_Control::getPollingRate() const
+int xUrControl::getPollingRate() const
 {
     return mPollingRate;
 }
@@ -285,7 +288,7 @@ int xUR_Control::getPollingRate() const
  * @brief UR_Control::setPollingRate setting private parameter "pollingRate", and checking if its within limits of the robots pollingrate
  * @param pollingRate int in hertz [Hz] between 0 and 125 [Hz]
  */
-void xUR_Control::setPollingRate(int pollingRate)
+void xUrControl::setPollingRate(int pollingRate)
 {
     if(pollingRate <= 125 && pollingRate > 0){
         mPollingRate = pollingRate;

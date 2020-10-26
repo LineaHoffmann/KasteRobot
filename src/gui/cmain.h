@@ -2,20 +2,53 @@
 #define CMAIN_H
 #pragma once
 
-#include "../includeheader.h"
-#include "clinker.h"
+#ifndef LOG_DEFINES
+#define LOG_DEFINES 1
+#define logstd wxLogMessage
+#define logwar wxLogWarning
+#define logerr wxLogError
+#endif
+
+#include <string>
+#include <vector>
+#include <chrono>
+#include <utility>
+#include <thread>
+#include <mutex>
+
+#include <ctime> // For timestamp, C++20 isn't showing up :((
+
+#include "wx/wx.h"
+#include "wx/app.h"
+#include "wx/frame.h"
+#include "wx/menu.h"
+#include "wx/sizer.h"
+#include "wx/splitter.h"
+#include "wx/textctrl.h"
+#include "wx/notebook.h"
+#include "wx/treelist.h"
+#include "wx/statusbr.h"
+#include "wx/aboutdlg.h"
+#include "wx/artprov.h"
+
+#include "opencv2/core.hpp"
+#include "opencv2/opencv.hpp"
+
 #include "cimagepanel.h"
 
+#include "../logic/xcontroller.h"
 
-enum FUNCTION_BINDING_IDS {
-    ID_TIMER_CAMERA_UPDATE,
+enum FUNCTION_BINDING_ID {
+    ID_TIMER_VIEW1_UPDATE,      // Updating for view 1
+    ID_TIMER_VIEW2_UPDATE,      // Not used at the moment
+    ID_TIMER_INFOTREE_UPDATE,   // Updating the information tree
 
-    ID_MENU_SAVE_LOG,
+    ID_MENU_SAVE_LOG,           // Menu buttons
     ID_MENU_SAVE_SNAPSHOT,
     ID_MENU_EXIT,
     ID_MENU_ABOUT,
 
-    ID_BTN_ROBOT_CONNECT,
+    ID_BTN_ROBOT_CONNECT,       // Notebook panel buttons
     ID_BTN_ROBOT_DISCONNECT,
     ID_BTN_GRIPPER_CONNECT,
     ID_BTN_GRIPPER_DISCONNECT,
@@ -25,135 +58,66 @@ enum FUNCTION_BINDING_IDS {
     ID_BTN_DATABASE_DISCONNECT
 };
 
-
 class cMain : public wxFrame
 {
 public:
     cMain();
     ~cMain();
 
-    void addLinker(cLinker* linker);
+
+    void pushStrToStatus(std::string& msg); // Thread safe
+    void popStrFromStatus(); // Thread safe
+    void setLogicControllerPointer(std::shared_ptr<xController> controller); // Thread safe
 
 private:
     // GUI event handler functions, linked in top of cMain.cpp
     // They get to keep uppercase first letter
-    void OnTimerCameraUpdate(wxTimerEvent &evt);
-    // Main window top bar functions
-    void OnMenuSaveLog(wxCommandEvent &evt);
-    void OnMenuSaveSnap(wxCommandEvent &evt);
-    void OnMenuExit(wxCommandEvent &evt);
-    void OnMenuAbout(wxCommandEvent &evt);
-    // Left panel controls handler functions
-    void OnBtnRobotConnect(wxCommandEvent &evt);
-    void OnBtnRobotDisconnect(wxCommandEvent &evt);
-    void OnBtnGripperConnect(wxCommandEvent &evt);
-    void OnBtnGripperDisconnect(wxCommandEvent &evt);
-    void OnBtnCameraConnect(wxCommandEvent &evt);
-    void OnBtnCameraDisconnect(wxCommandEvent &evt);
-    void OnBtnDatabaseConnect(wxCommandEvent &evt);
-    void OnBtnDatabaseDisconnect(wxCommandEvent &evt);
-
-    // Functions for keeping the main constructor readable
-    void initSizers();
-    void initMainWindow();
-    void initMenu();
-
-    // Functions for keeping the fuctions for keeping the main constructor readable, readable ...
-    void initLeftPanel();
-    void initRightPanel();
-
-    // Functions for keeping the fuctions for the fuctions for keeping the main... :)
-    void initTabGeneral();
-    void initTabRobot();
-    void initTabGripper();
-    void initTabCamera();
-    void initTabDatabase();
+    void OnTimerView1Update(wxTimerEvent &evt);
+    void OnTimerView2Update(wxTimerEvent &evt);
+    void OnTimerInfoUpdate(wxTimerEvent &evt);
+    void OnButtonPress(wxCommandEvent &evt);
 
 private:
+    // Pointer to logic controller object
+    std::shared_ptr<xController> mController;
+
     // Main window
-    wxSplitterWindow *mSplitterMain = nullptr;
+    cImagePanel *mPanelView1;  // Panel for view 1
+    cImagePanel *mPanelView2;  // Panel for view 2
 
-    // Left side gets all interactive controls
-    wxNotebook *mLeftBookPanel = nullptr;
-    wxPanel *mLeftSubPanelGeneral = nullptr;
-    wxPanel *mLeftSubPanelRobot = nullptr;
-    wxPanel *mLeftSubPanelGripper = nullptr;
-    wxPanel *mLeftSubPanelCamera = nullptr;
-    wxPanel *mLeftSubPanelDatabase = nullptr;
+    // Logging area
+    wxTextCtrl *mTextCtrl;
+    wxLogTextCtrl *mTextLog;
 
-    // Right side gets camera feed and robot orientation
-    wxSplitterWindow *mRightSplitpanel = nullptr;
+    // PanelNotebook
+    wxNotebook *mNotebook;
+    wxTreeListCtrl *mTreeList;
 
-    // GUI sizers
-    wxBoxSizer *mSizerMain = nullptr;
-    wxBoxSizer *mSizerRight = nullptr;
-    wxBoxSizer *mSizerLeft = nullptr;
-    wxBoxSizer *mSizerLeftGeneral = nullptr;
-    wxBoxSizer *mSizerLeftRobot = nullptr;
-    wxBoxSizer *mSizerLeftGripper = nullptr;
-    wxBoxSizer *mSizerLeftCamera = nullptr;
-    wxBoxSizer *mSizerLeftDatabase = nullptr;
-
-    // GUI elements for general tab
-    wxTreeListCtrl *mTabGeneralTreeList = nullptr;
-
-    wxTreeListItem *mTabGeneralSubRobot = nullptr;
-    wxTreeListItem *mTabGeneralSubRobotTCP = nullptr;
-    wxTreeListItem *mTabGeneralSubRobotJoints = nullptr;
-    wxTreeListItem *mTabGeneralSubRobotIP = nullptr;
-    wxTreeListItem *mTabGeneralSubRobotState = nullptr;
-
-    wxTreeListItem *mTabGeneralSubCamera = nullptr;
-    wxTreeListItem *mTabGeneralSubCameraIP = nullptr;
-    wxTreeListItem *mTabGeneralSubCameraState = nullptr;
-
-    wxTreeListItem *mTabGeneralSubGripper = nullptr;
-    wxTreeListItem *mTabGeneralSubGripperIP = nullptr;
-    wxTreeListItem *mTabGeneralSubGripperState = nullptr;
-
-    wxTreeListItem *mTabGeneralSubDatabase = nullptr;
-    wxTreeListItem *mTabGeneralSubDatabaseHost = nullptr;
-    wxTreeListItem *mTabGeneralSubDatabaseUser = nullptr;
-    wxTreeListItem *mTabGeneralSubDatabaseState = nullptr;
-    wxTreeListItem *mTabGeneralSubDatabaseLastEntry = nullptr;
-
-    wxTextCtrl *mTabGeneralTextCtrl = nullptr;
-    wxLogTextCtrl *mTabGeneralLog = nullptr;
-
-    // GUI elements for robot tab
-    wxButton *mTabRobotConnectBtn = nullptr;
-    wxButton *mTabRobotDisconnectBtn = nullptr;
-    wxTextCtrl *mTabRobotIpEntryTxtCtrl = nullptr;
-
-    // GUI elements for gripper tab
-    wxButton *mTabGripperConnectBtn = nullptr;
-    wxButton *mTabGripperDisconnectBtn = nullptr;
-    wxTextCtrl *mTabGripperIpEntryTxtCtrl = nullptr;
-
-    // GUI elements for camera tab
-    wxButton *mTabCameraConnectBtn = nullptr;
-    wxButton *mTabCameraDisconnectBtn = nullptr;
-    wxTextCtrl *mTabCameraIpEntryTxtCtrl = nullptr;
-
-    // GUI elements for database tab
-    wxButton *mTabDatabaseConnectBtn = nullptr;
-    wxButton *mTabDatabaseDisconnectBtn = nullptr;
-    wxTextCtrl *mTabDatabaseHostEntryTxtCtrl = nullptr;
-    wxTextCtrl *mTabDatabaseUserEntryTxtCtrl = nullptr;
-    wxTextCtrl *mTabDatabasePasswordEntryTxtCtrl = nullptr;
+    // About box
+    wxAboutDialogInfo *mAboutBox;
 
     // Top menu bar
-    wxMenuBar *mMenuBar = nullptr;
+    wxMenuBar *mMenuBar;
 
-    // Viewing area for camera feed
-    cImagePanel *mCameraPanel = nullptr;
-    wxTimer mTimerCamera;
+    // Bottom status bar
+    wxStatusBar *mStatusBar;
 
-    // Viewing area for robot orientation
-    cImagePanel *mRobotPanel = nullptr;
+    // Update timers
+    wxTimer mTimerView1;
+    //wxTimer mTimerView2;
+    wxTimer mTimerInfo;
 
-    // Pointer to the layer interface class
-    cLinker *mLinker = nullptr;
+    std::mutex mMtx;
+
+    // Data entries for the tree view
+    wxTreeListItem *mTreeRootRobot;
+    wxTreeListItem *mTreeRootCamera;
+    wxTreeListItem *mTreeRootGripper;
+    wxTreeListItem *mTreeRootDatabase;
+    wxTreeListItem *mTreeRobotState;
+    wxTreeListItem *mTreeRobotIP;
+    wxTreeListItem *mTreeRobotPort;
+    wxTreeListItem *mTreeCameraState;
 
     // Just a macro to enable wxWidgets events
     wxDECLARE_EVENT_TABLE();
