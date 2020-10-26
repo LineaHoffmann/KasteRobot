@@ -6,7 +6,7 @@ project(KasteRobot)
 
 # Using C++17 for header inline const defines
 # Jonas used C++11 for the camera, 17 should be good
-# Add 25/10/2020 SRP - 20 has added std::chrono calendar functions! Would be nice, but no :(
+# 25/10/2020 SRP - 20 has added std::chrono calendar functions! Would be nice, but no :(
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 17)
 
@@ -18,7 +18,7 @@ find_package(wxWidgets REQUIRED COMPONENTS net core base)
 include("${wxWidgets_USE_FILE}")
 
 # Qt5 library (for Qt SQL)
-find_package(Qt5 COMPONENTS Core REQUIRED)
+find_package(Qt5 COMPONENTS Core Sql REQUIRED)
 
 # OpenCV library
 find_package(OpenCV REQUIRED)
@@ -89,7 +89,7 @@ set(GCC_COVERAGE_COMPILE_FLAGS "-I/usr/local/lib/wx/include/gtk3-unicode-3.0 -I/
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
 
 # Linking libraries
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core Qt5::Sql)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${Pylon_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${OpenCV_LIBS})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${ROBWORK_LIBRARIES})
