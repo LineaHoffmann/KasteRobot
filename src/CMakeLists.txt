@@ -17,6 +17,9 @@ set(CMAKE_BUILD_TYPE Debug)
 find_package(wxWidgets REQUIRED COMPONENTS net core base)
 include("${wxWidgets_USE_FILE}")
 
+# Qt5 library (for Qt SQL)
+find_package(Qt5 COMPONENTS Core REQUIRED)
+
 # OpenCV library
 find_package(OpenCV REQUIRED)
 
@@ -86,9 +89,10 @@ set(GCC_COVERAGE_COMPILE_FLAGS "-I/usr/local/lib/wx/include/gtk3-unicode-3.0 -I/
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
 
 # Linking libraries
-target_link_libraries(${PROJECT_NAME} ${Pylon_LIBRARIES})
-target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
-target_link_libraries(${PROJECT_NAME} ${ROBWORK_LIBRARIES})
-target_link_libraries(${PROJECT_NAME} ${wxWidgets_LIBRARIES}) # Not doing enough, next line corrects that (from wx-config --libs)
-target_link_libraries(${PROJECT_NAME} ur_rtde::rtde)
-target_link_libraries(${PROJECT_NAME} -L/usr/local/lib -pthread   -lwx_gtk3u_xrc-3.0 -lwx_gtk3u_html-3.0 -lwx_gtk3u_qa-3.0 -lwx_gtk3u_adv-3.0 -lwx_gtk3u_core-3.0 -lwx_baseu_xml-3.0 -lwx_baseu_net-3.0 -lwx_baseu-3.0)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${Pylon_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${OpenCV_LIBS})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${ROBWORK_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${wxWidgets_LIBRARIES}) # Not doing enough, next line corrects that (from wx-config --libs)
+target_link_libraries(${PROJECT_NAME} PRIVATE ur_rtde::rtde)
+target_link_libraries(${PROJECT_NAME} PRIVATE -L/usr/local/lib -pthread -lwx_gtk3u_xrc-3.0 -lwx_gtk3u_html-3.0 -lwx_gtk3u_qa-3.0 -lwx_gtk3u_adv-3.0 -lwx_gtk3u_core-3.0 -lwx_baseu_xml-3.0 -lwx_baseu_net-3.0 -lwx_baseu-3.0)
