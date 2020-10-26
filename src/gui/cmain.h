@@ -127,6 +127,25 @@ private:
     wxTreeListItem *mTreeDatabaseName;
     wxTreeListItem *mTreeDatabaseSchema;
 
+    // Objects for the notebook tabs (buttons, fields, etc)
+    wxButton *mBtnRobotConnect;
+    wxButton *mBtnRobotDisconnect;
+    wxButton *mBtnCameraConnect;
+    wxButton *mBtnCameraDisconnect;
+    wxButton *mBtnGripperConnect;
+    wxButton *mBtnGripperDisconnect;
+    wxButton *mBtnDatabaseConnect;
+    wxButton *mBtnDatabaseDisconnect;
+    wxTextCtrl *mTxtRobotIP;
+    wxTextCtrl *mTxtRobotPort;
+    wxTextCtrl *mTxtCameraExposure;
+    wxTextCtrl *mTxtGripperIP;
+    wxTextCtrl *mTxtGripperPort;
+    wxTextCtrl *mTxtDatabaseIP;
+    wxTextCtrl *mTxtDatabasePort;
+    wxTextCtrl *mTxtDatabaseUser;
+    wxTextCtrl *mTxtDatabasePassword;
+    wxTextCtrl *mTxtDatabaseSchema;
 
     // Just a macro to enable wxWidgets events
     wxDECLARE_EVENT_TABLE();

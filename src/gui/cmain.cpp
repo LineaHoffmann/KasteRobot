@@ -143,13 +143,48 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mTreeDatabaseSchema = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootDatabase, "Schema"));
 
     // Robot tab building
-    wxButton btnRobotConnect(mNotebookRobot, ID_BTN_ROBOT_CONNECT, "Connect", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "Connect Robot");
+    mBtnRobotConnect = new wxButton(mNotebookRobot, ID_BTN_ROBOT_CONNECT);
+    mBtnRobotDisconnect = new wxButton(mNotebookRobot, ID_BTN_ROBOT_DISCONNECT);
+    mSizerNotebookRobot->Add(mBtnRobotConnect);
+    mSizerNotebookRobot->Add(mBtnRobotDisconnect);
+    mTxtRobotIP = new wxTextCtrl(mNotebookRobot, wxID_ANY, "IP");
+    mTxtRobotPort = new wxTextCtrl(mNotebookRobot, wxID_ANY, "Port");
+    mSizerNotebookRobot->Add(mTxtRobotIP);
+    mSizerNotebookRobot->Add(mTxtRobotPort);
 
     // Camera tab building
+    mBtnCameraConnect = new wxButton(mNotebookCamera, ID_BTN_CAMERA_CONNECT);
+    mBtnCameraDisconnect = new wxButton(mNotebookCamera, ID_BTN_CAMERA_DISCONNECT);
+    mSizerNotebookCamera->Add(mBtnCameraConnect);
+    mSizerNotebookCamera->Add(mBtnCameraDisconnect);
+    mTxtCameraExposure = new wxTextCtrl(mNotebookCamera, wxID_ANY, "Exposure Time");
+    mSizerNotebookCamera->Add(mTxtCameraExposure);
 
     // Gripper tab building
+    mBtnGripperConnect = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_CONNECT);
+    mBtnGripperDisconnect = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_DISCONNECT);
+    mSizerNotebookGripper->Add(mBtnGripperConnect);
+    mSizerNotebookGripper->Add(mBtnGripperDisconnect);
+    mTxtGripperIP = new wxTextCtrl(mNotebookGripper, wxID_ANY, "IP");
+    mTxtGripperPort = new wxTextCtrl(mNotebookGripper, wxID_ANY, "Port");
+    mSizerNotebookGripper->Add(mTxtGripperIP);
+    mSizerNotebookGripper->Add(mTxtGripperPort);
 
     // Database tab building
+    mBtnDatabaseConnect = new wxButton(mNotebookDatabase, ID_BTN_GRIPPER_CONNECT);
+    mBtnDatabaseDisconnect = new wxButton(mNotebookDatabase, ID_BTN_GRIPPER_DISCONNECT);
+    mSizerNotebookDatabase->Add(mBtnDatabaseConnect);
+    mSizerNotebookDatabase->Add(mBtnDatabaseDisconnect);
+    mTxtDatabaseIP = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "IP");
+    mTxtDatabasePort = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "Port");
+    mTxtDatabaseUser = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "User");
+    mTxtDatabaseSchema = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "Schema");
+    mTxtDatabasePassword = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "Password");
+    mSizerNotebookDatabase->Add(mTxtDatabaseIP);
+    mSizerNotebookDatabase->Add(mTxtDatabasePort);
+    mSizerNotebookDatabase->Add(mTxtDatabaseUser);
+    mSizerNotebookDatabase->Add(mTxtDatabaseSchema);
+    mSizerNotebookDatabase->Add(mTxtDatabasePassword);
 
     // About box creation
     mAboutBox = new wxAboutDialogInfo;
@@ -256,6 +291,8 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
     switch (evt.GetId()) {
     case ID_MENU_SAVE_LOG:
         logstd("Menu->Save Log clicked");
+        // TODO: Pull this runs entries from database
+        //       and dump to some .txt file
         evt.Skip();
         break;
     case ID_MENU_SAVE_SNAPSHOT:
