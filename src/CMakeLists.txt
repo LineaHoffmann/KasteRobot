@@ -6,9 +6,9 @@ project(KasteRobot)
 
 # Using C++17 for header inline const defines
 # Jonas used C++11 for the camera, 17 should be good
-# Add 25/10/2020 SRP - 20 has added std::chrono calendar functions! Yes please
+# Add 25/10/2020 SRP - 20 has added std::chrono calendar functions! Would be nice, but no :(
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 
 # Building as debug for now (my robworks is not though, may be a problem)
 set(CMAKE_BUILD_TYPE Debug)
@@ -80,7 +80,6 @@ file (GLOB DB_FILES
 # CMake complains here: Files in some directories may conflict with implicit libraries (librtde.so.1.3 in /usr/lib/x86_64-linux-gnu hidden by /usr/local/lib)
 # Might be a local mistake on my machine due to multiples of the same lib
 add_executable(${PROJECT_NAME} ${SRC} ${GUI_FILES} ${LOGIC_FILES} ${DB_FILES})
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
 
 # Some more wxWidgets compiling stuff (wx-config --cxxflags)
 set(GCC_COVERAGE_COMPILE_FLAGS "-I/usr/local/lib/wx/include/gtk3-unicode-3.0 -I/usr/local/include/wx-3.0 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread")
