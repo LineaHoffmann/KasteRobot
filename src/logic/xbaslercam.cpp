@@ -43,9 +43,9 @@ void xBaslerCam::shutdown() {mExit.exchange(true);}
 void xBaslerCam::calibrate()
 {
     //calibrate
-    std::string print = "Calibration started using path: ";
-    print.append(path);
-    logstd(print.c_str());
+    std::stringstream print; // String stream for printing to wxLog
+    print << path;
+    logstd(print.str().c_str());
     //std::cout << "calibration started. Using pictures from folder: " + path << std::endl;
 
     cv::Mat frame;
@@ -87,18 +87,18 @@ void xBaslerCam::calibrate()
         }
     }
     cv::calibrateCamera(objpoints, imgpoints, cv::Size(frame.rows,frame.cols), cameraMatrix, distCoeffs, R, T);
-    print = "Camera Matric: ";
-    print << cameraMatrix;
-    logstd(print.c_str());
-    print = "Distortion Coefficients: ";
-    print << distCoeffs;
-    logstd(print.c_str());
-    print = "Rotation Vector: ";
-    print << R;
-    logstd(print.c_str());
-    print = "Translation Vector: ";
-    print << T;
-    logstd(print.c_str());
+    print.clear();
+    print << "Camera Matric: " << cameraMatrix;
+    logstd(print.str().c_str());
+    print.clear();
+    print << "Distortion Coefficients: " << distCoeffs;
+    logstd(print.str().c_str());
+    print.clear();
+    print << "Rotation Vector: " << R;
+    logstd(print.str().c_str());
+    print.clear();
+    print << "Translation Vector: " << T;
+    logstd(print.str().c_str());
     //std::cout << "cameraMatrix : " << cameraMatrix << std::endl;
     //std::cout << "distCoeffs : " << distCoeffs << std::endl;
     //std::cout << "Rotation vector : " << R << std::endl;

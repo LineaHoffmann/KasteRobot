@@ -118,7 +118,6 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
                                       wxALIGN_RIGHT,
                                       wxCOL_RESIZABLE);
     mSizerNotebookGeneral->Add(mTreeList, wxSizerFlags(1).Expand());
-
     // NOTE: This is where to add items to the tree
     wxTreeListItem root = mTreeList->GetRootItem();
     // Top level
@@ -126,11 +125,31 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mTreeRootCamera = new wxTreeListItem(mTreeList->AppendItem(root, "Camera"));
     mTreeRootGripper = new wxTreeListItem(mTreeList->AppendItem(root, "Gripper"));
     mTreeRootDatabase = new wxTreeListItem(mTreeList->AppendItem(root, "Database"));
-    // Sub levels
+    // Sub levels - Robot
     mTreeRobotState = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootRobot, "State"));
     mTreeRobotIP = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootRobot, "IP"));
     mTreeRobotPort = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootRobot, "Port"));
+    // Sub levels - Camera
     mTreeCameraState = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootCamera, "State"));
+    // Sub levels - Gripper
+    mTreeGripperState = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootGripper, "State"));
+    mTreeGripperIP = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootGripper, "IP"));
+    mTreeGripperPort = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootGripper, "Port"));
+    // Sub levels - Database
+    mTreeDatabaseState = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootDatabase, "State"));
+    mTreeDatabaseIP = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootDatabase, "IP"));
+    mTreeDatabasePort = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootDatabase, "Port"));
+    mTreeDatabaseName = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootDatabase, "Name"));
+    mTreeDatabaseSchema = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootDatabase, "Schema"));
+
+    // Robot tab building
+    wxButton btnRobotConnect(mNotebookRobot, ID_BTN_ROBOT_CONNECT, "Connect", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "Connect Robot");
+
+    // Camera tab building
+
+    // Gripper tab building
+
+    // Database tab building
 
     // About box creation
     mAboutBox = new wxAboutDialogInfo;

@@ -118,6 +118,15 @@ private:
     wxTreeListItem *mTreeRobotIP;
     wxTreeListItem *mTreeRobotPort;
     wxTreeListItem *mTreeCameraState;
+    wxTreeListItem *mTreeGripperState;
+    wxTreeListItem *mTreeGripperIP;
+    wxTreeListItem *mTreeGripperPort;
+    wxTreeListItem *mTreeDatabaseState;
+    wxTreeListItem *mTreeDatabaseIP;
+    wxTreeListItem *mTreeDatabasePort;
+    wxTreeListItem *mTreeDatabaseName;
+    wxTreeListItem *mTreeDatabaseSchema;
+
 
     // Just a macro to enable wxWidgets events
     wxDECLARE_EVENT_TABLE();
