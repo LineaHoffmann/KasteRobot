@@ -30,6 +30,7 @@
 #include "wx/statusbr.h"
 #include "wx/aboutdlg.h"
 #include "wx/artprov.h"
+#include <wx/gbsizer.h>
 
 #include "opencv2/core.hpp"
 #include "opencv2/opencv.hpp"
@@ -48,13 +49,19 @@ enum FUNCTION_BINDING_ID {
     ID_MENU_EXIT,
     ID_MENU_ABOUT,
 
-    ID_BTN_ROBOT_CONNECT,       // Notebook panel buttons
+    ID_BTN_ROBOT_CONNECT,       // Robot Notebook panel buttons
     ID_BTN_ROBOT_DISCONNECT,
-    ID_BTN_GRIPPER_CONNECT,
+    ID_BTN_ROBOT_UPDATE,
+    ID_BTN_ROBOT_SEND_CMD,
+    ID_BTN_ROBOT_SEND_POS,
+
+    ID_BTN_GRIPPER_CONNECT,     // Gripper Notebook panel buttons
     ID_BTN_GRIPPER_DISCONNECT,
-    ID_BTN_CAMERA_CONNECT,
+
+    ID_BTN_CAMERA_CONNECT,      // Camera Notebook panel buttons
     ID_BTN_CAMERA_DISCONNECT,
-    ID_BTN_DATABASE_CONNECT,
+
+    ID_BTN_DATABASE_CONNECT,    // Database Notebook panel buttons
     ID_BTN_DATABASE_DISCONNECT
 };
 
@@ -117,6 +124,7 @@ private:
     wxTreeListItem *mTreeRobotState;
     wxTreeListItem *mTreeRobotIP;
     wxTreeListItem *mTreeRobotPort;
+    wxTreeListItem *mTreeRobotPosition;
     wxTreeListItem *mTreeCameraState;
     wxTreeListItem *mTreeGripperState;
     wxTreeListItem *mTreeGripperIP;
@@ -128,19 +136,33 @@ private:
     wxTreeListItem *mTreeDatabaseSchema;
 
     // Objects for the notebook tabs (buttons, fields, etc)
+    // ROBOT SUB PANEL ENTRIES
     wxButton *mBtnRobotConnect;
     wxButton *mBtnRobotDisconnect;
-    wxButton *mBtnCameraConnect;
-    wxButton *mBtnCameraDisconnect;
-    wxButton *mBtnGripperConnect;
-    wxButton *mBtnGripperDisconnect;
-    wxButton *mBtnDatabaseConnect;
-    wxButton *mBtnDatabaseDisconnect;
+    wxButton *mBtnRobotUpdate;
+    wxButton *mBtnRobotSendCmd;
+    wxButton *mBtnRobotSendPos;
     wxTextCtrl *mTxtRobotIP;
     wxTextCtrl *mTxtRobotPort;
+    wxTextCtrl *mTxtRobotCmd;
+    wxTextCtrl *mTxtRobotX;
+    wxTextCtrl *mTxtRobotY;
+    wxTextCtrl *mTxtRobotZ;
+    wxTextCtrl *mTxtRobotRX;
+    wxTextCtrl *mTxtRobotRY;
+    wxTextCtrl *mTxtRobotRZ;
+    // CAMERA SUB PANEL ENTRIES
+    wxButton *mBtnCameraConnect;
+    wxButton *mBtnCameraDisconnect;
     wxTextCtrl *mTxtCameraExposure;
+    // GRIPPER SUB PANEL ENTRIES
+    wxButton *mBtnGripperConnect;
+    wxButton *mBtnGripperDisconnect;
     wxTextCtrl *mTxtGripperIP;
     wxTextCtrl *mTxtGripperPort;
+    // DATABASE SUB PANEL ENTRIES
+    wxButton *mBtnDatabaseConnect;
+    wxButton *mBtnDatabaseDisconnect;
     wxTextCtrl *mTxtDatabaseIP;
     wxTextCtrl *mTxtDatabasePort;
     wxTextCtrl *mTxtDatabaseUser;

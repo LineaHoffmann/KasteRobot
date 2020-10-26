@@ -52,7 +52,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
 
     // Notebook contents
     wxBoxSizer *mSizerNotebookGeneral = new wxBoxSizer(wxVERTICAL);
-    wxBoxSizer *mSizerNotebookRobot = new wxBoxSizer(wxHORIZONTAL);
+    //wxBoxSizer *mSizerNotebookRobot = new wxBoxSizer(wxHORIZONTAL); // SRP: Commented out while adding new code
     wxBoxSizer *mSizerNotebookGripper = new wxBoxSizer(wxHORIZONTAL);
     wxBoxSizer *mSizerNotebookCamera = new wxBoxSizer(wxHORIZONTAL);
     wxBoxSizer *mSizerNotebookDatabase = new wxBoxSizer(wxHORIZONTAL);
@@ -87,7 +87,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
                                              wxTAB_TRAVERSAL | wxNO_BORDER,
                                              "subPanel5");
     mNotebookGeneral->SetSizer(mSizerNotebookGeneral);
-    mNotebookRobot->SetSizer(mSizerNotebookRobot);
+    //mNotebookRobot->SetSizer(mSizerNotebookRobot);    // SRP: Commented out while adding new code
     mNotebookGripper->SetSizer(mSizerNotebookGripper);
     mNotebookCamera->SetSizer(mSizerNotebookCamera);
     mNotebookDatabase->SetSizer(mSizerNotebookDatabase);
@@ -129,6 +129,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mTreeRobotState = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootRobot, "State"));
     mTreeRobotIP = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootRobot, "IP"));
     mTreeRobotPort = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootRobot, "Port"));
+    mTreeRobotPosition = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootRobot, "Position"));
     // Sub levels - Camera
     mTreeCameraState = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootCamera, "State"));
     // Sub levels - Gripper
@@ -142,15 +143,59 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mTreeDatabaseName = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootDatabase, "Name"));
     mTreeDatabaseSchema = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootDatabase, "Schema"));
 
-    // Robot tab building
-    mBtnRobotConnect = new wxButton(mNotebookRobot, ID_BTN_ROBOT_CONNECT);
-    mBtnRobotDisconnect = new wxButton(mNotebookRobot, ID_BTN_ROBOT_DISCONNECT);
-    mSizerNotebookRobot->Add(mBtnRobotConnect);
-    mSizerNotebookRobot->Add(mBtnRobotDisconnect);
+    // Robot tab building - Buttons
+    mBtnRobotConnect = new wxButton(mNotebookRobot, ID_BTN_ROBOT_CONNECT, "Connect");
+    mBtnRobotDisconnect = new wxButton(mNotebookRobot, ID_BTN_ROBOT_DISCONNECT, "Disconnect");
+    mBtnRobotUpdate = new wxButton(mNotebookRobot, ID_BTN_ROBOT_UPDATE, "Update");
+    mBtnRobotSendCmd = new wxButton(mNotebookRobot, ID_BTN_ROBOT_SEND_CMD, "Send CMD");
+    mBtnRobotSendPos = new wxButton(mNotebookRobot, ID_BTN_ROBOT_SEND_POS, "Send Pos");
+    // Robot tab building - Text controls
     mTxtRobotIP = new wxTextCtrl(mNotebookRobot, wxID_ANY, "IP");
     mTxtRobotPort = new wxTextCtrl(mNotebookRobot, wxID_ANY, "Port");
-    mSizerNotebookRobot->Add(mTxtRobotIP);
-    mSizerNotebookRobot->Add(mTxtRobotPort);
+    mTxtRobotCmd = new wxTextCtrl(mNotebookRobot, wxID_ANY, "Enter Commands here");
+    mTxtRobotX = new wxTextCtrl(mNotebookRobot, wxID_ANY, "X");
+    mTxtRobotY = new wxTextCtrl(mNotebookRobot, wxID_ANY, "Y");
+    mTxtRobotZ = new wxTextCtrl(mNotebookRobot, wxID_ANY, "Z");
+    mTxtRobotRX = new wxTextCtrl(mNotebookRobot, wxID_ANY, "RX");
+    mTxtRobotRY = new wxTextCtrl(mNotebookRobot, wxID_ANY, "RY");
+    mTxtRobotRZ = new wxTextCtrl(mNotebookRobot, wxID_ANY, "RZ");
+    // Robot tab building - Static text
+    wxStaticText *sTxtRobotX = new wxStaticText(mNotebookRobot, wxID_ANY, "X");
+    wxStaticText *sTxtRobotY = new wxStaticText(mNotebookRobot, wxID_ANY, "Y");
+    wxStaticText *sTxtRobotZ = new wxStaticText(mNotebookRobot, wxID_ANY, "Z");
+    wxStaticText *sTxtRobotRX = new wxStaticText(mNotebookRobot, wxID_ANY, "RX");
+    wxStaticText *sTxtRobotRY = new wxStaticText(mNotebookRobot, wxID_ANY, "RY");
+    wxStaticText *sTxtRobotRZ = new wxStaticText(mNotebookRobot, wxID_ANY, "RZ");
+    // Robot tab building - GridBagSizer setup
+    wxGridBagSizer *mSizerNotebookRobot = new wxGridBagSizer(0, 0);
+    mSizerNotebookRobot->SetFlexibleDirection(wxBOTH);
+    mSizerNotebookRobot->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+    mSizerNotebookRobot->Add(mBtnRobotConnect, wxGBPosition(0, 0), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(mBtnRobotDisconnect, wxGBPosition(0, 1), wxGBSpan(1, 1), wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5);
+    mSizerNotebookRobot->Add(mBtnRobotUpdate, wxGBPosition(0, 2), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(mBtnRobotSendCmd, wxGBPosition(1, 0), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(mBtnRobotSendPos, wxGBPosition(3, 0), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(mTxtRobotIP, wxGBPosition(0, 3), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+    mSizerNotebookRobot->Add(mTxtRobotPort, wxGBPosition(0, 4), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+    mSizerNotebookRobot->Add(mTxtRobotCmd, wxGBPosition(1, 1), wxGBSpan(1, 4), wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+    mSizerNotebookRobot->Add(mTxtRobotX, wxGBPosition(2, 2), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(mTxtRobotY, wxGBPosition(3, 2), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(mTxtRobotZ, wxGBPosition(4, 2), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(mTxtRobotRX, wxGBPosition(2, 4), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(mTxtRobotRY, wxGBPosition(3, 4), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(mTxtRobotRZ, wxGBPosition(4, 4), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(sTxtRobotX, wxGBPosition(2, 1), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5);
+    mSizerNotebookRobot->Add(sTxtRobotY, wxGBPosition(3, 1), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5);
+    mSizerNotebookRobot->Add(sTxtRobotZ, wxGBPosition(4, 1), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5);
+    mSizerNotebookRobot->Add(sTxtRobotRX, wxGBPosition(2, 3), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5);
+    mSizerNotebookRobot->Add(sTxtRobotRY, wxGBPosition(3, 3), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5);
+    mSizerNotebookRobot->Add(sTxtRobotRZ, wxGBPosition(4, 3), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5);
+    for (uint32_t i = 0; i < 5; i++) {
+        mSizerNotebookRobot->AddGrowableCol(i);
+        mSizerNotebookRobot->AddGrowableRow(i);
+    }
+    mNotebookRobot->SetSizer(mSizerNotebookRobot);
+    mNotebookRobot->Layout();
 
     // Camera tab building
     mBtnCameraConnect = new wxButton(mNotebookCamera, ID_BTN_CAMERA_CONNECT);
@@ -294,7 +339,7 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         // TODO: Pull current runs entries from database
         //       and dump to some .txt file
         evt.Skip();
-        break;
+        return;
     case ID_MENU_SAVE_SNAPSHOT:
         logstd("Menu->Save Snapshot clicked");
     {
@@ -315,52 +360,66 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         logstd(s.c_str());
         evt.Skip();
     }
-        break;
+        return;
     case ID_MENU_EXIT:
         // Sending to cout because the application will die now
         std::cout << "Menu->Exit clicked" << std::endl;
         Close(true);
         evt.Skip();
-        break;
+        return;
     case ID_MENU_ABOUT:
         logstd("Menu->About clicked");
         wxAboutBox(*mAboutBox);
         evt.Skip();
-        break;
+        return;
     case ID_BTN_ROBOT_CONNECT:
         logstd("Robot->Connect clicked");
         evt.Skip();
-        break;
+        return;
     case ID_BTN_ROBOT_DISCONNECT:
         logstd("Robot->Disconnect clicked");
         evt.Skip();
-        break;
+        return;
+    case ID_BTN_ROBOT_UPDATE:
+        logstd("Robot->Update clicked");
+        evt.Skip();
+        return;
+    case ID_BTN_ROBOT_SEND_CMD:
+        logstd("Robot->Send Command clicked");
+        evt.Skip();
+        return;
+    case ID_BTN_ROBOT_SEND_POS:
+        logstd("Robot->Send Position clicked");
+        evt.Skip();
+        return;
     case ID_BTN_GRIPPER_CONNECT:
         logstd("Gripper->Connect clicked");
         evt.Skip();
-        break;
+        return;
     case ID_BTN_GRIPPER_DISCONNECT:
         logstd("Gripper->Disconnect clicked");
         evt.Skip();
-        break;
+        return;
     case ID_BTN_CAMERA_CONNECT:
         logstd("Camera->Connect clicked");
         evt.Skip();
-        break;
+        return;
     case ID_BTN_CAMERA_DISCONNECT:
         logstd("Camera->Disconnect clicked");
         evt.Skip();
-        break;
+        return;
     case ID_BTN_DATABASE_CONNECT:
         logstd("Database->Connect clicked");
         evt.Skip();
-        break;
+        return;
     case ID_BTN_DATABASE_DISCONNECT:
         logstd("Database->Disconnect clicked");
         evt.Skip();
-        break;
+        return;
     default:
         break;
     }
+    logerr("An event fell through the button handler!");
+    evt.Skip(); // Event didn't catch
     return;
 }
