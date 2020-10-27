@@ -61,20 +61,11 @@ private:
     void OnTimerInfoUpdate(wxTimerEvent &evt);
     void OnButtonPress(wxCommandEvent &evt);
 
-    template<typename Action>
-    void xTryAction(Action action) {
-        try {
-            return action();
-        } catch (x_err::error &e) {
-            logerr(e.what());
-        }
-    };
-
     // Template function for wrapping calls in most basic x_err / std::exception handling
     // Credit must go to StackExchange users Morwenn and Tim Martin
     // https://codereview.stackexchange.com/questions/2484/generic-c-exception-catch-handler-macro
     // Takes a lambda as argument and optionally an appended message
-    // Minimum C++14 for decltype(), I believe [srp]
+    // Minimum C++11 for decltype()
     template<typename Callable>
     auto xTry(Callable&& func, const std::string& msg="") -> decltype(func()) {
         try {
