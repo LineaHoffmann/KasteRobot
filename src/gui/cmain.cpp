@@ -287,12 +287,10 @@ void cMain::popStrFromStatus()
     if (mStatusBar != NULL && mStatusBar->GetFieldsCount() == 3)
         mStatusBar->PopStatusText(2);
 }
-
 void cMain::setLogicControllerPointer(std::shared_ptr<xController> controller)
 {
     mController = controller;
 }
-
 void cMain::OnTimerView1Update(wxTimerEvent &evt)
 {
     // Check if a new image is available
@@ -320,15 +318,20 @@ void cMain::OnTimerView1Update(wxTimerEvent &evt)
     mPanelView1->setNewImage(output);
     evt.Skip();
 }
-
 void cMain::OnTimerInfoUpdate(wxTimerEvent &evt)
 {
-    if (evt.GetId() == ID_MENU_SAVE_LOG)
-
     // Updating event for refreshing the info tree
     // TODO: Write this
     // Collect info from all available object through
     // the logic controller, in a thread safe manner
+
+    // POSIX resource use
+    struct rusage use;
+    if (getrusage(RUSAGE_SELF, &use) == 0) {
+        std::string s = "Current Resource Use [MB]: ";
+        s.append(std::to_string(use.ru_maxrss / 1048576.0f));
+        pushStrToStatus(s);
+    }
     evt.Skip();
 }
 void cMain::OnButtonPress(wxCommandEvent &evt) {
@@ -336,8 +339,9 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
     switch (evt.GetId()) {
     case ID_MENU_SAVE_LOG:
         logstd("Menu->Save Log clicked");
-        // TODO: Pull current runs entries from database
-        //       and dump to some .txt file
+        xTry([&] {mController->guiButtonPressed(ID_MENU_SAVE_LOG);});
+        // TODO: Pull current run entries from database
+        //       and dump to some file
         evt.Skip();
         return;
     case ID_MENU_SAVE_SNAPSHOT:
@@ -374,46 +378,57 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         return;
     case ID_BTN_ROBOT_CONNECT:
         logstd("Robot->Connect clicked");
+        xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_CONNECT);});
         evt.Skip();
         return;
     case ID_BTN_ROBOT_DISCONNECT:
         logstd("Robot->Disconnect clicked");
+        xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_DISCONNECT);});
         evt.Skip();
         return;
     case ID_BTN_ROBOT_UPDATE:
         logstd("Robot->Update clicked");
+        xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_UPDATE);});
         evt.Skip();
         return;
     case ID_BTN_ROBOT_SEND_CMD:
         logstd("Robot->Send Command clicked");
+        xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_SEND_CMD);});
         evt.Skip();
         return;
     case ID_BTN_ROBOT_SEND_POS:
         logstd("Robot->Send Position clicked");
+        xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_SEND_POS);});
         evt.Skip();
         return;
     case ID_BTN_GRIPPER_CONNECT:
         logstd("Gripper->Connect clicked");
+        xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_CONNECT);});
         evt.Skip();
         return;
     case ID_BTN_GRIPPER_DISCONNECT:
         logstd("Gripper->Disconnect clicked");
+        xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_DISCONNECT);});
         evt.Skip();
         return;
     case ID_BTN_CAMERA_CONNECT:
         logstd("Camera->Connect clicked");
+        xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_CONNECT);});
         evt.Skip();
         return;
     case ID_BTN_CAMERA_DISCONNECT:
         logstd("Camera->Disconnect clicked");
+        xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_DISCONNECT);});
         evt.Skip();
         return;
     case ID_BTN_DATABASE_CONNECT:
         logstd("Database->Connect clicked");
+        xTry([&] {mController->guiButtonPressed(ID_BTN_DATABASE_CONNECT);});
         evt.Skip();
         return;
     case ID_BTN_DATABASE_DISCONNECT:
         logstd("Database->Disconnect clicked");
+        xTry([&] {mController->guiButtonPressed(ID_BTN_DATABASE_DISCONNECT);});
         evt.Skip();
         return;
     default:

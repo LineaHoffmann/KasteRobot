@@ -17,6 +17,8 @@
 #include <mutex>
 
 #include <ctime> // For timestamp, C++20 isn't showing up :((
+#include <sys/resource.h> // For resource use tracking
+
 
 #include "wx/wx.h"
 #include "wx/app.h"
@@ -37,33 +39,8 @@
 
 #include "cimagepanel.hpp"
 
+#include "idbindings.h"
 #include "../logic/xcontroller.hpp"
-
-enum FUNCTION_BINDING_ID {
-    ID_TIMER_VIEW1_UPDATE,      // Updating for view 1
-    ID_TIMER_VIEW2_UPDATE,      // Not used at the moment
-    ID_TIMER_INFOTREE_UPDATE,   // Updating the information tree
-
-    ID_MENU_SAVE_LOG,           // Menu buttons
-    ID_MENU_SAVE_SNAPSHOT,
-    ID_MENU_EXIT,
-    ID_MENU_ABOUT,
-
-    ID_BTN_ROBOT_CONNECT,       // Robot Notebook panel buttons
-    ID_BTN_ROBOT_DISCONNECT,
-    ID_BTN_ROBOT_UPDATE,
-    ID_BTN_ROBOT_SEND_CMD,
-    ID_BTN_ROBOT_SEND_POS,
-
-    ID_BTN_GRIPPER_CONNECT,     // Gripper Notebook panel buttons
-    ID_BTN_GRIPPER_DISCONNECT,
-
-    ID_BTN_CAMERA_CONNECT,      // Camera Notebook panel buttons
-    ID_BTN_CAMERA_DISCONNECT,
-
-    ID_BTN_DATABASE_CONNECT,    // Database Notebook panel buttons
-    ID_BTN_DATABASE_DISCONNECT
-};
 
 class cMain : public wxFrame
 {
@@ -83,6 +60,31 @@ private:
     void OnTimerView2Update(wxTimerEvent &evt);
     void OnTimerInfoUpdate(wxTimerEvent &evt);
     void OnButtonPress(wxCommandEvent &evt);
+
+    template<typename Action>
+    void xTryAction(Action action) {
+        try {
+            return action();
+        } catch (x_err::error &e) {
+            logerr(e.what());
+        }
+    };
+
+    // Template function for wrapping calls in most basic x_err / std::exception handling
+    // Credit must go to StackExchange users Morwenn and Tim Martin
+    // https://codereview.stackexchange.com/questions/2484/generic-c-exception-catch-handler-macro
+    // Takes a lambda as argument and optionally an appended message
+    // Minimum C++14 for decltype(), I believe [srp]
+    template<typename Callable>
+    auto xTry(Callable&& func, const std::string& msg="") -> decltype(func()) {
+        try {
+            return func();
+        } catch (const x_err::error &e) {
+            logerr((std::string(e.what()).append(msg)).c_str());
+        } catch (const std::exception &e) {
+            logerr((std::string(e.what()).append(msg)).c_str());
+        }
+    }
 
 private:
     // Pointer to logic controller object

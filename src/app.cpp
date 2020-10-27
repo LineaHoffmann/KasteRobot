@@ -43,20 +43,10 @@ void app::threadFunc() {
     std::shared_ptr<xController> controller = std::make_shared<xController>();
     guiMain->setLogicControllerPointer(controller);
 
-    struct rusage use;
+
     while (!mJoinThread) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        // POSIX resource desctription
-        if (getrusage(RUSAGE_SELF, &use) == 0) {
-            std::string s = "Current App Thread Resource Use [MB]: ";
-            s.append(std::to_string(use.ru_maxrss / 1048576.0f));
-            guiMain->pushStrToStatus(s);
-            //std::cout << s << std::endl;
-            if (use.ru_maxrss / 1048576.0f > 10) {
-                std::cout << "WARNING: Memory use exceeds 10 MB! This is where my system [srp] starts to chug. Closing program .. " << std::endl;
-                this->Exit();
-            }
-        }
+
     }
     std::cout << "App thread is dying now .." << std::endl;
 }

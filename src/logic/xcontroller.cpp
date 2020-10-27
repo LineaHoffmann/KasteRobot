@@ -30,3 +30,8 @@ cv::Mat xController::getImage()
     if (mCamera) return mCamera->getImage();
     else return cv::Mat();
 }
+
+void xController::guiButtonPressed(BINDING_ID)
+{
+    throw x_err::error(x_err::what::NO_IMPLEMENTATION);
+}

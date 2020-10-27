@@ -25,6 +25,8 @@
 
 namespace x_err {
 struct what {
+    inline static const std::string NO_IMPLEMENTATION = "This is not implemented in the xController class yet .. ";
+
     inline static const std::string ROBOT_BAD_IP = "Connection to host could not be resolved! ";
     inline static const std::string ROBOT_NOT_CONNECTED = "Robot connections have not been established! ";
 

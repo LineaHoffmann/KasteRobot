@@ -20,15 +20,7 @@
 #include "xurcontrol.hpp"
 #include "xgripperclient.hpp"
 #include "xexceptions.hpp"
-
-// Not sure where to place this, both xController and cMain need access
-enum GUI_BUTTONS {
-    ROBOT_CONNECT,
-    ROBOT_DISCONNECT,
-    CAMERA_CONNECT,
-    CAMERA_DISCONNECT,
-    CAMERA_STOP
-};
+#include "../gui/idbindings.h"
 
 class xController
 {
@@ -40,7 +32,6 @@ public:
     void setRobot(std::shared_ptr<xUrControl> robot);
     void setGripper(std::shared_ptr<xGripperClient> gripper);
 
-
     // ********* //
     // GUI CALLS //
     // ********* //
@@ -50,8 +41,8 @@ public:
     // For GUI when updating info tree
     void fillInfo(struct treeInfo); // TODO: Perhaps a struct to keep all info? Who knows
     // For GUI button calls. Don't actually do stuff here, only post the tasks!
-    // The GUI thread does not like working
-    void guiButtonPressed(GUI_BUTTONS); // A little enum to keep buttons in? See top
+    // The GUI thread does not like working in here
+    void guiButtonPressed(BINDING_ID);
 
 private:
     std::shared_ptr<xBaslerCam> mCamera;
