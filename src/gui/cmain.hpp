@@ -144,10 +144,18 @@ private:
     wxTextCtrl *mTxtRobotRX;
     wxTextCtrl *mTxtRobotRY;
     wxTextCtrl *mTxtRobotRZ;
+    wxStaticBitmap *mBmpRobotStatus;
     // CAMERA SUB PANEL ENTRIES
     wxButton *mBtnCameraConnect;
     wxButton *mBtnCameraDisconnect;
+    wxButton *mBtnCameraRecalibrate;
+    wxButton *mBtnCameraSetExposure;
+    wxButton *mBtnCameraSetFramerate;
+    wxButton *mBtnCameraSetCalibrationPath;
     wxTextCtrl *mTxtCameraExposure;
+    wxTextCtrl *mTxtCameraFramerate;
+    wxTextCtrl *mTxtCameraCalibrationPath;
+    wxStaticBitmap *mBmpCameraStatus;
     // GRIPPER SUB PANEL ENTRIES
     wxButton *mBtnGripperConnect;
     wxButton *mBtnGripperDisconnect;

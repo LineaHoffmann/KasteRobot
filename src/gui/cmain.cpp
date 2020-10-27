@@ -53,7 +53,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     wxBoxSizer *mSizerNotebookGeneral = new wxBoxSizer(wxVERTICAL);
     //wxBoxSizer *mSizerNotebookRobot = new wxBoxSizer(wxHORIZONTAL);
     wxBoxSizer *mSizerNotebookGripper = new wxBoxSizer(wxHORIZONTAL);
-    wxBoxSizer *mSizerNotebookCamera = new wxBoxSizer(wxHORIZONTAL);
+    //wxBoxSizer *mSizerNotebookCamera = new wxBoxSizer(wxHORIZONTAL);
     wxBoxSizer *mSizerNotebookDatabase = new wxBoxSizer(wxHORIZONTAL);
     wxPanel *mNotebookGeneral = new wxPanel(mNotebook,
                                             wxID_ANY,
@@ -88,7 +88,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mNotebookGeneral->SetSizer(mSizerNotebookGeneral);
     //mNotebookRobot->SetSizer(mSizerNotebookRobot);
     mNotebookGripper->SetSizer(mSizerNotebookGripper);
-    mNotebookCamera->SetSizer(mSizerNotebookCamera);
+    //mNotebookCamera->SetSizer(mSizerNotebookCamera);
     mNotebookDatabase->SetSizer(mSizerNotebookDatabase);
     mNotebook->InsertPage(0,mNotebookGeneral, "General");
     mNotebook->InsertPage(1,mNotebookRobot, "Robot");
@@ -118,6 +118,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
                                       wxCOL_RESIZABLE);
     mSizerNotebookGeneral->Add(mTreeList, wxSizerFlags(1).Expand());
     // NOTE: This is where to add items to the tree
+    // TODO: Make it be expanded on first start!
     wxTreeListItem root = mTreeList->GetRootItem();
     // Top level
     mTreeRootRobot = new wxTreeListItem(mTreeList->AppendItem(root, "Robot"));
@@ -165,6 +166,9 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     wxStaticText *sTxtRobotRX = new wxStaticText(mNotebookRobot, wxID_ANY, "RX");
     wxStaticText *sTxtRobotRY = new wxStaticText(mNotebookRobot, wxID_ANY, "RY");
     wxStaticText *sTxtRobotRZ = new wxStaticText(mNotebookRobot, wxID_ANY, "RZ");
+    // Camera tab building - Static bitmap
+    mBmpRobotStatus = new wxStaticBitmap(mNotebookRobot, wxID_ANY, GetIcon());
+    mBmpRobotStatus->SetBackgroundColour(wxColor(255,0,0));
     // Robot tab building - GridBagSizer setup
     wxGridBagSizer *mSizerNotebookRobot = new wxGridBagSizer(0, 0);
     mSizerNotebookRobot->SetFlexibleDirection(wxBOTH);
@@ -189,6 +193,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mSizerNotebookRobot->Add(sTxtRobotRX, wxGBPosition(2, 3), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5);
     mSizerNotebookRobot->Add(sTxtRobotRY, wxGBPosition(3, 3), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5);
     mSizerNotebookRobot->Add(sTxtRobotRZ, wxGBPosition(4, 3), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5);
+    mSizerNotebookRobot->Add( mBmpRobotStatus, wxGBPosition( 2, 0 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
     for (uint32_t i = 0; i < 5; i++) {
         mSizerNotebookRobot->AddGrowableCol(i);
         mSizerNotebookRobot->AddGrowableRow(i);
@@ -196,13 +201,50 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mNotebookRobot->SetSizer(mSizerNotebookRobot);
     mNotebookRobot->Layout();
 
-    // Camera tab building
-    mBtnCameraConnect = new wxButton(mNotebookCamera, ID_BTN_CAMERA_CONNECT);
-    mBtnCameraDisconnect = new wxButton(mNotebookCamera, ID_BTN_CAMERA_DISCONNECT);
-    mSizerNotebookCamera->Add(mBtnCameraConnect);
-    mSizerNotebookCamera->Add(mBtnCameraDisconnect);
+    // Camera  tab building - Buttons
+    mBtnCameraConnect = new wxButton(mNotebookCamera, ID_BTN_CAMERA_CONNECT, "Connect");
+    mBtnCameraDisconnect = new wxButton(mNotebookCamera, ID_BTN_CAMERA_DISCONNECT, "Disconnect");
+    mBtnCameraRecalibrate = new wxButton(mNotebookCamera, ID_BTN_CAMERA_DISCONNECT, "Recalibrate");
+    mBtnCameraSetExposure = new wxButton(mNotebookCamera, ID_BTN_CAMERA_DISCONNECT, "Set Exposure");
+    mBtnCameraSetFramerate = new wxButton(mNotebookCamera, ID_BTN_CAMERA_DISCONNECT, "Set Framerate");
+    mBtnCameraSetCalibrationPath = new wxButton(mNotebookCamera, ID_BTN_CAMERA_DISCONNECT, "Set Cal. Path");
+    // Camera tab building - Text controls
     mTxtCameraExposure = new wxTextCtrl(mNotebookCamera, wxID_ANY, "Exposure Time");
-    mSizerNotebookCamera->Add(mTxtCameraExposure);
+    mTxtCameraFramerate = new wxTextCtrl(mNotebookCamera, wxID_ANY, "Framerate");
+    mTxtCameraCalibrationPath = new wxTextCtrl(mNotebookCamera, wxID_ANY, "Calibration path");
+    // Camera tab building - Static bitmap
+    mBmpCameraStatus = new wxStaticBitmap(mNotebookCamera, wxID_ANY, GetIcon());
+    mBmpCameraStatus->SetBackgroundColour(wxColor(255,0,0));
+    // Camera tab building - GridBagSizer setup
+    wxGridBagSizer *mSizerNotebookCamera = new wxGridBagSizer(0, 0);
+    mSizerNotebookCamera->SetFlexibleDirection( wxBOTH );
+    mSizerNotebookCamera->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    mSizerNotebookCamera->Add( mBtnCameraConnect, wxGBPosition( 2, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mBtnCameraDisconnect, wxGBPosition( 2, 1 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mBtnCameraRecalibrate, wxGBPosition( 2, 2 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mBtnCameraSetExposure, wxGBPosition( 2, 3 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mBtnCameraSetFramerate, wxGBPosition( 2, 4 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mBtnCameraSetCalibrationPath, wxGBPosition( 4, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mTxtCameraExposure, wxGBPosition( 3, 3 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mTxtCameraFramerate, wxGBPosition( 3, 4 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mTxtCameraCalibrationPath, wxGBPosition( 4, 1 ), wxGBSpan( 1, 3 ), wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mBmpCameraStatus, wxGBPosition( 3, 0 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( 0, 0, wxGBPosition( 0, 0 ), wxGBSpan( 2, 5 ), wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( 0, 0, wxGBPosition( 5, 0 ), wxGBSpan( 2, 5 ), wxEXPAND, 5 );
+    mSizerNotebookCamera->AddGrowableCol( 0 );
+    mSizerNotebookCamera->AddGrowableCol( 1 );
+    mSizerNotebookCamera->AddGrowableCol( 2 );
+    mSizerNotebookCamera->AddGrowableCol( 3 );
+    mSizerNotebookCamera->AddGrowableCol( 4 );
+    //mSizerNotebookCamera->AddGrowableRow( 0 );
+    mSizerNotebookCamera->AddGrowableRow( 1 );
+    mSizerNotebookCamera->AddGrowableRow( 2 );
+    mSizerNotebookCamera->AddGrowableRow( 3 );
+    mSizerNotebookCamera->AddGrowableRow( 4 );
+    mSizerNotebookCamera->AddGrowableRow( 5 );
+    //mSizerNotebookCamera->AddGrowableRow( 6 );
+    mNotebookCamera->SetSizer( mSizerNotebookCamera );
+    mNotebookCamera->Layout();
 
     // Gripper tab building
     mBtnGripperConnect = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_CONNECT);
