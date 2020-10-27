@@ -6,7 +6,7 @@ xGripperClient::xGripperClient() {
 
 
 void xGripperClient::entryThread() {
-    std::cout << "Client Thread started" << std::endl;
+    //std::cout << "Client Thread started" << std::endl;
     logstd("Gripper client thread started .. ");
     xGripperClient::connectSocket("192.168.0.1", 1000);
 

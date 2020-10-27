@@ -20,7 +20,7 @@
 #include "xurcontrol.hpp"
 #include "xgripperclient.hpp"
 #include "xexceptions.hpp"
-#include "../gui/idbindings.h"
+#include "../gui/cidbindings.hpp"
 
 class xController
 {

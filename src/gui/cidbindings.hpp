@@ -1,8 +1,8 @@
-#ifndef IDBINDINGS_H
-#define IDBINDINGS_H
+#ifndef CIDBINDINGS_H
+#define CIDBINDINGS_H
 #pragma once
 
-#endif // IDBINDINGS_H
+#endif // CIDBINDINGS_H
 
 enum BINDING_ID {
     ID_TIMER_VIEW1_UPDATE,      // Updating for view 1
@@ -22,10 +22,18 @@ enum BINDING_ID {
 
     ID_BTN_GRIPPER_CONNECT,     // Gripper Notebook panel buttons
     ID_BTN_GRIPPER_DISCONNECT,
+    ID_BTN_GRIPPER_UPDATE,
+    ID_BTN_GRIPPER_OPEN,
+    ID_BTN_GRIPPER_CLOSE,
 
     ID_BTN_CAMERA_CONNECT,      // Camera Notebook panel buttons
     ID_BTN_CAMERA_DISCONNECT,
+    ID_BTN_CAMERA_RECALIBRATE,
+    ID_BTN_CAMERA_SET_EXPOSURE,
+    ID_BTN_CAMERA_SET_FRAMERATE,
+    ID_BTN_CAMERA_SET_CAL_PATH,
 
     ID_BTN_DATABASE_CONNECT,    // Database Notebook panel buttons
-    ID_BTN_DATABASE_DISCONNECT
+    ID_BTN_DATABASE_DISCONNECT,
+    ID_BTN_DATABASE_UPDATE
 };

@@ -39,7 +39,7 @@
 
 #include "cimagepanel.hpp"
 
-#include "idbindings.h"
+#include "cidbindings.hpp"
 #include "../logic/xcontroller.hpp"
 
 class cMain : public wxFrame
@@ -64,16 +64,15 @@ private:
     // Template function for wrapping calls in most basic x_err / std::exception handling
     // Credit must go to StackExchange users Morwenn and Tim Martin
     // https://codereview.stackexchange.com/questions/2484/generic-c-exception-catch-handler-macro
-    // Takes a lambda as argument and optionally an appended message
-    // Minimum C++11 for decltype()
+    // Meant to take a lambda-wrapped function call as argument and optionally a prepended message
     template<typename Callable>
     auto xTry(Callable&& func, const std::string& msg="") -> decltype(func()) {
         try {
             return func();
         } catch (const x_err::error &e) {
-            logerr((std::string(e.what()).append(msg)).c_str());
+            logwar((std::string(msg).append(e.what())).c_str());
         } catch (const std::exception &e) {
-            logerr((std::string(e.what()).append(msg)).c_str());
+            logerr((std::string(msg).append(e.what())).c_str());
         }
     }
 
@@ -119,9 +118,13 @@ private:
     wxTreeListItem *mTreeRobotPort;
     wxTreeListItem *mTreeRobotPosition;
     wxTreeListItem *mTreeCameraState;
+    wxTreeListItem *mTreeCameraExposure;
+    wxTreeListItem *mTreeCameraFramerate;
+    wxTreeListItem *mTreeCameraCalibrationPath;
     wxTreeListItem *mTreeGripperState;
     wxTreeListItem *mTreeGripperIP;
     wxTreeListItem *mTreeGripperPort;
+    wxTreeListItem *mTreeGripperWidth;
     wxTreeListItem *mTreeDatabaseState;
     wxTreeListItem *mTreeDatabaseIP;
     wxTreeListItem *mTreeDatabasePort;
@@ -159,16 +162,22 @@ private:
     // GRIPPER SUB PANEL ENTRIES
     wxButton *mBtnGripperConnect;
     wxButton *mBtnGripperDisconnect;
+    wxButton *mBtnGripperUpdate;
+    wxButton *mBtnGripperOpen;
+    wxButton *mBtnGripperClose;
     wxTextCtrl *mTxtGripperIP;
     wxTextCtrl *mTxtGripperPort;
+    wxStaticBitmap *mBmpGripperStatus;
     // DATABASE SUB PANEL ENTRIES
     wxButton *mBtnDatabaseConnect;
     wxButton *mBtnDatabaseDisconnect;
+    wxButton *mBtnDatabaseUpdate;
     wxTextCtrl *mTxtDatabaseIP;
     wxTextCtrl *mTxtDatabasePort;
     wxTextCtrl *mTxtDatabaseUser;
     wxTextCtrl *mTxtDatabasePassword;
     wxTextCtrl *mTxtDatabaseSchema;
+    wxStaticBitmap *mBmpDatabaseStatus;
 
     // Just a macro to enable wxWidgets events
     wxDECLARE_EVENT_TABLE();

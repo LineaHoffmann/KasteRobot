@@ -1,7 +1,7 @@
 #include "cmain.hpp"
 
 // Event -> Function binding table
-// Event binding name enum is in the header
+// Event binding name enum is in cidbindings.hpp
 wxBEGIN_EVENT_TABLE(cMain, wxFrame)
     // Timer bindings
     EVT_TIMER(ID_TIMER_VIEW1_UPDATE, cMain::OnTimerView1Update)
@@ -52,7 +52,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     // Notebook contents
     wxBoxSizer *mSizerNotebookGeneral = new wxBoxSizer(wxVERTICAL);
     //wxBoxSizer *mSizerNotebookRobot = new wxBoxSizer(wxHORIZONTAL);
-    wxBoxSizer *mSizerNotebookGripper = new wxBoxSizer(wxHORIZONTAL);
+    //wxBoxSizer *mSizerNotebookGripper = new wxBoxSizer(wxHORIZONTAL);
     //wxBoxSizer *mSizerNotebookCamera = new wxBoxSizer(wxHORIZONTAL);
     wxBoxSizer *mSizerNotebookDatabase = new wxBoxSizer(wxHORIZONTAL);
     wxPanel *mNotebookGeneral = new wxPanel(mNotebook,
@@ -87,7 +87,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
                                              "subPanel5");
     mNotebookGeneral->SetSizer(mSizerNotebookGeneral);
     //mNotebookRobot->SetSizer(mSizerNotebookRobot);
-    mNotebookGripper->SetSizer(mSizerNotebookGripper);
+    //mNotebookGripper->SetSizer(mSizerNotebookGripper);
     //mNotebookCamera->SetSizer(mSizerNotebookCamera);
     mNotebookDatabase->SetSizer(mSizerNotebookDatabase);
     mNotebook->InsertPage(0,mNotebookGeneral, "General");
@@ -109,7 +109,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
                                              wxDefaultSize,
                                              wxTL_DEFAULT_STYLE);
     mTreeList->AppendColumn("Description",
-                                      wxCOL_WIDTH_DEFAULT,
+                                      160,
                                       wxALIGN_LEFT,
                                       wxCOL_RESIZABLE | wxCOL_SORTABLE);
     mTreeList->AppendColumn("Data",
@@ -117,8 +117,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
                                       wxALIGN_RIGHT,
                                       wxCOL_RESIZABLE);
     mSizerNotebookGeneral->Add(mTreeList, wxSizerFlags(1).Expand());
-    // NOTE: This is where to add items to the tree
-    // TODO: Make it be expanded on first start!
+    // This is where to add items to the tree
     wxTreeListItem root = mTreeList->GetRootItem();
     // Top level
     mTreeRootRobot = new wxTreeListItem(mTreeList->AppendItem(root, "Robot"));
@@ -132,10 +131,14 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mTreeRobotPosition = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootRobot, "Position"));
     // Sub levels - Camera
     mTreeCameraState = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootCamera, "State"));
+    mTreeCameraExposure = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootCamera, "Exposure Time"));
+    mTreeCameraFramerate = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootCamera, "Framerate"));
+    mTreeCameraCalibrationPath = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootCamera, "Calibration Path"));
     // Sub levels - Gripper
     mTreeGripperState = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootGripper, "State"));
     mTreeGripperIP = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootGripper, "IP"));
     mTreeGripperPort = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootGripper, "Port"));
+    mTreeGripperWidth = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootGripper, "Width"));
     // Sub levels - Database
     mTreeDatabaseState = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootDatabase, "State"));
     mTreeDatabaseIP = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootDatabase, "IP"));
@@ -173,20 +176,20 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     wxGridBagSizer *mSizerNotebookRobot = new wxGridBagSizer(0, 0);
     mSizerNotebookRobot->SetFlexibleDirection(wxBOTH);
     mSizerNotebookRobot->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
-    mSizerNotebookRobot->Add(mBtnRobotConnect, wxGBPosition(0, 0), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5);
-    mSizerNotebookRobot->Add(mBtnRobotDisconnect, wxGBPosition(0, 1), wxGBSpan(1, 1), wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5);
-    mSizerNotebookRobot->Add(mBtnRobotUpdate, wxGBPosition(0, 2), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5);
-    mSizerNotebookRobot->Add(mBtnRobotSendCmd, wxGBPosition(1, 0), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5);
-    mSizerNotebookRobot->Add(mBtnRobotSendPos, wxGBPosition(3, 0), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5);
-    mSizerNotebookRobot->Add(mTxtRobotIP, wxGBPosition(0, 3), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
-    mSizerNotebookRobot->Add(mTxtRobotPort, wxGBPosition(0, 4), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
-    mSizerNotebookRobot->Add(mTxtRobotCmd, wxGBPosition(1, 1), wxGBSpan(1, 4), wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
-    mSizerNotebookRobot->Add(mTxtRobotX, wxGBPosition(2, 2), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5);
-    mSizerNotebookRobot->Add(mTxtRobotY, wxGBPosition(3, 2), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5);
-    mSizerNotebookRobot->Add(mTxtRobotZ, wxGBPosition(4, 2), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5);
-    mSizerNotebookRobot->Add(mTxtRobotRX, wxGBPosition(2, 4), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5);
-    mSizerNotebookRobot->Add(mTxtRobotRY, wxGBPosition(3, 4), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5);
-    mSizerNotebookRobot->Add(mTxtRobotRZ, wxGBPosition(4, 4), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(mBtnRobotConnect, wxGBPosition(0, 0), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(mBtnRobotDisconnect, wxGBPosition(0, 1), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(mBtnRobotUpdate, wxGBPosition(0, 2), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(mBtnRobotSendCmd, wxGBPosition(1, 0), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(mBtnRobotSendPos, wxGBPosition(3, 0), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(mTxtRobotIP, wxGBPosition(0, 3), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookRobot->Add(mTxtRobotPort, wxGBPosition(0, 4), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookRobot->Add(mTxtRobotCmd, wxGBPosition(1, 1), wxGBSpan(1, 4), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookRobot->Add(mTxtRobotX, wxGBPosition(2, 2), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(mTxtRobotY, wxGBPosition(3, 2), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(mTxtRobotZ, wxGBPosition(4, 2), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(mTxtRobotRX, wxGBPosition(2, 4), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(mTxtRobotRY, wxGBPosition(3, 4), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(mTxtRobotRZ, wxGBPosition(4, 4), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
     mSizerNotebookRobot->Add(sTxtRobotX, wxGBPosition(2, 1), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5);
     mSizerNotebookRobot->Add(sTxtRobotY, wxGBPosition(3, 1), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5);
     mSizerNotebookRobot->Add(sTxtRobotZ, wxGBPosition(4, 1), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5);
@@ -204,10 +207,10 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     // Camera  tab building - Buttons
     mBtnCameraConnect = new wxButton(mNotebookCamera, ID_BTN_CAMERA_CONNECT, "Connect");
     mBtnCameraDisconnect = new wxButton(mNotebookCamera, ID_BTN_CAMERA_DISCONNECT, "Disconnect");
-    mBtnCameraRecalibrate = new wxButton(mNotebookCamera, ID_BTN_CAMERA_DISCONNECT, "Recalibrate");
-    mBtnCameraSetExposure = new wxButton(mNotebookCamera, ID_BTN_CAMERA_DISCONNECT, "Set Exposure");
-    mBtnCameraSetFramerate = new wxButton(mNotebookCamera, ID_BTN_CAMERA_DISCONNECT, "Set Framerate");
-    mBtnCameraSetCalibrationPath = new wxButton(mNotebookCamera, ID_BTN_CAMERA_DISCONNECT, "Set Cal. Path");
+    mBtnCameraRecalibrate = new wxButton(mNotebookCamera, ID_BTN_CAMERA_RECALIBRATE, "Recalibrate");
+    mBtnCameraSetExposure = new wxButton(mNotebookCamera, ID_BTN_CAMERA_SET_EXPOSURE, "Set Exposure");
+    mBtnCameraSetFramerate = new wxButton(mNotebookCamera, ID_BTN_CAMERA_SET_FRAMERATE, "Set Framerate");
+    mBtnCameraSetCalibrationPath = new wxButton(mNotebookCamera, ID_BTN_CAMERA_SET_CAL_PATH, "Set Cal. Path");
     // Camera tab building - Text controls
     mTxtCameraExposure = new wxTextCtrl(mNotebookCamera, wxID_ANY, "Exposure Time");
     mTxtCameraFramerate = new wxTextCtrl(mNotebookCamera, wxID_ANY, "Framerate");
@@ -219,46 +222,61 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     wxGridBagSizer *mSizerNotebookCamera = new wxGridBagSizer(0, 0);
     mSizerNotebookCamera->SetFlexibleDirection( wxBOTH );
     mSizerNotebookCamera->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    mSizerNotebookCamera->Add( mBtnCameraConnect, wxGBPosition( 2, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
-    mSizerNotebookCamera->Add( mBtnCameraDisconnect, wxGBPosition( 2, 1 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
-    mSizerNotebookCamera->Add( mBtnCameraRecalibrate, wxGBPosition( 2, 2 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
-    mSizerNotebookCamera->Add( mBtnCameraSetExposure, wxGBPosition( 2, 3 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
-    mSizerNotebookCamera->Add( mBtnCameraSetFramerate, wxGBPosition( 2, 4 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
-    mSizerNotebookCamera->Add( mBtnCameraSetCalibrationPath, wxGBPosition( 4, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
-    mSizerNotebookCamera->Add( mTxtCameraExposure, wxGBPosition( 3, 3 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
-    mSizerNotebookCamera->Add( mTxtCameraFramerate, wxGBPosition( 3, 4 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
-    mSizerNotebookCamera->Add( mTxtCameraCalibrationPath, wxGBPosition( 4, 1 ), wxGBSpan( 1, 3 ), wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
-    mSizerNotebookCamera->Add( mBmpCameraStatus, wxGBPosition( 3, 0 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
-    mSizerNotebookCamera->Add( 0, 0, wxGBPosition( 0, 0 ), wxGBSpan( 2, 5 ), wxEXPAND, 5 );
-    mSizerNotebookCamera->Add( 0, 0, wxGBPosition( 5, 0 ), wxGBSpan( 2, 5 ), wxEXPAND, 5 );
-    mSizerNotebookCamera->AddGrowableCol( 0 );
-    mSizerNotebookCamera->AddGrowableCol( 1 );
-    mSizerNotebookCamera->AddGrowableCol( 2 );
-    mSizerNotebookCamera->AddGrowableCol( 3 );
-    mSizerNotebookCamera->AddGrowableCol( 4 );
-    //mSizerNotebookCamera->AddGrowableRow( 0 );
-    mSizerNotebookCamera->AddGrowableRow( 1 );
-    mSizerNotebookCamera->AddGrowableRow( 2 );
-    mSizerNotebookCamera->AddGrowableRow( 3 );
-    mSizerNotebookCamera->AddGrowableRow( 4 );
-    mSizerNotebookCamera->AddGrowableRow( 5 );
-    //mSizerNotebookCamera->AddGrowableRow( 6 );
+    mSizerNotebookCamera->Add( mBtnCameraConnect, wxGBPosition( 1, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mBtnCameraDisconnect, wxGBPosition( 1, 1 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mBtnCameraRecalibrate, wxGBPosition( 1, 2 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mBtnCameraSetExposure, wxGBPosition( 1, 3 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mBtnCameraSetFramerate, wxGBPosition( 1, 4 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mBtnCameraSetCalibrationPath, wxGBPosition( 3, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mTxtCameraExposure, wxGBPosition( 2, 3 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mTxtCameraFramerate, wxGBPosition( 2, 4 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mTxtCameraCalibrationPath, wxGBPosition( 3, 1 ), wxGBSpan( 1, 3 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mBmpCameraStatus, wxGBPosition( 2, 0 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( 0, 0, wxGBPosition( 0, 0 ), wxGBSpan( 1, 5 ), wxALL|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( 0, 0, wxGBPosition( 4, 0 ), wxGBSpan( 1, 5 ), wxALL|wxEXPAND, 5 );
+    for (uint32_t i = 0; i < 5; i++) {
+        mSizerNotebookCamera->AddGrowableCol(i);
+        mSizerNotebookCamera->AddGrowableRow(i);
+    }
     mNotebookCamera->SetSizer( mSizerNotebookCamera );
     mNotebookCamera->Layout();
 
-    // Gripper tab building
-    mBtnGripperConnect = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_CONNECT);
-    mBtnGripperDisconnect = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_DISCONNECT);
-    mSizerNotebookGripper->Add(mBtnGripperConnect);
-    mSizerNotebookGripper->Add(mBtnGripperDisconnect);
+    // Gripper tab building - Buttons
+    mBtnGripperConnect = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_CONNECT, "Connect");
+    mBtnGripperDisconnect = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_DISCONNECT, "Disconnect");
+    mBtnGripperUpdate = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_UPDATE, "Update");
+    mBtnGripperOpen = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_OPEN, "Open");
+    mBtnGripperClose = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_CLOSE, "Close");
+    // Gripper tab building - Text controls
     mTxtGripperIP = new wxTextCtrl(mNotebookGripper, wxID_ANY, "IP");
     mTxtGripperPort = new wxTextCtrl(mNotebookGripper, wxID_ANY, "Port");
-    mSizerNotebookGripper->Add(mTxtGripperIP);
-    mSizerNotebookGripper->Add(mTxtGripperPort);
+    // Gripper tab building - Static bitmap
+    mBmpGripperStatus = new wxStaticBitmap(mNotebookGripper, wxID_ANY, GetIcon());
+    mBmpGripperStatus->SetBackgroundColour(wxColor(255,0,0));
+    // Gripper tab building - GridBagSizer setup
+    wxGridBagSizer *mSizerNotebookGripper = new wxGridBagSizer(0, 0);
+    mSizerNotebookGripper->SetFlexibleDirection( wxBOTH );
+    mSizerNotebookGripper->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    mSizerNotebookGripper->Add( mBtnGripperConnect, wxGBPosition( 1, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookGripper->Add( mBtnGripperDisconnect, wxGBPosition( 1, 1 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookGripper->Add( mBtnGripperUpdate, wxGBPosition( 1, 2 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookGripper->Add( mBtnGripperOpen, wxGBPosition( 3, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookGripper->Add( mBtnGripperClose, wxGBPosition( 3, 1 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookGripper->Add( mTxtGripperIP, wxGBPosition( 1, 3 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookGripper->Add( mTxtGripperPort, wxGBPosition( 1, 4 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookGripper->Add( mBmpGripperStatus, wxGBPosition( 2, 0 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
+    mSizerNotebookGripper->Add( 0, 0, wxGBPosition( 0, 0 ), wxGBSpan( 1, 5 ), wxALL|wxEXPAND, 5 );
+    mSizerNotebookGripper->Add( 0, 0, wxGBPosition( 4, 0 ), wxGBSpan( 1, 5 ), wxALL|wxEXPAND, 5 );
+    for (uint32_t i = 0; i < 5; i++) {
+        mSizerNotebookGripper->AddGrowableCol(i);
+        mSizerNotebookGripper->AddGrowableRow(i);
+    }
+    mNotebookGripper->SetSizer(mSizerNotebookGripper);
+    mNotebookGripper->Layout();
 
     // Database tab building
-    mBtnDatabaseConnect = new wxButton(mNotebookDatabase, ID_BTN_GRIPPER_CONNECT);
-    mBtnDatabaseDisconnect = new wxButton(mNotebookDatabase, ID_BTN_GRIPPER_DISCONNECT);
+    mBtnDatabaseConnect = new wxButton(mNotebookDatabase, ID_BTN_GRIPPER_CONNECT, "Connect");
+    mBtnDatabaseDisconnect = new wxButton(mNotebookDatabase, ID_BTN_GRIPPER_DISCONNECT, "Disconnect");
     mSizerNotebookDatabase->Add(mBtnDatabaseConnect);
     mSizerNotebookDatabase->Add(mBtnDatabaseDisconnect);
     mTxtDatabaseIP = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "IP");
@@ -309,6 +327,11 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     // Starting timers
     mTimerView1.Start(500);
     mTimerInfo.Start(1000);
+
+    mTreeList->Expand(*mTreeRootRobot);
+    mTreeList->Expand(*mTreeRootCamera);
+    mTreeList->Expand(*mTreeRootGripper);
+    mTreeList->Expand(*mTreeRootDatabase);
 }
 cMain::~cMain()
 {
@@ -384,7 +407,7 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         // TODO: Pull current run entries from database
         //       and dump to some file
         evt.Skip();
-        return;
+        break;
     case ID_MENU_SAVE_SNAPSHOT:
         logstd("Menu->Save Snapshot clicked");
     {
@@ -405,77 +428,117 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         logstd(s.c_str());
         evt.Skip();
     }
-        return;
+        break;
     case ID_MENU_EXIT:
         // Sending to cout because the application will die now
         std::cout << "Menu->Exit clicked" << std::endl;
         Close(true);
         evt.Skip();
-        return;
+        break;
     case ID_MENU_ABOUT:
         logstd("Menu->About clicked");
         wxAboutBox(*mAboutBox);
         evt.Skip();
-        return;
+        break;
     case ID_BTN_ROBOT_CONNECT:
         logstd("Robot->Connect clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_CONNECT);});
         evt.Skip();
-        return;
+        break;
     case ID_BTN_ROBOT_DISCONNECT:
         logstd("Robot->Disconnect clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_DISCONNECT);});
         evt.Skip();
-        return;
+        break;
     case ID_BTN_ROBOT_UPDATE:
         logstd("Robot->Update clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_UPDATE);});
         evt.Skip();
-        return;
+        break;
     case ID_BTN_ROBOT_SEND_CMD:
         logstd("Robot->Send Command clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_SEND_CMD);});
         evt.Skip();
-        return;
+        break;
     case ID_BTN_ROBOT_SEND_POS:
         logstd("Robot->Send Position clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_SEND_POS);});
         evt.Skip();
-        return;
+        break;
     case ID_BTN_GRIPPER_CONNECT:
         logstd("Gripper->Connect clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_CONNECT);});
         evt.Skip();
-        return;
+        break;
     case ID_BTN_GRIPPER_DISCONNECT:
         logstd("Gripper->Disconnect clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_DISCONNECT);});
         evt.Skip();
-        return;
+        break;
+    case ID_BTN_GRIPPER_UPDATE:
+        logstd("Gripper->Update clicked");
+        xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_UPDATE);});
+        evt.Skip();
+        break;
+    case ID_BTN_GRIPPER_OPEN:
+        logstd("Gripper->Open clicked");
+        xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_OPEN);});
+        evt.Skip();
+        break;
+    case ID_BTN_GRIPPER_CLOSE:
+        logstd("Gripper->Close clicked");
+        xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_CLOSE);});
+        evt.Skip();
+        break;
     case ID_BTN_CAMERA_CONNECT:
         logstd("Camera->Connect clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_CONNECT);});
         evt.Skip();
-        return;
+        break;
     case ID_BTN_CAMERA_DISCONNECT:
         logstd("Camera->Disconnect clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_DISCONNECT);});
         evt.Skip();
-        return;
+        break;
+    case ID_BTN_CAMERA_RECALIBRATE:
+        logstd("Camera->Recalibrate clicked");
+        xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_RECALIBRATE);});
+        evt.Skip();
+        break;
+    case ID_BTN_CAMERA_SET_EXPOSURE:
+        logstd("Camera->Set Exposure clicked");
+        xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_SET_EXPOSURE);});
+        evt.Skip();
+        break;
+    case ID_BTN_CAMERA_SET_FRAMERATE:
+        logstd("Camera->Set Framerate clicked");
+        xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_SET_FRAMERATE);});
+        evt.Skip();
+        break;
+    case ID_BTN_CAMERA_SET_CAL_PATH:
+        logstd("Camera->Set Calibration Path clicked");
+        xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_SET_CAL_PATH);});
+        evt.Skip();
+        break;
     case ID_BTN_DATABASE_CONNECT:
         logstd("Database->Connect clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_DATABASE_CONNECT);});
         evt.Skip();
-        return;
+        break;
     case ID_BTN_DATABASE_DISCONNECT:
         logstd("Database->Disconnect clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_DATABASE_DISCONNECT);});
         evt.Skip();
-        return;
+        break;
+    case ID_BTN_DATABASE_UPDATE:
+        logstd("Database->Update clicked");
+        xTry([&] {mController->guiButtonPressed(ID_BTN_DATABASE_UPDATE);});
+        evt.Skip();
+        break;
     default:
+        logerr("An event fell through the button handler!");
+        evt.Skip(); // Event didn't catch
         break;
     }
-    logerr("An event fell through the button handler!");
-    evt.Skip(); // Event didn't catch
     return;
 }

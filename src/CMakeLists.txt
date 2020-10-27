@@ -51,6 +51,8 @@ file(GLOB GUI_FILES
 
     ${PROJECT_SOURCE_DIR}/gui/cimagepanel.cpp
     ${PROJECT_SOURCE_DIR}/gui/cimagepanel.hpp
+
+    ${PROJECT_SOURCE_DIR}/gui/cidbindings.hpp
     )
 
 # Logic layer source files GLOB
