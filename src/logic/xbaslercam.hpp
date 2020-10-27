@@ -28,8 +28,8 @@ class xBaslerCam
 public:
     xBaslerCam();
     xBaslerCam(std::string calibrationPath);
-    xBaslerCam(std::string calibrationPath, int exposure);
-    xBaslerCam(std::string calibrationPath, int exposure, int maxFrameRate);
+    xBaslerCam(std::string calibrationPath, uint32_t exposure);
+    xBaslerCam(std::string calibrationPath, uint32_t exposure, uint32_t maxFrameRate);
 
     ~xBaslerCam();
 
@@ -57,13 +57,13 @@ private:
     // Atomics for thread safety
     std::atomic<bool> mIsRunning;
     std::atomic<bool> mExit;
-    std::atomic<bool> mHasNewImage; // New Image bool
+    std::atomic<bool> mHasNewImage;
 
-    int myExposure = 12500;
-    int frameRate  = 60;
-    int frame = 1;
+    double myExposure = 12500;
+    uint64_t frameRate  = 60;
+    uint64_t frame = 1;
     bool isRectified = false;
-    int CHECKERBOARD[2]{9,6};
+    int32_t CHECKERBOARD[2]{9,6};
 
     std::vector<cv::Mat> caliPics;
     cv::Mat map1,map2;

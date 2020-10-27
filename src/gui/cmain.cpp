@@ -20,17 +20,12 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
                  mTimerView1 (this, ID_TIMER_VIEW1_UPDATE),
                  mTimerInfo (this, ID_TIMER_INFOTREE_UPDATE)
 {
-    // Icon for the window
+    // Icon for the window & about box
     wxIcon icon(wxT("../resources/icon.png"), wxBITMAP_TYPE_PNG);
     SetIcon(icon);
 
-    // Main grid sizer
-    SetSizeHints( wxDefaultSize, wxDefaultSize );
-    wxGridSizer* gridSizer;
-    gridSizer = new wxGridSizer( 0, 2, 0, 0 );
-
-    // Image viewing panel 1
-    mPanelView1 = new cImagePanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
+    // Notebook area
+    mNotebook = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER);
     // Text control area
     mTextCtrl = new wxTextCtrl(this,
                                wxID_ANY,
@@ -40,10 +35,14 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
                                0|wxVSCROLL|wxBORDER|wxTE_READONLY | wxTE_MULTILINE | wxTE_LEFT | wxTE_CHARWRAP);
     mTextLog = new wxLogTextCtrl(mTextCtrl); // For writing to gui log system-wide, should be thread safe
     wxLog::SetActiveTarget(mTextLog);
+    // Image viewing panel 1
+    mPanelView1 = new cImagePanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
     // Image viewing panel 2
     mPanelView2 = new cImagePanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
-    // Notebook area
-    mNotebook = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER);
+    // Main grid sizer
+    SetSizeHints( wxDefaultSize, wxDefaultSize );
+    wxGridSizer* gridSizer;
+    gridSizer = new wxGridSizer( 0, 2, 0, 0 );
     // Order dictates placement, top left - top right - bottom left - bottom right
     gridSizer->Add( mTextCtrl, 1, wxEXPAND | wxALL, 0 );
     gridSizer->Add( mPanelView1, 1, wxEXPAND | wxALL, 0 );
@@ -52,7 +51,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
 
     // Notebook contents
     wxBoxSizer *mSizerNotebookGeneral = new wxBoxSizer(wxVERTICAL);
-    //wxBoxSizer *mSizerNotebookRobot = new wxBoxSizer(wxHORIZONTAL); // SRP: Commented out while adding new code
+    //wxBoxSizer *mSizerNotebookRobot = new wxBoxSizer(wxHORIZONTAL);
     wxBoxSizer *mSizerNotebookGripper = new wxBoxSizer(wxHORIZONTAL);
     wxBoxSizer *mSizerNotebookCamera = new wxBoxSizer(wxHORIZONTAL);
     wxBoxSizer *mSizerNotebookDatabase = new wxBoxSizer(wxHORIZONTAL);
@@ -87,7 +86,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
                                              wxTAB_TRAVERSAL | wxNO_BORDER,
                                              "subPanel5");
     mNotebookGeneral->SetSizer(mSizerNotebookGeneral);
-    //mNotebookRobot->SetSizer(mSizerNotebookRobot);    // SRP: Commented out while adding new code
+    //mNotebookRobot->SetSizer(mSizerNotebookRobot);
     mNotebookGripper->SetSizer(mSizerNotebookGripper);
     mNotebookCamera->SetSizer(mSizerNotebookCamera);
     mNotebookDatabase->SetSizer(mSizerNotebookDatabase);

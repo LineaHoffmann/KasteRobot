@@ -11,11 +11,11 @@ xBaslerCam::xBaslerCam(std::string calibrationPath)
     : xBaslerCam() {
     path = calibrationPath;
 }
-xBaslerCam::xBaslerCam(std::string calibrationPath, int exposure)
+xBaslerCam::xBaslerCam(std::string calibrationPath, uint32_t exposure)
     : xBaslerCam(calibrationPath) {
     myExposure = exposure;
 }
-xBaslerCam::xBaslerCam(std::string calibrationPath, int exposure, int maxFrameRate)
+xBaslerCam::xBaslerCam(std::string calibrationPath, uint32_t exposure, uint32_t maxFrameRate)
     : xBaslerCam(calibrationPath, exposure) {
     frameRate = maxFrameRate;
 }
@@ -62,9 +62,9 @@ void xBaslerCam::calibrate()
 
     // Defining the world coordinates for 3D points
     std::vector<cv::Point3f> objp;
-    for(int i{0}; i<CHECKERBOARD[1]; i++)
+    for(int32_t i{0}; i<CHECKERBOARD[1]; i++)
     {
-        for(int j{0}; j<CHECKERBOARD[0]; j++)
+        for(int32_t j{0}; j<CHECKERBOARD[0]; j++)
             objp.push_back(cv::Point3f(j,i,0));
     }
 
