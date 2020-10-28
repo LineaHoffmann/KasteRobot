@@ -73,6 +73,7 @@ file(GLOB LOGIC_FILES
     ${PROJECT_SOURCE_DIR}/logic/xgripperclient.hpp
 
     ${PROJECT_SOURCE_DIR}/logic/xexceptions.hpp
+    ${PROJECT_SOURCE_DIR}/logic/xmath.hpp
     )
 
 # Database layer source files GLOB
