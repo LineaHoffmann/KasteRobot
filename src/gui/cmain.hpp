@@ -19,7 +19,6 @@
 #include <ctime> // For timestamp, C++20 isn't showing up :((
 #include <sys/resource.h> // For resource use tracking
 
-
 #include "wx/wx.h"
 #include "wx/app.h"
 #include "wx/frame.h"
@@ -64,15 +63,15 @@ private:
     // Template function for wrapping calls in most basic x_err / std::exception handling
     // Credit must go to StackExchange users Morwenn and Tim Martin
     // https://codereview.stackexchange.com/questions/2484/generic-c-exception-catch-handler-macro
-    // Meant to take a lambda-wrapped function call as argument and optionally a prepended message
     template<typename Callable>
-    auto xTry(Callable&& func, const std::string& msg="") -> decltype(func()) {
+    auto xTry(Callable&& f) -> decltype(f()) {
         try {
-            return func();
+            f();
+            return;
         } catch (const x_err::error &e) {
-            logwar((std::string(msg).append(e.what())).c_str());
+            logwar(e.what());
         } catch (const std::exception &e) {
-            logerr((std::string(msg).append(e.what())).c_str());
+            logerr(e.what());
         }
     }
 
@@ -178,6 +177,15 @@ private:
     wxTextCtrl *mTxtDatabasePassword;
     wxTextCtrl *mTxtDatabaseSchema;
     wxStaticBitmap *mBmpDatabaseStatus;
+    // TESTING SUB PANEL ENTRIES
+    wxButton *mBtnTestMathXYZtoVAA;
+    wxTextCtrl *mTxtTestMathInX;
+    wxTextCtrl *mTxtTestMathInY;
+    wxTextCtrl *mTxtTestMathInZ;
+    wxTextCtrl *mTxtTestMathInAngleLowLim;
+    wxTextCtrl *mTxtTestMathInAngleHighLim;
+    wxTextCtrl *mTxtTestMathInVelocityLowLim;
+    wxTextCtrl *mTxtTestMathInVelocityHighLim;
 
     // Just a macro to enable wxWidgets events
     wxDECLARE_EVENT_TABLE();

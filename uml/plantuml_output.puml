@@ -43,6 +43,7 @@ class cMain {
 	+cMain()
 	-wxDECLARE_EVENT_TABLE()
 	+~cMain()
+	-xTry(Callable&& f) -> decltype(f()) : auto
 	-mPanelView1 : cImagePanel*
 	-mPanelView2 : cImagePanel*
 	-mMtx : std::mutex
@@ -57,18 +58,36 @@ class cMain {
 	-mAboutBox : wxAboutDialogInfo*
 	-mBtnCameraConnect : wxButton*
 	-mBtnCameraDisconnect : wxButton*
+	-mBtnCameraRecalibrate : wxButton*
+	-mBtnCameraSetCalibrationPath : wxButton*
+	-mBtnCameraSetExposure : wxButton*
+	-mBtnCameraSetFramerate : wxButton*
 	-mBtnDatabaseConnect : wxButton*
 	-mBtnDatabaseDisconnect : wxButton*
+	-mBtnDatabaseUpdate : wxButton*
+	-mBtnGripperClose : wxButton*
 	-mBtnGripperConnect : wxButton*
 	-mBtnGripperDisconnect : wxButton*
+	-mBtnGripperOpen : wxButton*
+	-mBtnGripperUpdate : wxButton*
 	-mBtnRobotConnect : wxButton*
 	-mBtnRobotDisconnect : wxButton*
+	-mBtnRobotSendCmd : wxButton*
+	-mBtnRobotSendPos : wxButton*
+	-mBtnRobotUpdate : wxButton*
+	-mBtnTestMathXYZtoVAA : wxButton*
 	-mTextLog : wxLogTextCtrl*
 	-mMenuBar : wxMenuBar*
 	-mNotebook : wxNotebook*
+	-mBmpCameraStatus : wxStaticBitmap*
+	-mBmpDatabaseStatus : wxStaticBitmap*
+	-mBmpGripperStatus : wxStaticBitmap*
+	-mBmpRobotStatus : wxStaticBitmap*
 	-mStatusBar : wxStatusBar*
 	-mTextCtrl : wxTextCtrl*
+	-mTxtCameraCalibrationPath : wxTextCtrl*
 	-mTxtCameraExposure : wxTextCtrl*
+	-mTxtCameraFramerate : wxTextCtrl*
 	-mTxtDatabaseIP : wxTextCtrl*
 	-mTxtDatabasePassword : wxTextCtrl*
 	-mTxtDatabasePort : wxTextCtrl*
@@ -76,11 +95,28 @@ class cMain {
 	-mTxtDatabaseUser : wxTextCtrl*
 	-mTxtGripperIP : wxTextCtrl*
 	-mTxtGripperPort : wxTextCtrl*
+	-mTxtRobotCmd : wxTextCtrl*
 	-mTxtRobotIP : wxTextCtrl*
 	-mTxtRobotPort : wxTextCtrl*
+	-mTxtRobotRX : wxTextCtrl*
+	-mTxtRobotRY : wxTextCtrl*
+	-mTxtRobotRZ : wxTextCtrl*
+	-mTxtRobotX : wxTextCtrl*
+	-mTxtRobotY : wxTextCtrl*
+	-mTxtRobotZ : wxTextCtrl*
+	-mTxtTestMathInAngleHighLim : wxTextCtrl*
+	-mTxtTestMathInAngleLowLim : wxTextCtrl*
+	-mTxtTestMathInVelocityHighLim : wxTextCtrl*
+	-mTxtTestMathInVelocityLowLim : wxTextCtrl*
+	-mTxtTestMathInX : wxTextCtrl*
+	-mTxtTestMathInY : wxTextCtrl*
+	-mTxtTestMathInZ : wxTextCtrl*
 	-mTimerInfo : wxTimer
 	-mTimerView1 : wxTimer
 	-mTreeList : wxTreeListCtrl*
+	-mTreeCameraCalibrationPath : wxTreeListItem*
+	-mTreeCameraExposure : wxTreeListItem*
+	-mTreeCameraFramerate : wxTreeListItem*
 	-mTreeCameraState : wxTreeListItem*
 	-mTreeDatabaseIP : wxTreeListItem*
 	-mTreeDatabaseName : wxTreeListItem*
@@ -90,8 +126,10 @@ class cMain {
 	-mTreeGripperIP : wxTreeListItem*
 	-mTreeGripperPort : wxTreeListItem*
 	-mTreeGripperState : wxTreeListItem*
+	-mTreeGripperWidth : wxTreeListItem*
 	-mTreeRobotIP : wxTreeListItem*
 	-mTreeRobotPort : wxTreeListItem*
+	-mTreeRobotPosition : wxTreeListItem*
 	-mTreeRobotState : wxTreeListItem*
 	-mTreeRootCamera : wxTreeListItem*
 	-mTreeRootDatabase : wxTreeListItem*
@@ -120,6 +158,8 @@ namespace x_err {
 		+{static} CAMERA_WRONG_PATH : inline static const std::string
 		+{static} GRIPPER_NOT_STARTED : inline static const std::string
 		+{static} GRIPPER_NO_ACK : inline static const std::string
+		+{static} MATH_NO_RESULT : inline static const std::string
+		+{static} NO_IMPLEMENTATION : inline static const std::string
 		+{static} ROBOT_BAD_IP : inline static const std::string
 		+{static} ROBOT_NOT_CONNECTED : inline static const std::string
 		+{static} ROBWORK_INVALID_DATA : inline static const std::string
@@ -130,8 +170,8 @@ namespace x_err {
 class xBaslerCam {
 	+xBaslerCam()
 	+xBaslerCam(std::string calibrationPath)
-	+xBaslerCam(std::string calibrationPath, int exposure)
-	+xBaslerCam(std::string calibrationPath, int exposure, int maxFrameRate)
+	+xBaslerCam(std::string calibrationPath, uint32_t exposure)
+	+xBaslerCam(std::string calibrationPath, uint32_t exposure, uint32_t maxFrameRate)
 	+~xBaslerCam()
 	-pylonImage : Pylon::CPylonImage
 	+hasNewImage() : bool
@@ -147,9 +187,7 @@ class xBaslerCam {
 	-map2 : cv::Mat
 	-openCvImage : cv::Mat
 	-remapped_image : cv::Mat
-	-frame : int
-	-frameRate : int
-	-myExposure : int
+	-myExposure : double
 	-mExit : std::atomic<bool>
 	-mHasNewImage : std::atomic<bool>
 	-mIsRunning : std::atomic<bool>
@@ -157,6 +195,8 @@ class xBaslerCam {
 	-path : std::string
 	+baslerCamThread : std::thread*
 	-caliPics : std::vector<cv::Mat>
+	-frame : uint64_t
+	-frameRate : uint64_t
 	-GrabPictures() : void
 	+calibrate() : void
 	+setPath(std::string calibrationPath) : void
@@ -175,7 +215,7 @@ class xController {
 	-mGripper : std::shared_ptr<xGripperClient>
 	-mRobot : std::shared_ptr<xUrControl>
 	+fillInfo(struct treeInfo) : void
-	+guiButtonPressed(GUI_BUTTONS) : void
+	+guiButtonPressed(BINDING_ID id, T data) : void
 	+setCamera(std::shared_ptr<xBaslerCam> camera) : void
 	+setGripper(std::shared_ptr<xGripperClient> gripper) : void
 	+setRobot(std::shared_ptr<xUrControl> robot) : void
@@ -202,6 +242,11 @@ class xGripperClient {
 }
 
 
+class xMath {
+	+{static} distance3d_to_v0_xyAngle_czAngle(const std::array<double, 3>& distanceXYZ, const std::array<double, 2>& angleLim, const std::array<double, 2>& velocityLim, double steps, double g) : std::array<double , 3>
+}
+
+
 class xUrControl {
 	+xUrControl()
 	+xUrControl(std::string IP)
@@ -213,24 +258,26 @@ class xUrControl {
 	+move(std::vector<std::vector<double> >& q, double& acc, double& speed, xUrControl::moveEnum moveMode) : bool
 	-moveJ(const std::vector<double>& q) : bool
 	-moveJ(const std::vector<double>& q, double speed, double acceleration) : bool
-	+getPollingRate() : int {query}
 	-mPollingRate : int
+	+getPollingRate() : int& {query}
+	-mCont : std::atomic<bool>
 	-mEptr : std::exception_ptr
 	-mMtx : std::mutex
-	+getIP() : std::string {query}
 	-mIP : std::string
-	-mThread : std::thread*
+	+getIP() : std::string& {query}
+	-mThreadData : std::thread*
+	-mThreadMain : std::thread*
 	+getCurrentPose() : std::vector<double>
-	+getCurrentPoseDeg() : std::vector<double>
-	+getLastPose() : std::vector<double>
+	+getLastPose() : std::vector<double>&
 	-mJoints : std::vector<double>*
 	-mUrControl : ur_rtde::RTDEControlInterface*
 	-mUrRecieve : ur_rtde::RTDEReceiveInterface*
 	+connect(std::string IP) : void
 	+disconnect() : void
+	-entryThread() : void
 	-getData() : void
 	-init() : void
-	-initRobot() : void
+	-initRobot(std::string IP) : void
 	+setIP(const std::string& value) : void
 	+setPollingRate(int pollingRate) : void
 	+startPolling() : void
@@ -267,15 +314,27 @@ class ximageHandler {
 }
 
 
-enum FUNCTION_BINDING_ID {
+enum BINDING_ID {
 	ID_BTN_CAMERA_CONNECT
 	ID_BTN_CAMERA_DISCONNECT
+	ID_BTN_CAMERA_RECALIBRATE
+	ID_BTN_CAMERA_SET_CAL_PATH
+	ID_BTN_CAMERA_SET_EXPOSURE
+	ID_BTN_CAMERA_SET_FRAMERATE
 	ID_BTN_DATABASE_CONNECT
 	ID_BTN_DATABASE_DISCONNECT
+	ID_BTN_DATABASE_UPDATE
+	ID_BTN_GRIPPER_CLOSE
 	ID_BTN_GRIPPER_CONNECT
 	ID_BTN_GRIPPER_DISCONNECT
+	ID_BTN_GRIPPER_OPEN
+	ID_BTN_GRIPPER_UPDATE
 	ID_BTN_ROBOT_CONNECT
 	ID_BTN_ROBOT_DISCONNECT
+	ID_BTN_ROBOT_SEND_CMD
+	ID_BTN_ROBOT_SEND_POS
+	ID_BTN_ROBOT_UPDATE
+	ID_BTN_TESTING_XYZ_VVA
 	ID_MENU_ABOUT
 	ID_MENU_EXIT
 	ID_MENU_SAVE_LOG
@@ -283,15 +342,6 @@ enum FUNCTION_BINDING_ID {
 	ID_TIMER_INFOTREE_UPDATE
 	ID_TIMER_VIEW1_UPDATE
 	ID_TIMER_VIEW2_UPDATE
-}
-
-
-enum GUI_BUTTONS {
-	CAMERA_CONNECT
-	CAMERA_DISCONNECT
-	CAMERA_STOP
-	ROBOT_CONNECT
-	ROBOT_DISCONNECT
 }
 
 

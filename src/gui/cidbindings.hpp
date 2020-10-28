@@ -35,5 +35,7 @@ enum BINDING_ID {
 
     ID_BTN_DATABASE_CONNECT,    // Database Notebook panel buttons
     ID_BTN_DATABASE_DISCONNECT,
-    ID_BTN_DATABASE_UPDATE
+    ID_BTN_DATABASE_UPDATE,
+
+    ID_BTN_TESTING_XYZ_VVA      // Testing Notebook panel buttons
 };

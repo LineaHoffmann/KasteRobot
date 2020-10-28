@@ -60,31 +60,37 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
                                             wxDefaultPosition,
                                             wxDefaultSize,
                                             wxTAB_TRAVERSAL | wxNO_BORDER,
-                                            "subPanel1");
+                                            "General panel");
     wxPanel *mNotebookRobot = new wxPanel(mNotebook,
                                           wxID_ANY,
                                           wxDefaultPosition,
                                           wxDefaultSize,
                                           wxTAB_TRAVERSAL | wxNO_BORDER,
-                                          "subPanel2");
+                                          "Robot panel");
     wxPanel *mNotebookGripper = new wxPanel(mNotebook,
                                             wxID_ANY,
                                             wxDefaultPosition,
                                             wxDefaultSize,
                                             wxTAB_TRAVERSAL | wxNO_BORDER,
-                                            "subPanel3");
+                                            "Gripper panel");
     wxPanel *mNotebookCamera = new wxPanel(mNotebook,
                                            wxID_ANY,
                                            wxDefaultPosition,
                                            wxDefaultSize,
                                            wxTAB_TRAVERSAL | wxNO_BORDER,
-                                           "subPanel4");
+                                           "Camera panel");
     wxPanel *mNotebookDatabase = new wxPanel(mNotebook,
                                              wxID_ANY,
                                              wxDefaultPosition,
                                              wxDefaultSize,
                                              wxTAB_TRAVERSAL | wxNO_BORDER,
-                                             "subPanel5");
+                                             "Database panel");
+    wxPanel *mNotebookTesting = new wxPanel(mNotebook,
+                                             wxID_ANY,
+                                             wxDefaultPosition,
+                                             wxDefaultSize,
+                                             wxTAB_TRAVERSAL | wxNO_BORDER,
+                                             "Testing panel");
     mNotebookGeneral->SetSizer(mSizerNotebookGeneral);
     //mNotebookRobot->SetSizer(mSizerNotebookRobot);
     //mNotebookGripper->SetSizer(mSizerNotebookGripper);
@@ -95,6 +101,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mNotebook->InsertPage(2,mNotebookGripper, "Gripper");
     mNotebook->InsertPage(3,mNotebookCamera, "Camera");
     mNotebook->InsertPage(4,mNotebookDatabase, "Database");
+    mNotebook->InsertPage(5,mNotebookTesting, "Testing");
     wxColour LIGHT_BLUE = wxColor(84,88,94);
     mNotebook->SetBackgroundColour(LIGHT_BLUE);
     mNotebookGeneral->SetBackgroundColour(LIGHT_BLUE);
@@ -102,6 +109,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mNotebookGripper->SetBackgroundColour(LIGHT_BLUE);
     mNotebookCamera->SetBackgroundColour(LIGHT_BLUE);
     mNotebookDatabase->SetBackgroundColour(LIGHT_BLUE);
+    mNotebookTesting->SetBackgroundColour(LIGHT_BLUE);
     // Tree list creation (shows in mNotebookGeneral tab)
     mTreeList = new wxTreeListCtrl(mNotebookGeneral,
                                              wxID_ANY,
@@ -289,6 +297,31 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mSizerNotebookDatabase->Add(mTxtDatabaseUser);
     mSizerNotebookDatabase->Add(mTxtDatabaseSchema);
     mSizerNotebookDatabase->Add(mTxtDatabasePassword);
+
+    // Testing tab building - Buttons
+    mBtnTestMathXYZtoVAA = new wxButton(mNotebookTesting, ID_BTN_TESTING_XYZ_VVA, "XYZ->VAA");
+    // Testing tab building - Text Controls
+    mTxtTestMathInX = new wxTextCtrl(mNotebookTesting, wxID_ANY, "X");
+    mTxtTestMathInY = new wxTextCtrl(mNotebookTesting, wxID_ANY, "Y");
+    mTxtTestMathInZ = new wxTextCtrl(mNotebookTesting, wxID_ANY, "Z");
+    mTxtTestMathInAngleLowLim = new wxTextCtrl(mNotebookTesting, wxID_ANY, "Low Angle");
+    mTxtTestMathInAngleHighLim = new wxTextCtrl(mNotebookTesting, wxID_ANY, "High Angle");
+    mTxtTestMathInVelocityLowLim = new wxTextCtrl(mNotebookTesting, wxID_ANY, "Low Speed");
+    mTxtTestMathInVelocityHighLim = new wxTextCtrl(mNotebookTesting, wxID_ANY, "High Speed");
+    // Testing tab building - GridBagSizer setup
+    wxGridBagSizer *mSizerNotebookTesting = new wxGridBagSizer(0, 0);
+    mSizerNotebookTesting->SetFlexibleDirection( wxBOTH );
+    mSizerNotebookTesting->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    mSizerNotebookTesting->Add( mBtnTestMathXYZtoVAA, wxGBPosition( 0, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookTesting->Add( mTxtTestMathInX, wxGBPosition( 1, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookTesting->Add( mTxtTestMathInY, wxGBPosition( 2, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookTesting->Add( mTxtTestMathInZ, wxGBPosition( 3, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookTesting->Add( mTxtTestMathInAngleLowLim, wxGBPosition( 1, 2 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookTesting->Add( mTxtTestMathInAngleHighLim, wxGBPosition( 2, 2 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookTesting->Add( mTxtTestMathInVelocityLowLim, wxGBPosition( 1, 3 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookTesting->Add( mTxtTestMathInVelocityHighLim, wxGBPosition( 2, 3 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mNotebookTesting->SetSizer(mSizerNotebookTesting);
+    mNotebookTesting->Layout();
 
     // About box creation
     mAboutBox = new wxAboutDialogInfo;
@@ -533,6 +566,25 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
     case ID_BTN_DATABASE_UPDATE:
         logstd("Database->Update clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_DATABASE_UPDATE);});
+        evt.Skip();
+        break;
+    case ID_BTN_TESTING_XYZ_VVA:
+    {
+        logstd("Testing->XYZ_VVA clicked");
+        // Load data from testing fields of this math function
+        double x, y, z, alow, ahigh, vlow, vhigh;
+        mTxtTestMathInX->GetValue().ToDouble(&x);
+        mTxtTestMathInY->GetValue().ToDouble(&y);
+        mTxtTestMathInZ->GetValue().ToDouble(&z);
+        mTxtTestMathInAngleLowLim->GetValue().ToDouble(&alow);
+        mTxtTestMathInAngleHighLim->GetValue().ToDouble(&ahigh);
+        mTxtTestMathInVelocityLowLim->GetValue().ToDouble(&vlow);
+        mTxtTestMathInVelocityHighLim->GetValue().ToDouble(&vhigh);
+        std::array<double, 7> data {x, y, z, alow, ahigh, vlow, vhigh};
+        xTry( [&] {
+            mController->guiButtonPressed(ID_BTN_TESTING_XYZ_VVA, data);
+        });
+    }
         evt.Skip();
         break;
     default:

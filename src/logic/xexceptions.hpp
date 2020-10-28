@@ -1,5 +1,6 @@
 #ifndef XEXCEPTIONS
 #define XEXCEPTIONS
+#pragma once
 
 #include <system_error>
 

@@ -31,7 +31,7 @@ cv::Mat xController::getImage()
     else return cv::Mat();
 }
 
-void xController::guiButtonPressed(BINDING_ID)
-{
-    throw x_err::error(x_err::what::NO_IMPLEMENTATION);
-}
+//template <typename T>
+//void xController::guiButtonPressed(BINDING_ID id, T data)
+
+
