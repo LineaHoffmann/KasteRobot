@@ -1,4 +1,4 @@
-#include "ximagehandler.h"
+#include "ximagehandler.hpp"
 
 ximageHandler::ximageHandler()
 {

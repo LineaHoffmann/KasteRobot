@@ -14,19 +14,22 @@
 #include <vector>
 #include <chrono>
 #include <iostream>
+#include <atomic>
 
 #include "pylon/PylonIncludes.h"
 #include "opencv2/opencv.hpp"
 #include "opencv2/core.hpp"
 #include "wx/log.h"
 
+#include "xexceptions.hpp"
+
 class xBaslerCam
 {
 public:
     xBaslerCam();
     xBaslerCam(std::string calibrationPath);
-    xBaslerCam(std::string calibrationPath, int exposure);
-    xBaslerCam(std::string calibrationPath, int exposure, int maxFrameRate);
+    xBaslerCam(std::string calibrationPath, uint32_t exposure);
+    xBaslerCam(std::string calibrationPath, uint32_t exposure, uint32_t maxFrameRate);
 
     ~xBaslerCam();
 
@@ -38,8 +41,8 @@ public:
     void calibrate(); //run calibration on pictures in path
     void updateCameraMatrix(cv::Mat NewCameraMatrix, cv::Mat NewCoeffs); //changing calibration manually use with care
 
-    cv::Mat& getImage(); //get newest cv:Mat image (remapped)
-
+    bool hasNewImage(); // Checks if a new picture is available - THREADSAFE
+    const cv::Mat getImage(); // get newest cv:Mat image (remapped) - THREADSAFE
 
     std::thread *baslerCamThread; //skal muligvis senere flyttes til private.
 
@@ -51,13 +54,16 @@ private:
     cv::Mat openCvImage;    // Create an OpenCV image.
     std::string path = "../imgs/*.bmp";     // Path of the folder containing checkerboard images
 
-    int myExposure = 12500;
-    int frameRate  = 60;
-    int frame = 1;
-    bool exit = false;
-    bool running = false;
+    // Atomics for thread safety
+    std::atomic<bool> mIsRunning;
+    std::atomic<bool> mExit;
+    std::atomic<bool> mHasNewImage;
+
+    double myExposure = 12500;
+    uint64_t frameRate  = 60;
+    uint64_t frame = 1;
     bool isRectified = false;
-    int CHECKERBOARD[2]{9,6};
+    int32_t CHECKERBOARD[2]{9,6};
 
     std::vector<cv::Mat> caliPics;
     cv::Mat map1,map2;
@@ -69,7 +75,7 @@ private:
     cv::Mat R;
     cv::Mat T;
 
-    std::mutex PicsMtx;
+    std::mutex mMtx;
 
 };
 

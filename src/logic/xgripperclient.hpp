@@ -1,13 +1,32 @@
 #ifndef XGRIPPERCLIENT_H
 #define XGRIPPERCLIENT_H
 
-#include "../includeheader.h"
+#ifndef LOG_DEFINES
+#define LOG_DEFINES 1
+#define logstd wxLogMessage
+#define logwar wxLogWarning
+#define logerr wxLogError
+#endif
 
+#include "wx/wx.h"
+
+#include <sys/types.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <cstring>
+
+#include <thread>
+#include <mutex>
+#include <iostream>
 
 class xGripperClient
 {
 public:
     xGripperClient();
+
+private:
     void connectSocket(std::string ipAddress, int port);
     std::string writeRead(std::string mCommand);
     void entryThread();

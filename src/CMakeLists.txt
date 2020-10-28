@@ -4,8 +4,10 @@ project(KasteRobot)
 #set(CMAKE_COMPILER_GTK_FLAGS "-DWITH_GTK_3_X=ON")
 #set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${CMAKE_COMPILER_GTK_FLAGS}")
 
-# Using C++17 (used previously for inline const globals.. Probably unnecessary)
+# Using C++17 for header inline const defines
 # Jonas used C++11 for the camera, 17 should be good
+# 25/10/2020 SRP - 20 has added std::chrono calendar functions! Would be nice, but no :(
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 17)
 
 # Building as debug for now (my robworks is not though, may be a problem)
@@ -14,6 +16,9 @@ set(CMAKE_BUILD_TYPE Debug)
 # wxWidgets library
 find_package(wxWidgets REQUIRED COMPONENTS net core base)
 include("${wxWidgets_USE_FILE}")
+
+# Qt5 library (for Qt SQL)
+find_package(Qt5 COMPONENTS Core Sql REQUIRED)
 
 # OpenCV library
 find_package(OpenCV REQUIRED)
@@ -36,49 +41,47 @@ find_package(ur_rtde REQUIRED)
 # USE EXPLICIT GLOBBING! please ..
 file(GLOB SRC
     ${PROJECT_SOURCE_DIR}/app.cpp
-    ${PROJECT_SOURCE_DIR}/app.h
-    #${PROJECT_SOURCE_DIR}/includeheader.h
+    ${PROJECT_SOURCE_DIR}/app.hpp
     )
 
 # GUI layer source files GLOB
 file(GLOB GUI_FILES
     ${PROJECT_SOURCE_DIR}/gui/cmain.cpp
-    ${PROJECT_SOURCE_DIR}/gui/cmain.h
+    ${PROJECT_SOURCE_DIR}/gui/cmain.hpp
 
     ${PROJECT_SOURCE_DIR}/gui/cimagepanel.cpp
-    ${PROJECT_SOURCE_DIR}/gui/cimagepanel.h
+    ${PROJECT_SOURCE_DIR}/gui/cimagepanel.hpp
 
-    ${PROJECT_SOURCE_DIR}/gui/clinker.cpp
-    ${PROJECT_SOURCE_DIR}/gui/clinker.h
+    ${PROJECT_SOURCE_DIR}/gui/cidbindings.hpp
     )
 
 # Logic layer source files GLOB
 file(GLOB LOGIC_FILES
+    ${PROJECT_SOURCE_DIR}/logic/xcontroller.cpp
+    ${PROJECT_SOURCE_DIR}/logic/xcontroller.hpp
+
     ${PROJECT_SOURCE_DIR}/logic/xbaslercam.cpp
-    ${PROJECT_SOURCE_DIR}/logic/xbaslercam.h
+    ${PROJECT_SOURCE_DIR}/logic/xbaslercam.hpp
 
     ${PROJECT_SOURCE_DIR}/logic/ximagehandler.cpp
-    ${PROJECT_SOURCE_DIR}/logic/ximagehandler.h
-
-    ${PROJECT_SOURCE_DIR}/logic/xlinker.cpp
-    ${PROJECT_SOURCE_DIR}/logic/xlinker.h
-
-    ${PROJECT_SOURCE_DIR}/logic/xexceptions.h
+    ${PROJECT_SOURCE_DIR}/logic/ximagehandler.hpp
 
     ${PROJECT_SOURCE_DIR}/logic/xurcontrol.cpp
-    ${PROJECT_SOURCE_DIR}/logic/xurcontrol.h
+    ${PROJECT_SOURCE_DIR}/logic/xurcontrol.hpp
 
-    ${PROJECT_SOURCE_DIR}/logic/xgripperclient.h
     ${PROJECT_SOURCE_DIR}/logic/xgripperclient.cpp
+    ${PROJECT_SOURCE_DIR}/logic/xgripperclient.hpp
 
     ${PROJECT_SOURCE_DIR}/logic/xdetectcollision.h
     ${PROJECT_SOURCE_DIR}/logic/xdetectcollision.cpp
+
+    ${PROJECT_SOURCE_DIR}/logic/xexceptions.hpp
     )
 
 # Database layer source files GLOB
 file (GLOB DB_FILES
      ${PROJECT_SOURCE_DIR}/database/qdatabasehandler.cpp
-     ${PROJECT_SOURCE_DIR}/database/qdatabasehandler.h
+     ${PROJECT_SOURCE_DIR}/database/qdatabasehandler.hpp
     )
 
 # Creating executable, linked with source files
@@ -91,9 +94,10 @@ set(GCC_COVERAGE_COMPILE_FLAGS "-I/usr/local/lib/wx/include/gtk3-unicode-3.0 -I/
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
 
 # Linking libraries
-target_link_libraries(${PROJECT_NAME} ${Pylon_LIBRARIES})
-target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
-target_link_libraries(${PROJECT_NAME} ${ROBWORK_LIBRARIES})
-target_link_libraries(${PROJECT_NAME} ${wxWidgets_LIBRARIES}) # Not doing enough, next line corrects that (from wx-config --libs)
-target_link_libraries(${PROJECT_NAME} ur_rtde::rtde)
-target_link_libraries(${PROJECT_NAME} -L/usr/local/lib -pthread   -lwx_gtk3u_xrc-3.0 -lwx_gtk3u_html-3.0 -lwx_gtk3u_qa-3.0 -lwx_gtk3u_adv-3.0 -lwx_gtk3u_core-3.0 -lwx_baseu_xml-3.0 -lwx_baseu_net-3.0 -lwx_baseu-3.0)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core Qt5::Sql)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${Pylon_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${OpenCV_LIBS})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${ROBWORK_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${wxWidgets_LIBRARIES}) # Not doing enough, next line corrects that (from wx-config --libs)
+target_link_libraries(${PROJECT_NAME} PRIVATE ur_rtde::rtde)
+target_link_libraries(${PROJECT_NAME} PRIVATE -L/usr/local/lib -pthread -lwx_gtk3u_xrc-3.0 -lwx_gtk3u_html-3.0 -lwx_gtk3u_qa-3.0 -lwx_gtk3u_adv-3.0 -lwx_gtk3u_core-3.0 -lwx_baseu_xml-3.0 -lwx_baseu_net-3.0 -lwx_baseu-3.0)

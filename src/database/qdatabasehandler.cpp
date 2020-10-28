@@ -1,4 +1,4 @@
-#include "qdatabasehandler.h"
+#include "qdatabasehandler.hpp"
 
 qDatabaseHandler::qDatabaseHandler()
 {

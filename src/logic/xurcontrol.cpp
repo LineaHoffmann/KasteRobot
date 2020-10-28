@@ -1,5 +1,4 @@
-
-#include "xurcontrol.h"
+#include "xurcontrol.hpp"
 //#include "../includeheader.h"
 
 // WARNING: To-do plugin doesn't see the headers .. There are a few notes in there
@@ -57,9 +56,10 @@ void xUrControl::connect(std::string IP){
             logstd("UR_Control: connect: RTDE Recieve connected");
 
         } catch (std::exception &e) {
-            mEptr = std::current_exception();
-            std::cout << "ur_rtde Recieve exception: " << e.what() << std::endl;
-            std::rethrow_exception(mEptr);
+            //mEptr = std::current_exception();
+            //std::cout << "ur_rtde Recieve exception: " << e.what() << std::endl;
+            throw x_err::error(e.what());
+            //std::rethrow_exception(mEptr);
             return;
         };
     }
@@ -70,16 +70,16 @@ void xUrControl::connect(std::string IP){
             logstd("UR_Control: connect: RTDE control connected");
 
         } catch (std::exception &e) {
-            mEptr = std::current_exception();
-            std::cout << "ur_rtde Control exception: " << e.what() << std::endl;
-            std::rethrow_exception(mEptr);
+            throw x_err::error(e.what());
+//            mEptr = std::current_exception();
+//            std::cout << "ur_rtde Control exception: " << e.what() << std::endl;
+//            std::rethrow_exception(mEptr);
         };
     }
 }
 
 void xUrControl::disconnect()
 {
-    // Lock the mutex, the other threads thread come in through xLinker
     std::lock_guard<std::mutex> lock(mMtx);
     if(isConnected){
         mUrControl->disconnect();
@@ -92,7 +92,7 @@ void xUrControl::disconnect()
 bool xUrControl::move(std::vector<std::vector<double>> &q, double &speed, double &acc, xUrControl::moveEnum moveMode)
 {
     if (!isConnected) {
-        std::cerr << "UR_Control::move: Host not connected!" << std::endl;
+        //std::cerr << "UR_Control::move: Host not connected!" << std::endl;
         throw x_err::error(x_err::what::ROBOT_NOT_CONNECTED);
         //throw(UR_NotConnected());
         return false;
