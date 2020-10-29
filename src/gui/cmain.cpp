@@ -336,16 +336,14 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mAboutBox->SetName("Robot Thrower");
     mAboutBox->SetDescription("3rd Semester Project in Robotics\n"
                               "University of Southern Denmark");
+
+    // About box creation
     system(VERSIONSCRIPT); // Creates a version.txt file in the build dir
-    try {
-        // system() can't throw, but ifstream can?
-        std::ifstream istr("version.txt");  // Reads the version.txt
-        std::ostringstream ostr; ostr << istr.rdbuf();
-        std::string s = ostr.str(); s.erase(s.begin(), s.begin() +  + s.find("/") + 1);
-        mAboutBox->SetVersion(s.c_str());
-    } catch (...) {
-        mAboutBox->SetVersion("VERSION SET FAILED");
-    }
+    std::ifstream istr("version.txt");  // Reads the version.txt
+    std::ostringstream ostr; ostr << istr.rdbuf();
+    std::string s = ostr.str(); s.erase(s.begin(), s.begin() +  + s.find("/") + 1);
+    if (!s.empty()) mAboutBox->SetVersion(s.c_str());
+    else mAboutBox->SetVersion("VERSION SET FAILED");
 
     // Menu bar creation
     mMenuBar = new wxMenuBar();
