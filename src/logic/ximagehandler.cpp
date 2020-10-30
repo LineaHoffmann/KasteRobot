@@ -197,7 +197,7 @@ bool ximageHandler::dectectBall()
     float thisRadius;
     //draw filled contours of whats left.
     cv::Mat drawing = table;
-    for( int i = 0; i< contours.size(); i++ )
+    for(unsigned int i = 0; i< contours.size(); i++ )
     {
         cv::minEnclosingCircle(contours[i], thisCenterPixel, thisRadius);
 
