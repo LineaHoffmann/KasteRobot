@@ -16,8 +16,10 @@
 #include <thread>
 #include <mutex>
 
-#include <ctime> // For timestamp, C++20 isn't showing up :((
+#include <ctime> // For timestamp
 #include <sys/resource.h> // For resource use tracking
+#include <unistd.h> // For version in About
+#include <limits.h>
 
 #include "wx/wx.h"
 #include "wx/app.h"

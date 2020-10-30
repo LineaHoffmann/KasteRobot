@@ -1,5 +1,14 @@
 #include "cmain.hpp"
 
+// Shell script for version auto updating
+// Should maybe have some error checking inbuilt
+#define VERSIONSCRIPT "\
+#/bin/bash \n\
+cd $PWD \n\
+git describe --all --long > version.txt \n\
+clear\
+"
+
 // Event -> Function binding table
 // Event binding name enum is in cidbindings.hpp
 wxBEGIN_EVENT_TABLE(cMain, wxFrame)
@@ -102,14 +111,6 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mNotebook->InsertPage(3,mNotebookCamera, "Camera");
     mNotebook->InsertPage(4,mNotebookDatabase, "Database");
     mNotebook->InsertPage(5,mNotebookTesting, "Testing");
-    wxColour LIGHT_BLUE = wxColor(84,88,94);
-    mNotebook->SetBackgroundColour(LIGHT_BLUE);
-    mNotebookGeneral->SetBackgroundColour(LIGHT_BLUE);
-    mNotebookRobot->SetBackgroundColour(LIGHT_BLUE);
-    mNotebookGripper->SetBackgroundColour(LIGHT_BLUE);
-    mNotebookCamera->SetBackgroundColour(LIGHT_BLUE);
-    mNotebookDatabase->SetBackgroundColour(LIGHT_BLUE);
-    mNotebookTesting->SetBackgroundColour(LIGHT_BLUE);
     // Tree list creation (shows in mNotebookGeneral tab)
     mTreeList = new wxTreeListCtrl(mNotebookGeneral,
                                              wxID_ANY,
@@ -177,7 +178,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     wxStaticText *sTxtRobotRX = new wxStaticText(mNotebookRobot, wxID_ANY, "RX");
     wxStaticText *sTxtRobotRY = new wxStaticText(mNotebookRobot, wxID_ANY, "RY");
     wxStaticText *sTxtRobotRZ = new wxStaticText(mNotebookRobot, wxID_ANY, "RZ");
-    // Camera tab building - Static bitmap
+    // Robot tab building - Static bitmap
     mBmpRobotStatus = new wxStaticBitmap(mNotebookRobot, wxID_ANY, GetIcon());
     mBmpRobotStatus->SetBackgroundColour(wxColor(255,0,0));
     // Robot tab building - GridBagSizer setup
@@ -336,6 +337,14 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mAboutBox->SetDescription("3rd Semester Project in Robotics\n"
                               "University of Southern Denmark");
 
+    // About box creation
+    system(VERSIONSCRIPT); // Creates a version.txt file in the build dir
+    std::ifstream istr("version.txt");  // Reads the version.txt
+    std::ostringstream ostr; ostr << istr.rdbuf();
+    std::string s = ostr.str(); s.erase(s.begin(), s.begin() +  + s.find("/") + 1);
+    if (!s.empty()) mAboutBox->SetVersion(s.c_str());
+    else mAboutBox->SetVersion("VERSION SET FAILED");
+
     // Menu bar creation
     mMenuBar = new wxMenuBar();
     SetMenuBar(mMenuBar);
@@ -439,7 +448,6 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         xTry([&] {mController->guiButtonPressed(ID_MENU_SAVE_LOG);});
         // TODO: Pull current run entries from database
         //       and dump to some file
-        evt.Skip();
         break;
     case ID_MENU_SAVE_SNAPSHOT:
         logstd("Menu->Save Snapshot clicked");
@@ -459,7 +467,6 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         bitmap.SaveFile(path.str().c_str(), wxBITMAP_TYPE_PNG);
         std::string s = "Snapshot saved: "; s.append(path.str());
         logstd(s.c_str());
-        evt.Skip();
     }
         break;
     case ID_MENU_EXIT:
@@ -467,106 +474,86 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         std::cout << "Menu->Exit clicked" << std::endl;
         Close(true);
         evt.Skip();
-        break;
+        return;
     case ID_MENU_ABOUT:
         logstd("Menu->About clicked");
         wxAboutBox(*mAboutBox);
-        evt.Skip();
         break;
     case ID_BTN_ROBOT_CONNECT:
         logstd("Robot->Connect clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_CONNECT);});
-        evt.Skip();
         break;
     case ID_BTN_ROBOT_DISCONNECT:
         logstd("Robot->Disconnect clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_DISCONNECT);});
-        evt.Skip();
         break;
     case ID_BTN_ROBOT_UPDATE:
         logstd("Robot->Update clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_UPDATE);});
-        evt.Skip();
         break;
     case ID_BTN_ROBOT_SEND_CMD:
         logstd("Robot->Send Command clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_SEND_CMD);});
-        evt.Skip();
         break;
     case ID_BTN_ROBOT_SEND_POS:
         logstd("Robot->Send Position clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_SEND_POS);});
-        evt.Skip();
         break;
     case ID_BTN_GRIPPER_CONNECT:
         logstd("Gripper->Connect clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_CONNECT);});
-        evt.Skip();
         break;
     case ID_BTN_GRIPPER_DISCONNECT:
         logstd("Gripper->Disconnect clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_DISCONNECT);});
-        evt.Skip();
         break;
     case ID_BTN_GRIPPER_UPDATE:
         logstd("Gripper->Update clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_UPDATE);});
-        evt.Skip();
         break;
     case ID_BTN_GRIPPER_OPEN:
         logstd("Gripper->Open clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_OPEN);});
-        evt.Skip();
         break;
     case ID_BTN_GRIPPER_CLOSE:
         logstd("Gripper->Close clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_CLOSE);});
-        evt.Skip();
         break;
     case ID_BTN_CAMERA_CONNECT:
         logstd("Camera->Connect clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_CONNECT);});
-        evt.Skip();
         break;
     case ID_BTN_CAMERA_DISCONNECT:
         logstd("Camera->Disconnect clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_DISCONNECT);});
-        evt.Skip();
         break;
     case ID_BTN_CAMERA_RECALIBRATE:
         logstd("Camera->Recalibrate clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_RECALIBRATE);});
-        evt.Skip();
         break;
     case ID_BTN_CAMERA_SET_EXPOSURE:
         logstd("Camera->Set Exposure clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_SET_EXPOSURE);});
-        evt.Skip();
         break;
     case ID_BTN_CAMERA_SET_FRAMERATE:
         logstd("Camera->Set Framerate clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_SET_FRAMERATE);});
-        evt.Skip();
         break;
     case ID_BTN_CAMERA_SET_CAL_PATH:
         logstd("Camera->Set Calibration Path clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_SET_CAL_PATH);});
-        evt.Skip();
         break;
     case ID_BTN_DATABASE_CONNECT:
         logstd("Database->Connect clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_DATABASE_CONNECT);});
-        evt.Skip();
         break;
     case ID_BTN_DATABASE_DISCONNECT:
         logstd("Database->Disconnect clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_DATABASE_DISCONNECT);});
-        evt.Skip();
         break;
     case ID_BTN_DATABASE_UPDATE:
         logstd("Database->Update clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_DATABASE_UPDATE);});
-        evt.Skip();
         break;
     case ID_BTN_TESTING_XYZ_VVA:
     {
@@ -582,15 +569,14 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         mTxtTestMathInVelocityHighLim->GetValue().ToDouble(&vhigh);
         std::array<double, 7> data {x, y, z, alow, ahigh, vlow, vhigh};
         xTry( [&] {
-            mController->guiButtonPressed(ID_BTN_TESTING_XYZ_VVA, data);
+            mController->guiButtonPressed<std::array<double, 7>>(ID_BTN_TESTING_XYZ_VVA, data);
         });
     }
-        evt.Skip();
         break;
     default:
         logerr("An event fell through the button handler!");
-        evt.Skip(); // Event didn't catch
         break;
     }
+    evt.Skip();
     return;
 }
