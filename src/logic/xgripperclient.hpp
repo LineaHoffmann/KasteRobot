@@ -25,6 +25,7 @@ class xGripperClient
 {
 public:
     xGripperClient();
+    ~xGripperClient();
 
 private:
     void connectSocket(std::string ipAddress, int port);

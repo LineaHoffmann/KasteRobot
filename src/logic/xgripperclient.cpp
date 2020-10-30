@@ -6,29 +6,13 @@ xGripperClient::xGripperClient() {
 
 
 void xGripperClient::entryThread() {
-    //std::cout << "Client Thread started" << std::endl;
+
     logstd("Gripper client thread started .. ");
     xGripperClient::connectSocket("192.168.0.1", 1000);
 
-    //Check if new incoming data from gripper in a queue
-    char buf[32];
-    int bytesRecieved;
-    memset(buf, 0, 32);
-    bytesRecieved = recv(mSock, buf, 32, 0);
-    std::string answer(buf);
-
-    send(mSock, mCommand.c_str(), mCommand.size() + 1, 0);
-
-    bool readBool = true;
-    while (readBool == true) {
-        if (bytesRecieved == 0 || answer == mAnswer) {
-            usleep(25000);
-            }
-            else
-                 mAnswer = answer;
-
-        answer = "N/A";
-        }
+    while (true) {
+        // Do something
+    }
 }
 
 
@@ -44,6 +28,12 @@ void xGripperClient::connectSocket(std::string ipAddress, int port) {
 
     connect(mSock, (sockaddr*)&mHint, sizeof(mHint));
     }
+
+xGripperClient::~xGripperClient() {
+    mT1->join();
+    delete mT1;
+
+}
 
 
 std::string xGripperClient::writeRead(std::string command) {
@@ -61,5 +51,3 @@ std::string xGripperClient::writeRead(std::string command) {
      std::string mAnswer(buf);
      return mAnswer;
 }
-
-// Make functions for gripper functionality (Set grip, width, open, home, release etc.)
