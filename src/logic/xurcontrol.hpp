@@ -15,6 +15,7 @@
 #include <mutex>
 #include <exception>
 #include <iostream>
+#include <atomic>
 
 #include "ur_rtde/rtde_control_interface.h"
 #include "ur_rtde/rtde_receive_interface.h"
@@ -52,23 +53,19 @@ public:
     bool move(std::vector<std::vector<double>> &q, double &acc, double &speed, xUrControl::moveEnum moveMode);
 
     //read current pose in rads or deg
-    // TODO: Should probably return const references
     std::vector<double> getCurrentPose();
-    std::vector<double> getCurrentPoseDeg();
 
     //Getter setter for defining IP addres of host server AKA the UR5 robot
-    // TODO: Should probably return const reference
-    std::string getIP() const;
+    const std::string &getIP() const;
     void setIP(const std::string &value);
 
     //Data polling for datasharing
     void startPolling();
     void stopPolling();
 
-    // NOTE: Really should probably be returned as const reference
-    std::vector<double> getLastPose();
+    const std::vector<double> &getLastPose();
 
-    int getPollingRate() const;
+    const int &getPollingRate() const;
     void setPollingRate(int pollingRate);
 
     //returning pointer to the datastruct.
@@ -79,15 +76,17 @@ private:
     //private functions
     void getData();
     void init();
-    void initRobot();
+    void initRobot(std::string IP);
+    void entryThread();
 
-        //move with rad input
-        bool moveJ(const std::vector<double> &q);
-        bool moveJ(const std::vector<double> &q, double speed, double acceleration);
+    //move with rad input
+    bool moveJ(const std::vector<double> &q);
+    bool moveJ(const std::vector<double> &q, double speed, double acceleration);
 
 
     //flags
     bool isConnected = false;
+    std::atomic<bool> mCont;
 
     //Member Variables
     bool mContinue = true;
@@ -103,7 +102,8 @@ private:
     std::exception_ptr mEptr = nullptr;
 
     //threads
-    std::thread *mThread = nullptr;
+    std::thread *mThreadMain = nullptr;
+    std::thread *mThreadData = nullptr;
     std::mutex mMtx;
 };
 

@@ -6,20 +6,29 @@
 
 xUrControl::xUrControl()
 {
-    init();
+    this->mThreadMain = new std::thread(&xUrControl::entryThread, this);
 }
 
 xUrControl::xUrControl(std::string IP)
 {
-    init();
-    initRobot();
+    //TODO: make thread on init and infinite threads.
+    this->mThreadMain = new std::thread(&xUrControl::entryThread, this);
+    //Connecting to robot
     try{
         connect(IP);
         isConnected = true;
     } catch(std::exception &e){
-        std::rethrow_exception(mEptr);
+        throw x_err::error(x_err::what::ROBOT_NOT_CONNECTED);
+        //std::rethrow_exception(mEptr);
     }
+}
 
+void xUrControl::entryThread()
+{
+    init();
+    while (mCont){
+
+    }
 }
 
 xUrControl::~xUrControl()
@@ -28,11 +37,11 @@ xUrControl::~xUrControl()
     mUrControl->disconnect();
 
     //check if pointer types exists and delete if they exists.
-    if(mURStruct) {delete mURStruct;}
-    if(mJoints) {delete mJoints;}
-    if(mThread) {delete mThread;}
-    if (mUrControl)   {delete mUrControl;}
-    if (mUrRecieve != nullptr)   {delete mUrRecieve;}
+    if (mURStruct)              {delete mURStruct;}
+    if (mJoints)                {delete mJoints;}
+    if (mThreadData)            {delete mThreadData;}
+    if (mUrControl)             {delete mUrControl;}
+    if (mUrRecieve != nullptr)  {delete mUrRecieve;}
 }
 
 /**
@@ -47,6 +56,12 @@ void xUrControl::connect(std::string IP){
         mUrControl->reconnect();
         mUrRecieve->reconnect();
         logstd("Robot->Reconnected!");
+    }
+
+    try {
+        initRobot(IP);
+    } catch (const x_err::error &e) {
+        throw;
     }
 
     if(!mUrRecieve){
@@ -145,26 +160,14 @@ std::vector<double> xUrControl::getCurrentPose()
 }
 
 /**
- * @brief UR_Control::getCurrentPoseDeg
- * @return
- */
-std::vector<double> xUrControl::getCurrentPoseDeg()
-{
-    if(!isConnected){   return std::vector<double>(0); }
-
-    std::vector<double> out = mUrRecieve->getActualQ();
-
-    return out;
-}
-
-/**
  * @brief UR_Control::getIP
  * @return string with stored IP address
  */
-std::string xUrControl::getIP() const
+const std::string &xUrControl::getIP() const
 {
     return mIP;
 }
+
 /**
  * @brief UR_Control::setIP
  * @param value
@@ -190,7 +193,7 @@ void xUrControl::getData()
 
         //lock Scope
         {
-        std::unique_lock<std::mutex> dataLock(mMtx); //NOTE: unique lock applied, check type when merging programs.
+        std::lock_guard<std::mutex> dataLock(mMtx);
         // SRP: unique_lock is good here, but should be used in a single instantiation and use lock/unlock inside the while loop
         // See this: https://stackoverflow.com/questions/20516773/stdunique-lockstdmutex-or-stdlock-guardstdmutex
 
@@ -220,15 +223,18 @@ void xUrControl::init()
 /**
  * @brief UR_Control::initRobot send scriptfile to robot, to init TCP ect.
  */
-void xUrControl::initRobot()
+void xUrControl::initRobot(std::string IP)
 {
-    ur_rtde::ScriptClient script("127.0.0.1",3,14);
+    try {
+    ur_rtde::ScriptClient script(IP,3,14);
     script.connect();
     if (script.isConnected()) {
         script.sendScript("../src/logic/startupScript.txt");
     }
+    } catch (std::exception &e){
+        throw x_err::error(x_err::what::ROBOT_BAD_IP);
+    }
 }
-
 
 /**
  * @brief UR_Control::getURStruct
@@ -247,7 +253,7 @@ void xUrControl::startPolling()
     if(!isConnected){   return; }
 
     std::cout << "starting polling thread" << std::endl;
-    mThread = new std::thread(&xUrControl::getData, this);
+    mThreadData = new std::thread(&xUrControl::getData, this);
 }
 
 /**
@@ -257,10 +263,10 @@ void xUrControl::stopPolling()
 {
     mContinue = false;
 
-   if(mThread){
+   if(mThreadData){
         std::cout << "stopping polling from robot" << std::endl;
 
-        while (!mThread->joinable()){
+        while (!mThreadData->joinable()){
         }
     }
 }
@@ -269,7 +275,7 @@ void xUrControl::stopPolling()
  * @brief UR_Control::getLastPose getting last postion stored in the URStruct
  * @return return vector with latest saved position from the URStruct
  */
-std::vector<double> xUrControl::getLastPose()
+const std::vector<double> &xUrControl::getLastPose()
 {
     return mURStruct->pose;
 }
@@ -278,7 +284,7 @@ std::vector<double> xUrControl::getLastPose()
  * @brief UR_Control::getPollingRate getting pollingrate in hz
  * @return pollingrate as integer representing polling rate in [Hz]
  */
-int xUrControl::getPollingRate() const
+const int &xUrControl::getPollingRate() const
 {
     return mPollingRate;
 }

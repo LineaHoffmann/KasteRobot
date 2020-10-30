@@ -1,5 +1,6 @@
 #ifndef XEXCEPTIONS
 #define XEXCEPTIONS
+#pragma once
 
 #include <system_error>
 
@@ -39,6 +40,8 @@ struct what {
     inline static const std::string GRIPPER_NO_ACK = "Gripper did not respond with ACK! ";
 
     inline static const std::string ROBWORK_INVALID_DATA = "RobWork was given invalid data! ";
+
+    inline static const std::string MATH_NO_RESULT = "The calculation didn't provide a valid result! ";
 };
 class error : public std::runtime_error {
 public:

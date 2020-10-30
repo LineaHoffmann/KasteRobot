@@ -7,8 +7,8 @@ xController::xController()
     mCamera->start();
 
     // Robot
-    mRobot = std::make_shared<xUrControl>();
     try {
+        mRobot = std::make_shared<xUrControl>();
         mRobot->connect("127.0.0.1");
     } catch (x_err::error& e) {
         std::string s = "[ROBOT] ";
@@ -31,7 +31,7 @@ cv::Mat xController::getImage()
     else return cv::Mat();
 }
 
-void xController::guiButtonPressed(BINDING_ID)
-{
-    throw x_err::error(x_err::what::NO_IMPLEMENTATION);
-}
+//template <typename T>
+//void xController::guiButtonPressed(BINDING_ID id, T data)
+
+

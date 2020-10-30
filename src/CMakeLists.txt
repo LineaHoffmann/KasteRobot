@@ -6,7 +6,6 @@ project(KasteRobot)
 
 # Using C++17 for header inline const defines
 # Jonas used C++11 for the camera, 17 should be good
-# 25/10/2020 SRP - 20 has added std::chrono calendar functions! Would be nice, but no :(
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 17)
 
@@ -76,6 +75,9 @@ file(GLOB LOGIC_FILES
     ${PROJECT_SOURCE_DIR}/logic/xdetectcollision.cpp
 
     ${PROJECT_SOURCE_DIR}/logic/xexceptions.hpp
+
+    ${PROJECT_SOURCE_DIR}/logic/xmath.cpp
+    ${PROJECT_SOURCE_DIR}/logic/xmath.hpp
     )
 
 # Database layer source files GLOB
