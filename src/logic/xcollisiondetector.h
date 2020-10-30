@@ -15,11 +15,11 @@
 
 #include <vector>
 
-class xcollisiondetector
+class xCollisionDetector
 {
 public:
-    xcollisiondetector();
-    xcollisiondetector(std::string filePath);
+    xCollisionDetector();
+    xCollisionDetector(std::string filePath);
 
     void loadWorkcell(std::string filePath);
     bool checkCollision(rw::math::Q jointConfig);//

@@ -23,6 +23,7 @@
 #include "xgripperclient.hpp"
 #include "xexceptions.hpp"
 #include "../gui/cidbindings.hpp"
+#include "xcollisiondetector.h"
 
 #include "xmath.hpp"
 
@@ -74,6 +75,7 @@ private:
     std::shared_ptr<xBaslerCam> mCamera;
     std::shared_ptr<xUrControl> mRobot;
     std::shared_ptr<xGripperClient> mGripper;
+    std::shared_ptr<xCollisionDetector> mCollisionDetector;
 
     std::mutex mMtx;
 };

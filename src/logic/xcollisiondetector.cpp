@@ -1,17 +1,17 @@
 #include "xcollisiondetector.h"
 
 
-xcollisiondetector::xcollisiondetector()
+xCollisionDetector::xCollisionDetector()
 {
 
 }
 
-xcollisiondetector::xcollisiondetector(std::string filePath)
+xCollisionDetector::xCollisionDetector(std::string filePath)
 {
     loadWorkcell(filePath);
 }
 
-void xcollisiondetector::loadWorkcell(std::string filePath)
+void xCollisionDetector::loadWorkcell(std::string filePath)
 {
     rw::models::WorkCell::Ptr workcell = rw::loaders::WorkCellLoader::Factory::load(filePath);
     if (workcell.isNull()) {
@@ -27,7 +27,7 @@ void xcollisiondetector::loadWorkcell(std::string filePath)
     //solver = rw::invkin::ClosedFormIKSolverUR(robot, state)
 }
 
-bool xcollisiondetector::checkCollision(rw::math::Q jointConfig)
+bool xCollisionDetector::checkCollision(rw::math::Q jointConfig)
 {
     bool willCollide = false;
     const rw::math::Q myPose = jointConfig;
@@ -40,7 +40,7 @@ bool xcollisiondetector::checkCollision(rw::math::Q jointConfig)
     return willCollide;
 }
 
-bool xcollisiondetector::checkCollision(std::vector<std::vector<double>> jointConfigs)
+bool xCollisionDetector::checkCollision(std::vector<std::vector<double>> jointConfigs)
 {
     bool willCollide = false;
     std::vector<rw::math::Q> vectorQ;
@@ -66,7 +66,7 @@ bool xcollisiondetector::checkCollision(std::vector<std::vector<double>> jointCo
     return willCollide;
 }
 
-bool xcollisiondetector::checkCollision(std::vector<rw::math::Q> jointConfigs)
+bool xCollisionDetector::checkCollision(std::vector<rw::math::Q> jointConfigs)
 {
     bool willCollide = false;
     //kontroller alle Q-værdier i vectoren

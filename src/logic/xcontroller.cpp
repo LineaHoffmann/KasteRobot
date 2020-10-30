@@ -6,6 +6,9 @@ xController::xController()
     mCamera = std::make_shared<xBaslerCam>("../resources/pylonimgs/*.bmp", 12500);
     mCamera->start();
 
+    mCollisionDetector = std::make_shared<xCollisionDetector>("../resources/XML_files/Collision v1.wc.xml");
+
+
     // Robot
     try {
         mRobot = std::make_shared<xUrControl>();
@@ -33,9 +36,3 @@ cv::Mat xController::getImage()
 
 //template <typename T>
 //void xController::guiButtonPressed(BINDING_ID id, T data)
-
-
-//Til at oprette collisionsdetector
-//const std::string file = "../resources/XML_files/Collision v1.wc.xml";
-//xcollisiondetector testCollisionDetector = xcollisiondetector();
-//testCollisionDetector.loadWorkcell(file);
