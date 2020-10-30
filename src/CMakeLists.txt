@@ -71,8 +71,8 @@ file(GLOB LOGIC_FILES
     ${PROJECT_SOURCE_DIR}/logic/xgripperclient.cpp
     ${PROJECT_SOURCE_DIR}/logic/xgripperclient.hpp
 
-    ${PROJECT_SOURCE_DIR}/logic/xdetectcollision.h
-    ${PROJECT_SOURCE_DIR}/logic/xdetectcollision.cpp
+    ${PROJECT_SOURCE_DIR}/logic/xcollisiondetector.h
+    ${PROJECT_SOURCE_DIR}/logic/xcollisiondetector.cpp
 
     ${PROJECT_SOURCE_DIR}/logic/xexceptions.hpp
 

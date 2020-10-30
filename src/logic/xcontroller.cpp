@@ -35,3 +35,7 @@ cv::Mat xController::getImage()
 //void xController::guiButtonPressed(BINDING_ID id, T data)
 
 
+//Til at oprette collisionsdetector
+//const std::string file = "../resources/XML_files/Collision v1.wc.xml";
+//xcollisiondetector testCollisionDetector = xcollisiondetector();
+//testCollisionDetector.loadWorkcell(file);
