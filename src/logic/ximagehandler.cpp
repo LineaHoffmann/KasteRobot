@@ -167,8 +167,8 @@ bool ximageHandler::dectectBall()
     cv::Mat lower_red_hue_range;
     cv::Mat upper_red_hue_range;
     cv::Mat bin;
-    cv::inRange(hsv_image, cv::Scalar(colorRange[0], 100, 120), cv::Scalar(colorRange[1], 240, 255), lower_red_hue_range);
-    cv::inRange(hsv_image, cv::Scalar(colorRange[2], 100, 120), cv::Scalar(colorRange[3], 240, 255), upper_red_hue_range);
+    cv::inRange(hsv_image, cv::Scalar(colorRange[0], 100, 200), cv::Scalar(colorRange[1], 240, 255), lower_red_hue_range);
+    cv::inRange(hsv_image, cv::Scalar(colorRange[2], 100, 200), cv::Scalar(colorRange[3], 240, 255), upper_red_hue_range);
     cv::addWeighted(lower_red_hue_range, 1, upper_red_hue_range, 1, 0, bin);
 
     //remove noice
@@ -193,26 +193,31 @@ bool ximageHandler::dectectBall()
         }
     }
 
+    cv::Point2f thisCenterPixel;
+    float thisRadius;
     //draw filled contours of whats left.
     cv::Mat drawing = table;
-    for(unsigned int i = 0; i< contours.size(); i++ )
+    for( int i = 0; i< contours.size(); i++ )
     {
-        cv::minEnclosingCircle(contours[i], centerPixel, radius);
-        cv::circle(drawing, centerPixel, radius, cv::Scalar(0, 255, 0), 2 );
-        cv::circle(drawing, robotBase, 85, cv::Scalar(255, 255, 255), 2 );
+        cv::minEnclosingCircle(contours[i], thisCenterPixel, thisRadius);
+
+        if (showResult) cv::circle(drawing, thisCenterPixel, thisRadius, cv::Scalar(0, 255, 0), 2 );
+        if (showResult) cv::circle(drawing, robotBase, 85, cv::Scalar(255, 255, 255), 2 );
+        if (showResult) cv::imshow("ball", drawing);
+        if (debug) std::cout << radius << std::endl;
+
+
+        if (minMaxRadius.first < thisRadius && minMaxRadius.second > thisRadius){
+            centerPixel = thisCenterPixel;
+            radius = thisRadius;
+            return true;
+        }
+
+
+
     }
 
-
-    if (showResult) cv::imshow("ball", drawing);
-    if (debug) std::cout << radius << std::endl;
-    if (debug) std::cout << contours.size() << std::endl;
-
-    if (minMaxRadius.first < radius && minMaxRadius.second > radius  && contours.size() == 1){
-        return true;
-    } else {
         return false;
-    }
-
 }
 
 cv::Mat ximageHandler::getInputImage() const

@@ -234,23 +234,24 @@ void xBaslerCam::GrabPictures()
         logstd(s.str().c_str());
         //std::cout << "New exposure: " << exposureTime->GetValue() << std::endl;
 
-        //TEST FOR FRAMERATE CAP!! HAVE NOT BEEN TESTED LIVE YET!//
-        // enable framerate cap
-        GenApi::CEnumerationPtr AcquisitionFrameRateEnable( nodemap.GetNode( "AcquisitionFrameRateEnable"));
-        if ( GenApi::IsWritable( AcquisitionFrameRateEnable)){
-            AcquisitionFrameRateEnable->FromString("true");
-            logstd("AcquisitionFrameRateEnable enabled.");
-            //std::cout << "AcquisitionFrameRateEnable enabled." << std::endl;
-        }
+
+
+        GenApi::CBooleanPtr(nodemap.GetNode("AcquisitionFrameRateEnable"))->SetValue(true);
+        s.str(std::string()); // Reset the stringstream
+        s << "AcquisitionFrameRate enabled.";
+        logstd(s.str().c_str());
+
         // set framerate cap
-        GenApi::CEnumerationPtr AcquisitionFrameRate( nodemap.GetNode( "AcquisitionFrameRate"));
+        GenApi::CFloatPtr AcquisitionFrameRate( nodemap.GetNode( "AcquisitionFrameRate"));
         if(AcquisitionFrameRate.IsValid()) {
-            AcquisitionFrameRate->SetIntValue(frameRate);
-            s.str(std::string());
+            AcquisitionFrameRate->SetValue(frameRate);
+
+            s.str(std::string()); // Reset the stringstream
             s << "AcquisitionFrameRate set to: " << frameRate;
             logstd(s.str().c_str());
-            //std::cout << "AcquisitionFrameRate set to: " << frameRate << std::endl;
         }
+
+
 
         // sets up free-running continuous acquisition.
         camera.StartGrabbing(Pylon::GrabStrategy_LatestImageOnly);

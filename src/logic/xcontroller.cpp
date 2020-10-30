@@ -3,7 +3,7 @@
 xController::xController()
 {
     // Camera
-    mCamera = std::make_shared<xBaslerCam>("../resources/pylonimgs/*.bmp", 12500);
+    mCamera = std::make_shared<xBaslerCam>("../resources/pylonimgs/*.bmp", 5000, 37);
     mCamera->start();
 
     mCollisionDetector = std::make_shared<xCollisionDetector>("../resources/XML_files/Collision v1.wc.xml");
