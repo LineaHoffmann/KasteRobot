@@ -214,16 +214,13 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mNotebookRobot->Layout();
 
     // Camera  tab building - Buttons
-    mBtnCameraConnect = new wxButton(mNotebookCamera, ID_BTN_CAMERA_CONNECT, "Connect");
-    mBtnCameraDisconnect = new wxButton(mNotebookCamera, ID_BTN_CAMERA_DISCONNECT, "Disconnect");
+    mBtnCameraStart = new wxButton(mNotebookCamera, ID_BTN_CAMERA_START, "Start");
+    mBtnCameraStop = new wxButton(mNotebookCamera, ID_BTN_CAMERA_STOP, "Stop");
     mBtnCameraRecalibrate = new wxButton(mNotebookCamera, ID_BTN_CAMERA_RECALIBRATE, "Recalibrate");
-    mBtnCameraSetExposure = new wxButton(mNotebookCamera, ID_BTN_CAMERA_SET_EXPOSURE, "Set Exposure");
-    mBtnCameraSetFramerate = new wxButton(mNotebookCamera, ID_BTN_CAMERA_SET_FRAMERATE, "Set Framerate");
-    mBtnCameraSetCalibrationPath = new wxButton(mNotebookCamera, ID_BTN_CAMERA_SET_CAL_PATH, "Set Cal. Path");
     // Camera tab building - Text controls
-    mTxtCameraExposure = new wxTextCtrl(mNotebookCamera, wxID_ANY, "Exposure Time");
-    mTxtCameraFramerate = new wxTextCtrl(mNotebookCamera, wxID_ANY, "Framerate");
-    mTxtCameraCalibrationPath = new wxTextCtrl(mNotebookCamera, wxID_ANY, "Calibration path");
+    mTxtCameraExposure = new wxTextCtrl(mNotebookCamera, wxID_ANY, "5000");
+    mTxtCameraFramerate = new wxTextCtrl(mNotebookCamera, wxID_ANY, "30");
+    mTxtCameraCalibrationPath = new wxTextCtrl(mNotebookCamera, wxID_ANY, "../resources/pylonimgs/*.bmp");
     // Camera tab building - Static bitmap
     mBmpCameraStatus = new wxStaticBitmap(mNotebookCamera, wxID_ANY, GetIcon());
     mBmpCameraStatus->SetBackgroundColour(wxColor(255,0,0));
@@ -231,16 +228,19 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     wxGridBagSizer *mSizerNotebookCamera = new wxGridBagSizer(0, 0);
     mSizerNotebookCamera->SetFlexibleDirection( wxBOTH );
     mSizerNotebookCamera->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    mSizerNotebookCamera->Add( mBtnCameraConnect, wxGBPosition( 1, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-    mSizerNotebookCamera->Add( mBtnCameraDisconnect, wxGBPosition( 1, 1 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+
+    //row 1
+    mSizerNotebookCamera->Add( mBtnCameraStart, wxGBPosition( 1, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mBtnCameraStop, wxGBPosition( 1, 1 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( mBtnCameraRecalibrate, wxGBPosition( 1, 2 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-    mSizerNotebookCamera->Add( mBtnCameraSetExposure, wxGBPosition( 1, 3 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-    mSizerNotebookCamera->Add( mBtnCameraSetFramerate, wxGBPosition( 1, 4 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-    mSizerNotebookCamera->Add( mBtnCameraSetCalibrationPath, wxGBPosition( 3, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mBmpCameraStatus, wxGBPosition( 1, 4 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
+
+    //row 2
+    mSizerNotebookCamera->Add( mTxtCameraCalibrationPath, wxGBPosition( 2, 0 ), wxGBSpan( 1, 3 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( mTxtCameraExposure, wxGBPosition( 2, 3 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( mTxtCameraFramerate, wxGBPosition( 2, 4 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-    mSizerNotebookCamera->Add( mTxtCameraCalibrationPath, wxGBPosition( 3, 1 ), wxGBSpan( 1, 3 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-    mSizerNotebookCamera->Add( mBmpCameraStatus, wxGBPosition( 2, 0 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
+
+
     mSizerNotebookCamera->Add( 0, 0, wxGBPosition( 0, 0 ), wxGBSpan( 1, 5 ), wxALL|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( 0, 0, wxGBPosition( 4, 0 ), wxGBSpan( 1, 5 ), wxALL|wxEXPAND, 5 );
     for (uint32_t i = 0; i < 5; i++) {
@@ -519,29 +519,17 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         logstd("Gripper->Close clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_CLOSE);});
         break;
-    case ID_BTN_CAMERA_CONNECT:
+    case ID_BTN_CAMERA_START:
         logstd("Camera->Connect clicked");
-        xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_CONNECT);});
+        xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_START);});
         break;
-    case ID_BTN_CAMERA_DISCONNECT:
+    case ID_BTN_CAMERA_STOP:
         logstd("Camera->Disconnect clicked");
-        xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_DISCONNECT);});
+        xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_STOP);});
         break;
     case ID_BTN_CAMERA_RECALIBRATE:
         logstd("Camera->Recalibrate clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_RECALIBRATE);});
-        break;
-    case ID_BTN_CAMERA_SET_EXPOSURE:
-        logstd("Camera->Set Exposure clicked");
-        xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_SET_EXPOSURE);});
-        break;
-    case ID_BTN_CAMERA_SET_FRAMERATE:
-        logstd("Camera->Set Framerate clicked");
-        xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_SET_FRAMERATE);});
-        break;
-    case ID_BTN_CAMERA_SET_CAL_PATH:
-        logstd("Camera->Set Calibration Path clicked");
-        xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_SET_CAL_PATH);});
         break;
     case ID_BTN_DATABASE_CONNECT:
         logstd("Database->Connect clicked");

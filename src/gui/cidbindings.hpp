@@ -26,12 +26,9 @@ enum BINDING_ID {
     ID_BTN_GRIPPER_OPEN,
     ID_BTN_GRIPPER_CLOSE,
 
-    ID_BTN_CAMERA_CONNECT,      // Camera Notebook panel buttons
-    ID_BTN_CAMERA_DISCONNECT,
+    ID_BTN_CAMERA_START,      // Camera Notebook panel buttons
+    ID_BTN_CAMERA_STOP,
     ID_BTN_CAMERA_RECALIBRATE,
-    ID_BTN_CAMERA_SET_EXPOSURE,
-    ID_BTN_CAMERA_SET_FRAMERATE,
-    ID_BTN_CAMERA_SET_CAL_PATH,
 
     ID_BTN_DATABASE_CONNECT,    // Database Notebook panel buttons
     ID_BTN_DATABASE_DISCONNECT,

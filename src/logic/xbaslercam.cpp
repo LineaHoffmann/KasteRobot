@@ -254,6 +254,8 @@ void xBaslerCam::GrabPictures()
                 std::lock_guard<std::mutex> lock(mMtx);
                 if(isRectified){
                     cv::remap(openCvImage,remapped_image,map1,map2,cv::INTER_LINEAR);
+                } else {
+                    remapped_image = openCvImage;
                 }
                 mHasNewImage.exchange(true); // Set flag for new image
 

@@ -150,12 +150,9 @@ private:
     wxTextCtrl *mTxtRobotRZ;
     wxStaticBitmap *mBmpRobotStatus;
     // CAMERA SUB PANEL ENTRIES
-    wxButton *mBtnCameraConnect;
-    wxButton *mBtnCameraDisconnect;
+    wxButton *mBtnCameraStart;
+    wxButton *mBtnCameraStop;
     wxButton *mBtnCameraRecalibrate;
-    wxButton *mBtnCameraSetExposure;
-    wxButton *mBtnCameraSetFramerate;
-    wxButton *mBtnCameraSetCalibrationPath;
     wxTextCtrl *mTxtCameraExposure;
     wxTextCtrl *mTxtCameraFramerate;
     wxTextCtrl *mTxtCameraCalibrationPath;
