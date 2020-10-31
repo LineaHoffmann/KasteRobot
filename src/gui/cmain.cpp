@@ -336,12 +336,11 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mAboutBox->SetName("Robot Thrower");
     mAboutBox->SetDescription("3rd Semester Project in Robotics\n"
                               "University of Southern Denmark");
-
-    // About box creation
-    system(VERSIONSCRIPT); // Creates a version.txt file in the build dir
+    system(VERSIONSCRIPT);  // Creates a version.txt file in the build dir
+                            // NOTE: Doesn't have error handling, will crash if it fails
     std::ifstream istr("version.txt");  // Reads the version.txt
     std::ostringstream ostr; ostr << istr.rdbuf();
-    std::string s = ostr.str(); s.erase(s.begin(), s.begin() +  + s.find("/") + 1);
+    std::string s = ostr.str(); s.erase(s.begin(), s.begin() + s.find("/") + 1);
     if (!s.empty()) mAboutBox->SetVersion(s.c_str());
     else mAboutBox->SetVersion("VERSION SET FAILED");
 
@@ -370,6 +369,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mTimerView1.Start(500);
     mTimerInfo.Start(1000);
 
+    // Starting with expanded treelist
     mTreeList->Expand(*mTreeRootRobot);
     mTreeList->Expand(*mTreeRootCamera);
     mTreeList->Expand(*mTreeRootGripper);
