@@ -39,7 +39,6 @@ public:
 
     void setPath(std::string calibrationPath) {path = calibrationPath; }
     void calibrate(); //run calibration on pictures in path
-    void updateCameraMatrix(cv::Mat NewCameraMatrix, cv::Mat NewCoeffs); //changing calibration manually use with care
 
     bool hasNewImage(); // Checks if a new picture is available - THREADSAFE
     const cv::Mat getImage(); // get newest cv:Mat image (remapped) - THREADSAFE

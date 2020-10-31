@@ -23,20 +23,20 @@ xBaslerCam::~xBaslerCam(){}
 bool xBaslerCam::isConnected() {return mIsRunning.load();} // This must be thread safe
 bool xBaslerCam::start()
 {
-    calibrate();
+    if (!isRectified) calibrate();
     baslerCamThread = new std::thread(&xBaslerCam::GrabPictures,this);
-//    auto start_time = std::chrono::steady_clock::now();
-//    auto current_time = std::chrono::steady_clock::now();
-//    while(true) {
-//        current_time = std::chrono::steady_clock::now();
-//        if (running){
-//            return 1;
-//        }
-//        if (std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count() > 10){
-//            //|| baslerCamThread->joinable()){
-//            return 0;
-//        }
-//    }
+    //    auto start_time = std::chrono::steady_clock::now();
+    //    auto current_time = std::chrono::steady_clock::now();
+    //    while(true) {
+    //        current_time = std::chrono::steady_clock::now();
+    //        if (running){
+    //            return 1;
+    //        }
+    //        if (std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count() > 10){
+    //            //|| baslerCamThread->joinable()){
+    //            return 0;
+    //        }
+    //    }
     return true;
 }
 void xBaslerCam::shutdown() {mExit.exchange(true);}
@@ -103,15 +103,11 @@ void xBaslerCam::calibrate()
     //std::cout << "distCoeffs : " << distCoeffs << std::endl;
     //std::cout << "Rotation vector : " << R << std::endl;
     //std::cout << "Translation vector : " << T << std::endl;
-    isRectified = false;
+
+    cv::initUndistortRectifyMap(cameraMatrix, distCoeffs, cv::Mat(), cameraMatrix, cv::Size(openCvImage.cols,openCvImage.rows), CV_32FC1, map1, map2);
+    isRectified  = true;
 }
 
-void xBaslerCam::updateCameraMatrix(cv::Mat NewCameraMatrix, cv::Mat NewCoeffs)
-{
-    cameraMatrix = NewCameraMatrix;
-    distCoeffs = NewCoeffs;
-    isRectified = false;
-}
 
 /*
  * THESE TWO CALLS MUST BE THREAD SAFE!
@@ -120,34 +116,13 @@ bool xBaslerCam::hasNewImage() {return mHasNewImage.load();}
 const cv::Mat xBaslerCam::getImage()
 {
     std::lock_guard<std::mutex> lock(mMtx);
-    if (openCvImage.data || mIsRunning.load()) {
+    if (remapped_image.data || mIsRunning.load()) {
         // Returning a clone, not by reference, to ensure that the
         // local data isn't accessed from caller after this function
-        return openCvImage.clone();
-    } else {
-        // Maybe a warning image should be allocated permanently ..
-        // We generally shouldn't end here
-        return cv::imread("../resources/testImg.png", cv::IMREAD_COLOR);
+        return remapped_image.clone();
     }
 
-    // TODO: [srp] Don't do remapping in here, do it in the worker thread
-    //       Remapping here would be much worse to make thread safe
-
-//    //get pic and remap
-//    if (!openCvImage.data || !mIsRunning.load()) {
-//    openCvImage = cv::imread("../resources/testImg.png", cv::IMREAD_COLOR);
-
-//    //fjern hvis billede skal gennem remapping
-//    return openCvImage;
-//    }
-
-//    if (!isRectified){
-//        cv::initUndistortRectifyMap(cameraMatrix, distCoeffs, cv::Mat(), cameraMatrix, cv::Size(openCvImage.cols,openCvImage.rows), CV_32FC1, map1, map2);
-//        isRectified  = true;
-//    }
-
-//    cv::remap(openCvImage,remapped_image,map1,map2,cv::INTER_LINEAR);
-//    return remapped_image;
+    return cv::imread("../resources/testImg.png", cv::IMREAD_COLOR);
 }
 
 /**
@@ -273,9 +248,16 @@ void xBaslerCam::GrabPictures()
                 formatConverter.Convert(pylonImage, ptrGrabResult);
 
                 // Create an OpenCV image from a pylon image.
-                std::lock_guard<std::mutex> lock(mMtx);
                 openCvImage = cv::Mat(ptrGrabResult->GetHeight(), ptrGrabResult->GetWidth(), CV_8UC3, (uint8_t *) pylonImage.GetBuffer());
+
+
+                std::lock_guard<std::mutex> lock(mMtx);
+                if(isRectified){
+                    cv::remap(openCvImage,remapped_image,map1,map2,cv::INTER_LINEAR);
+                }
                 mHasNewImage.exchange(true); // Set flag for new image
+
+
 
                 frame++;
                 if(mExit.load()) {
@@ -301,8 +283,8 @@ void xBaslerCam::GrabPictures()
           << e.GetDescription();
         logerr(s.str().c_str());
 
-//        std::cerr << "An exception occurred." << std::endl
-//                  << e.GetDescription() << std::endl;
+        //        std::cerr << "An exception occurred." << std::endl
+        //                  << e.GetDescription() << std::endl;
         mIsRunning.exchange(false);
         // Rethrowing as logic error
         //throw x_err::error(x_err::what::CAMERA_GRAB_ERROR + e.what());
