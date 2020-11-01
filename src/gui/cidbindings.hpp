@@ -29,6 +29,7 @@ enum BINDING_ID {
     ID_BTN_CAMERA_START,      // Camera Notebook panel buttons
     ID_BTN_CAMERA_STOP,
     ID_BTN_CAMERA_RECALIBRATE,
+    ID_BTN_CAMERA_TRIG_FINDBALL,
 
     ID_BTN_DATABASE_CONNECT,    // Database Notebook panel buttons
     ID_BTN_DATABASE_DISCONNECT,

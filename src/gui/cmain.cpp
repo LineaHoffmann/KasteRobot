@@ -217,6 +217,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mBtnCameraStart = new wxButton(mNotebookCamera, ID_BTN_CAMERA_START, "Start");
     mBtnCameraStop = new wxButton(mNotebookCamera, ID_BTN_CAMERA_STOP, "Stop");
     mBtnCameraRecalibrate = new wxButton(mNotebookCamera, ID_BTN_CAMERA_RECALIBRATE, "Recalibrate");
+    mBtnCameraFindBall = new wxButton(mNotebookCamera, ID_BTN_CAMERA_TRIG_FINDBALL, "start/stop ballseeker");
     // Camera tab building - Text controls
     mTxtCameraExposure = new wxTextCtrl(mNotebookCamera, wxID_ANY, "5000");
     mTxtCameraFramerate = new wxTextCtrl(mNotebookCamera, wxID_ANY, "30");
@@ -239,6 +240,11 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mSizerNotebookCamera->Add( mTxtCameraCalibrationPath, wxGBPosition( 2, 0 ), wxGBSpan( 1, 3 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( mTxtCameraExposure, wxGBPosition( 2, 3 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( mTxtCameraFramerate, wxGBPosition( 2, 4 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    //row 3
+    mSizerNotebookCamera->Add( mBtnCameraFindBall, wxGBPosition( 3, 0 ), wxGBSpan( 1, 5 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+
+
+    //row 4
 
 
     mSizerNotebookCamera->Add( 0, 0, wxGBPosition( 0, 0 ), wxGBSpan( 1, 5 ), wxALL|wxEXPAND, 5 );
@@ -541,6 +547,11 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         logstd("Camera->Stop clicked");
 
         xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_STOP);});
+        break;
+    case ID_BTN_CAMERA_TRIG_FINDBALL:
+        logstd("Camera-> findball clicked");
+
+        xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_TRIG_FINDBALL);});
         break;
     case ID_BTN_CAMERA_RECALIBRATE:
     {

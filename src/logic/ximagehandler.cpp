@@ -1,5 +1,8 @@
 #include "ximagehandler.hpp"
 
+
+
+
 ximageHandler::ximageHandler()
 {
 
@@ -127,14 +130,23 @@ bool ximageHandler::cutOutTable()
     }
 }
 
-std::pair<cv::Point2f, float> ximageHandler::findBallAndPosition(cv::Mat image)
+std::pair<cv::Mat, std::pair<cv::Point2f, float>> ximageHandler::findBallAndPosition(cv::Mat image)
 {
     loadImage(image);
-    if(dectectBall()) {
-        return std::pair<cv::Point2f, float>(getPositionCM(),getRadiusCM());
+    std::pair<bool, cv::Mat> result = detectBall();
+    if(result.first) {
+        std::pair<cv::Point2f, float> data(getPositionCM(),getRadiusCM());
 
+        std::stringstream s;
+        s.str(std::string()); // Reset the stringstream
+        s << "ball position: " << data.first << " || radius: " << data.second;
+        logstd(s.str().c_str());
+
+        return std::pair<cv::Mat, std::pair<cv::Point2f, float>>(result.second, data);
     } else {
-        return std::pair<cv::Point2f, float>(cv::Point2f(), 0);
+        logstd("no ball found");
+        return std::pair<cv::Mat, std::pair<cv::Point2f, float>>(result.second, std::pair<cv::Point2f, float>(cv::Point2f(),0));
+
     }
 }
 
@@ -157,7 +169,7 @@ void ximageHandler::ballColor(int hue, int spread)
     }
 }
 
-bool ximageHandler::dectectBall()
+std::pair<bool, cv::Mat> ximageHandler::detectBall()
 {
     cv::Mat hsv_image;
     cv::cvtColor(table, hsv_image, cv::COLOR_BGR2HLS);
@@ -210,14 +222,13 @@ bool ximageHandler::dectectBall()
         if (minMaxRadius.first < thisRadius && minMaxRadius.second > thisRadius){
             centerPixel = thisCenterPixel;
             radius = thisRadius;
-            return true;
+            return std::pair<bool, cv::Mat>(true, drawing);
         }
 
 
 
     }
-
-        return false;
+        return std::pair<bool, cv::Mat>(false, cv::Mat());
 }
 
 cv::Mat ximageHandler::getInputImage() const

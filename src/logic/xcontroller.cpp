@@ -6,6 +6,15 @@ xController::xController()
     mCamera = std::make_shared<xBaslerCam>("../resources/pylonimgs/*.bmp", 5000, 37);
     mCamera->start();
 
+    //Imagehandler
+    mImagehandler = std::make_shared<ximageHandler>(cv::imread("../resources/testImg.png"));
+    mImagehandler->ballColor(10, 20); //set what color ball we are looking for
+    mImagehandler->setMinMaxRadius(1.7, 2.3); //i cm
+    mImagehandler->setRobotBase(42.2, 8.8); //i cm
+
+
+
+    //robworks
     mCollisionDetector = std::make_shared<xCollisionDetector>("../resources/XML_files/Collision v1.wc.xml");
 
 
@@ -25,13 +34,20 @@ xController::xController()
 xController::~xController() {};
 bool xController::hasNewImage()
 {
-    if (mCamera) return mCamera->hasNewImage();
+    if (mCamera) {
+        return mCamera->hasNewImage();
+    }
     else return false;
 }
 cv::Mat xController::getImage()
 {
-    if (mCamera) return mCamera->getImage();
-    else return cv::Mat();
+    if (mCamera) {
+        if(withBall) {
+            return mImagehandler->findBallAndPosition(mCamera->getImage()).first;
+        } else {
+            return mCamera->getImage();
+        }
+    } else return cv::Mat();
 }
 
 //template <typename T>

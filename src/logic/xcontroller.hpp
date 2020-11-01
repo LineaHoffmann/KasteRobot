@@ -25,6 +25,7 @@
 #include "xexceptions.hpp"
 #include "../gui/cidbindings.hpp"
 #include "xcollisiondetector.h"
+#include "ximagehandler.hpp"
 
 #include "xmath.hpp"
 
@@ -55,6 +56,17 @@ public:
             mCamera->shutdown();
             logstd("Stopping camera...");
             return;
+        }
+        if (id == BINDING_ID::ID_BTN_CAMERA_TRIG_FINDBALL) {
+            if (withBall) {
+                withBall = false;
+                logstd("Ball detection on live image turned off");
+                return;
+            } else {
+                withBall = true;
+                logstd("Ball detection on live image turned on");
+                return;
+            }
         }
         if (id == BINDING_ID::ID_BTN_TESTING_XYZ_VVA) {
             logstd("XYZ_VVA from xController");
@@ -112,6 +124,7 @@ public:
 
 
 private:
+    std::shared_ptr<ximageHandler> mImagehandler;
     std::shared_ptr<xBaslerCam> mCamera;
     std::shared_ptr<xUrControl> mRobot;
     std::shared_ptr<xGripperClient> mGripper;
@@ -119,6 +132,7 @@ private:
 
     std::mutex mMtx;
     std::thread *caliThread;
+    bool withBall = false;
 
 
 };

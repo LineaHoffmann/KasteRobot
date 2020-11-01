@@ -153,6 +153,7 @@ private:
     wxButton *mBtnCameraStart;
     wxButton *mBtnCameraStop;
     wxButton *mBtnCameraRecalibrate;
+    wxButton *mBtnCameraFindBall;
     wxTextCtrl *mTxtCameraExposure;
     wxTextCtrl *mTxtCameraFramerate;
     wxTextCtrl *mTxtCameraCalibrationPath;

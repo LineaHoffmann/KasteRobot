@@ -9,6 +9,14 @@
 #include <thread>
 #include <opencv2/imgproc.hpp>
 
+#ifndef LOG_DEFINES
+#define LOG_DEFINES 1
+#define logstd wxLogMessage
+#define logwar wxLogWarning
+#define logerr wxLogError
+#endif
+#include "wx/log.h"
+
 
 
 class ximageHandler
@@ -21,9 +29,9 @@ public:
     bool cutOutTable();
 
     //evt en funktion som samler alle loadimage, dectect, getcenter og transform i en funktion.
-    std::pair<cv::Point2f, float> findBallAndPosition(cv::Mat image);
+    std::pair<cv::Mat, std::pair<cv::Point2f, float>> findBallAndPosition(cv::Mat image);
 
-    bool dectectBall();
+    std::pair<bool, cv::Mat> detectBall();
     void ballColor(int hue, int spread);
 
     cv::Mat getInputImage() const;
