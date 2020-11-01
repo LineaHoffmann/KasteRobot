@@ -217,11 +217,9 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mBtnCameraStart = new wxButton(mNotebookCamera, ID_BTN_CAMERA_START, "Start");
     mBtnCameraStop = new wxButton(mNotebookCamera, ID_BTN_CAMERA_STOP, "Stop");
     mBtnCameraRecalibrate = new wxButton(mNotebookCamera, ID_BTN_CAMERA_RECALIBRATE, "Recalibrate");
-    mBtnCameraFindBall = new wxButton(mNotebookCamera, ID_BTN_CAMERA_TRIG_FINDBALL, "start/stop ballseeker");
+    mBtnCameraFindBall = new wxButton(mNotebookCamera, ID_BTN_CAMERA_FINDBALL, "start/stop ballseeker");
     mBtnCameraCutOut = new wxButton(mNotebookCamera, ID_BTN_CAMERA_CUT_TABLE, "CutOutTable");
     mBtnCameraDetectorSettings = new wxButton(mNotebookCamera, ID_BTN_CAMERA_LOAD_DETECTOR_SETTINGS, "Set Detector settings");
-
-
     // Camera tab building - Text controls
     mTxtCameraExposure = new wxTextCtrl(mNotebookCamera, wxID_ANY, "5000");
     mTxtCameraFramerate = new wxTextCtrl(mNotebookCamera, wxID_ANY, "30");
@@ -562,10 +560,10 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
 
         xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_STOP);});
         break;
-    case ID_BTN_CAMERA_TRIG_FINDBALL:
+    case ID_BTN_CAMERA_FINDBALL:
         logstd("Camera-> findball clicked");
 
-        xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_TRIG_FINDBALL);});
+        xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_FINDBALL);});
         break;
     case ID_BTN_CAMERA_RECALIBRATE:
     {
@@ -587,19 +585,16 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         std::pair<int, int> color;
         std::pair<float, float> size;
         try {
-        mTxtCameraBallMax->GetValue().ToDouble(&max);
-        mTxtCameraBallMin->GetValue().ToDouble(&min);
-        mTxtCameraHue->GetValue().ToLong(&hue);
-        mTxtCameraHueDelta->GetValue().ToLong(&hueDelta);
-        color = {hue, hueDelta};
-        size = {min, max};
-
+            mTxtCameraBallMax->GetValue().ToDouble(&max);
+            mTxtCameraBallMin->GetValue().ToDouble(&min);
+            mTxtCameraHue->GetValue().ToLong(&hue);
+            mTxtCameraHueDelta->GetValue().ToLong(&hueDelta);
+            color = {hue, hueDelta};
+            size = {min, max};
         } catch ( const std::exception &e ) {
             logwar(e.what());
             return;
         }
-
-
         xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_LOAD_DETECTOR_SETTINGS, std::pair<std::pair<long, long>, std::pair<double, double>>(color, size));});
     }
         break;

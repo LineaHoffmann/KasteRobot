@@ -1,13 +1,9 @@
 cmake_minimum_required(VERSION 3.10.2) # Ubuntu 18.04 default right now? My 20.04 is 3.16.3
 project(KasteRobot)
 
-#set(CMAKE_COMPILER_GTK_FLAGS "-DWITH_GTK_3_X=ON")
-#set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${CMAKE_COMPILER_GTK_FLAGS}")
-
-# Using C++17 for header inline const defines
-# Jonas used C++11 for the camera, 17 should be good
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# Using C++17
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Building as debug for now (my robworks is not though, may be a problem)
 set(CMAKE_BUILD_TYPE Debug)
@@ -16,8 +12,8 @@ set(CMAKE_BUILD_TYPE Debug)
 find_package(wxWidgets REQUIRED COMPONENTS net core base)
 include("${wxWidgets_USE_FILE}")
 
-# Qt5 library (for Qt SQL)
-find_package(Qt5 COMPONENTS Core Sql REQUIRED)
+# MySQL xDevAPI dependency
+find_package(OpenSSL REQUIRED)
 
 # OpenCV library
 find_package(OpenCV REQUIRED)
@@ -96,7 +92,7 @@ set(GCC_COVERAGE_COMPILE_FLAGS "-I/usr/local/lib/wx/include/gtk3-unicode-3.0 -I/
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
 
 # Linking libraries
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core Qt5::Sql)
+target_link_libraries(${PROJECT_NAME} PRIVATE mysqlcppconn8 OpenSSL::SSL resolv crypto)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${Pylon_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${OpenCV_LIBS})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${ROBWORK_LIBRARIES})

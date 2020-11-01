@@ -52,36 +52,64 @@ public:
     template<typename T = bool>
     void guiButtonPressed(BINDING_ID id, T data = false)
     {
-        if (id == BINDING_ID::ID_BTN_CAMERA_STOP) {
+        switch (id) {
+        case ID_BTN_CAMERA_START:
+            logstd("updating values and starting the camera ..");
+            if constexpr (std::is_same_v<T, std::pair<double, uint64_t>>) {
+                static_cast<std::pair<double, uint64_t>>(data);
+                mCamera->setMyExposure(data.first);
+                mCamera->setFrameRate(data.second);
+                mCamera->start();
+            }
+            break;
+        case ID_BTN_CAMERA_STOP:
+            logstd("Stopping camera ..");
             mCamera->shutdown();
-            logstd("Stopping camera...");
-            return;
-        }
-        if (id == BINDING_ID::ID_BTN_CAMERA_CUT_TABLE) {
+            break;
+        case ID_BTN_CAMERA_RECALIBRATE:
+            logstd("Recalibrating lens destortion calibration ..");
+            if constexpr (std::is_same_v<T, std::string>) {
+                static_cast<std::string>(data);
+                caliThread = new std::thread(xBaslerCam::liveCalibration, mCamera, data);
+            }
+            break;
+        case ID_BTN_CAMERA_FINDBALL:
+            if (withBall) {
+                withBall = false;
+                logstd("Ball detection on live image turned off ..");
+                return;
+            } else {
+                withBall = true;
+                logstd("Ball detection on live image turned on ..");
+                return;
+            }
+            break;
+        case ID_BTN_CAMERA_CUT_TABLE:
             logstd("taking picture from live camera and using it for table ROI");
             mImagehandler->loadImage(mCamera->getImage());
             mImagehandler->cutOutTable();
             logstd("ImageHandler ROI has been updated");
+            break;
+        case ID_BTN_CAMERA_LOAD_DETECTOR_SETTINGS:
+        {
+            if constexpr (std::is_same_v<T, std::pair<std::pair<long, long>, std::pair<double, double>>>) {
+                static_cast<std::pair<std::pair<long, long>, std::pair<double, double>>>(data);
+                std::stringstream s;
+                s.str(std::string()); // Reset the stringstream
+                s << "updating values for detector: " << data.first.first << " || " << data.first.second << " || " << data.second.first << " || " << data.second.second;
+                logstd(s.str().c_str());
+                mImagehandler->ballColor(static_cast<int>(data.first.first), static_cast<int>(data.first.second)); //set what color ball we are looking for
+                mImagehandler->setMinMaxRadius(static_cast<float>(data.second.first), static_cast<float>(data.second.second)); //i cm
 
-            return;
-        }
-        if (id == BINDING_ID::ID_BTN_CAMERA_TRIG_FINDBALL) {
-            if (withBall) {
-                withBall = false;
-                logstd("Ball detection on live image turned off");
-                return;
-            } else {
-                withBall = true;
-                logstd("Ball detection on live image turned on");
-                return;
             }
         }
-        if (id == BINDING_ID::ID_BTN_TESTING_XYZ_VVA) {
-            logstd("XYZ_VVA from xController");
+            break;
+        case ID_BTN_TESTING_XYZ_VVA:
+            logstd("XYZ_VVA from xController ..");
             try {
-                if constexpr (std::is_same_v<T, std::array<double,7>>) {
-                    static_cast<std::array<double,7>>(data);
-                    std::array<double, 3> xyz{ data[0], data[1], data[2] };
+            if constexpr (std::is_same_v<T, std::array<double,7>>) {
+                static_cast<std::array<double,7>>(data);
+                std::array<double, 3> xyz{ data[0], data[1], data[2] };
                     std::array<double, 2> aLims{ data[3], data[4] };
                     std::array<double, 2> vLims{ data[5], data[6] };
                     std::array<double, 3> res = xMath::distance3d_to_v0_xyAngle_czAngle(xyz, aLims, vLims);
@@ -93,59 +121,12 @@ public:
                 logwar(e.what());
                 return;
             }
+        default:
+            throw x_err::error(x_err::what::NO_IMPLEMENTATION);
+            break;
         }
-        throw x_err::error(x_err::what::NO_IMPLEMENTATION);
+        return;
     }
-
-
-
-    void guiButtonPressed(BINDING_ID id, std::pair<std::pair<long, long>, std::pair<double, double>> data)
-    {
-        if (id == BINDING_ID::ID_BTN_CAMERA_LOAD_DETECTOR_SETTINGS){
-            std::stringstream s;
-            s.str(std::string()); // Reset the stringstream
-            s << "updating values for detector: " << data.first.first << " || " << data.first.second << " || " << data.second.first << " || " << data.second.second;
-            logstd(s.str().c_str());
-
-            mImagehandler->ballColor(static_cast<int>(data.first.first), static_cast<int>(data.first.second)); //set what color ball we are looking for
-            mImagehandler->setMinMaxRadius(static_cast<float>(data.second.first), static_cast<float>(data.second.second)); //i cm
-            return;
-        }
-        throw x_err::error(x_err::what::NO_IMPLEMENTATION);
-    }
-
-    void guiButtonPressed(BINDING_ID id, std::pair<double, uint64_t> data)
-    {
-        if (id == BINDING_ID::ID_BTN_CAMERA_START){
-            mCamera->setMyExposure(data.first);
-            mCamera->setFrameRate(data.second);
-            mCamera->start();
-            logstd("updating values and starting the camera");
-
-
-            return;
-        }
-        throw x_err::error(x_err::what::NO_IMPLEMENTATION);
-    }
-    void guiButtonPressed(BINDING_ID id, std::string data)
-    {
-        if (id == BINDING_ID::ID_BTN_CAMERA_RECALIBRATE) {
-            logstd("recalibrating linse destortion");
-
-            caliThread = new std::thread(xBaslerCam::liveCalibration, mCamera, data);
-
-            return;
-
-
-
-
-
-        }
-        throw x_err::error(x_err::what::NO_IMPLEMENTATION);
-
-    }
-
-
 
 private:
     std::shared_ptr<ximageHandler> mImagehandler;

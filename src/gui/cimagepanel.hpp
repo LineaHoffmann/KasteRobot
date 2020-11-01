@@ -1,9 +1,7 @@
+#pragma once
 #ifndef CIMAGEPANEL_H
 #define CIMAGEPANEL_H
-#pragma once
 
-#include <utility>
-#include <mutex>
 #include <atomic>
 
 #include "wx/wx.h"
@@ -19,6 +17,10 @@ public:
                 const wxString &name = "");
     ~cImagePanel();
 
+    /**
+     * @brief Copy image into viewing panel
+     * @param Const reference to local temporary wxImage
+     */
     void setNewImage(const wxImage& img);
 
 private:
@@ -27,8 +29,8 @@ private:
     void Draw(wxDC& dc);    // Draws mCurrentImage to the view
 
     float scale = 1.0f;
-    bool mHasNewImage; // For checking if a new image has been copied to mNewImage
-    bool mIsDrawing;   // For checking if we are currently drawing an image
+    std::atomic<bool> mHasNewImage; // For checking if a new image has been copied to mNewImage
+    std::atomic<bool> mIsDrawing;   // For checking if we are currently drawing an image
     wxImage mCurrentImage;          // Currently displayed image
     wxImage mNewImage;              // New image loaded from setNewImage(..)
 };

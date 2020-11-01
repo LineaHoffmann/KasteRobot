@@ -16,8 +16,8 @@ cImagePanel::cImagePanel(wxWindow *parent,
     mCurrentImage = wxImage("../resources/defaultImage.png", wxBITMAP_TYPE_ANY);
     mNewImage = wxImage();
     // Defaults for the bools
-    mHasNewImage = false;
-    mIsDrawing = false;
+    mHasNewImage.exchange(false);
+    mIsDrawing.exchange(false);
 }
 cImagePanel::~cImagePanel() {
     mNewImage.Destroy();
@@ -31,7 +31,7 @@ void cImagePanel::setNewImage(const wxImage &img) {
     if (mNewImage.IsOk()) mNewImage.Clear();
     mNewImage = img.Copy();
     if (!mNewImage.IsOk()) return;
-    mHasNewImage = true;
+    mHasNewImage.exchange(true);
     // Lets post a resize event, then scale will also be re calc'ed
     wxSizeEvent sizeEvent;
     wxPostEvent(this, sizeEvent);
@@ -44,7 +44,7 @@ void cImagePanel::OnSizeEvent(wxSizeEvent& event) {
     // No actual resizing happens, only calculation of draw scaling
     int32_t viewHeight, viewWidth, imageHeight, imageWidth;
     GetSize(&viewWidth, &viewHeight);
-    if (mHasNewImage && mNewImage.IsOk()) {
+    if (mHasNewImage.load() && mNewImage.IsOk()) {
         imageHeight = mNewImage.GetSize().GetWidth();
         imageWidth = mNewImage.GetSize().GetWidth();
     } else {
@@ -78,11 +78,11 @@ void cImagePanel::OnPaintEvent(wxPaintEvent& event) {
 void cImagePanel::Draw(wxDC& dc) {
     // Drawing the mCurrentImage
     if (!dc.IsOk()) {return;}
-    if (mHasNewImage) {
+    if (mHasNewImage.load()) {
         // There is a new image in mNewImage
         // Load it into mCurrentImage
         mCurrentImage = mNewImage.Copy();
-        mHasNewImage = false;
+        mHasNewImage.exchange(false);
     }
     if ((mCurrentImage.GetWidth() > 0 || mCurrentImage.GetHeight() > 0) && mCurrentImage.IsOk()) {
         dc.SetUserScale(scale, scale);

@@ -1,6 +1,6 @@
+#pragma once
 #ifndef APP_H
 #define APP_H
-#pragma once
 
 #ifndef LOG_DEFINES
 #define LOG_DEFINES 1
@@ -9,16 +9,13 @@
 #define logerr wxLogError
 #endif
 
-#include <utility>
-#include <thread>
+//#include <utility>
+//#include <thread>
 
 #include "gui/cmain.hpp"
 #include "logic/xcontroller.hpp"
 
-#include "wx/wx.h"
-
-#include <sys/time.h>
-#include <sys/resource.h>
+//#include "wx/wx.h"
 
 class app : public wxApp
 {
@@ -34,7 +31,7 @@ private:
 
     std::thread* thread = nullptr;
     void threadFunc();
-    bool mJoinThread = false;
+    std::atomic<bool> mJoinThread;
 };
 
 #endif // APP_H

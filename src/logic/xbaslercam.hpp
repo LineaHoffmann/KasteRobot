@@ -12,8 +12,6 @@
 #include <mutex>
 #include <string>
 #include <vector>
-#include <chrono>
-#include <iostream>
 #include <atomic>
 
 #include "pylon/PylonIncludes.h"
@@ -26,23 +24,20 @@
 class xBaslerCam
 {
 public:
+    xBaslerCam(const std::string& calibrationPath = "../imgs/*.bmp",
+               const double exposure = 12500.0,
+               const uint64_t framerate = 60);
+    ~xBaslerCam();
     static void liveCalibration(std::shared_ptr<xBaslerCam> liveCamera, std::string path);
 
     void updateMapping(std::pair<cv::Mat, cv::Mat> newMapping);
     std::pair<cv::Mat, cv::Mat> getMapping();
 
-    xBaslerCam();
-    xBaslerCam(std::string calibrationPath);
-    xBaslerCam(std::string calibrationPath, uint32_t exposure);
-    xBaslerCam(std::string calibrationPath, uint32_t exposure, uint32_t maxFrameRate);
-
-    ~xBaslerCam();
-
     bool isConnected(); //returns true if we have a connection to the camera.
     bool start(); //returns true if the camera was started correctly.
     void shutdown();
 
-    void setPath(std::string calibrationPath) {path = calibrationPath; }
+    void setPath(const std::string& calibrationPath) {mPath = calibrationPath;}
     void calibrate(); //run calibration on pictures in path
 
     bool hasNewImage(); // Checks if a new picture is available - THREADSAFE
@@ -60,16 +55,16 @@ private:
     // Create a PylonImage that will be used to create OpenCV images later.
     Pylon::CPylonImage pylonImage;
     cv::Mat openCvImage;    // Create an OpenCV image.
-    std::string path = "../imgs/*.bmp";     // Path of the folder containing checkerboard images
+    std::string mPath;     // Path of the folder containing checkerboard images
 
     // Atomics for thread safety
     std::atomic<bool> mIsRunning;
     std::atomic<bool> mExit;
     std::atomic<bool> mHasNewImage;
 
-    double myExposure = 12500;
-    uint64_t frameRate  = 60;
-    uint64_t frame = 1;
+    double mExposure;
+    uint64_t mFramerate;
+    uint64_t mFrame = 1;
     bool isRectified = false;
     int32_t CHECKERBOARD[2]{9,6};
 
