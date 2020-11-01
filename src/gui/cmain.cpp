@@ -218,10 +218,19 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mBtnCameraStop = new wxButton(mNotebookCamera, ID_BTN_CAMERA_STOP, "Stop");
     mBtnCameraRecalibrate = new wxButton(mNotebookCamera, ID_BTN_CAMERA_RECALIBRATE, "Recalibrate");
     mBtnCameraFindBall = new wxButton(mNotebookCamera, ID_BTN_CAMERA_TRIG_FINDBALL, "start/stop ballseeker");
+    mBtnCameraCutOut = new wxButton(mNotebookCamera, ID_BTN_CAMERA_CUT_TABLE, "CutOutTable");
+    mBtnCameraDetectorSettings = new wxButton(mNotebookCamera, ID_BTN_CAMERA_LOAD_DETECTOR_SETTINGS, "Set Detector settings");
+
+
     // Camera tab building - Text controls
     mTxtCameraExposure = new wxTextCtrl(mNotebookCamera, wxID_ANY, "5000");
     mTxtCameraFramerate = new wxTextCtrl(mNotebookCamera, wxID_ANY, "30");
     mTxtCameraCalibrationPath = new wxTextCtrl(mNotebookCamera, wxID_ANY, "../resources/pylonimgs/*.bmp");
+    mTxtCameraHue = new wxTextCtrl(mNotebookCamera, wxID_ANY, "10");
+    mTxtCameraHueDelta = new wxTextCtrl(mNotebookCamera, wxID_ANY, "20");
+    mTxtCameraBallMin = new wxTextCtrl(mNotebookCamera, wxID_ANY, "1.7");
+    mTxtCameraBallMax = new wxTextCtrl(mNotebookCamera, wxID_ANY, "2.3");
+
     // Camera tab building - Static bitmap
     mBmpCameraStatus = new wxStaticBitmap(mNotebookCamera, wxID_ANY, GetIcon());
     mBmpCameraStatus->SetBackgroundColour(wxColor(255,0,0));
@@ -241,14 +250,19 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mSizerNotebookCamera->Add( mTxtCameraExposure, wxGBPosition( 2, 3 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( mTxtCameraFramerate, wxGBPosition( 2, 4 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     //row 3
-    mSizerNotebookCamera->Add( mBtnCameraFindBall, wxGBPosition( 3, 0 ), wxGBSpan( 1, 5 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-
+    mSizerNotebookCamera->Add( mBtnCameraFindBall, wxGBPosition( 3, 0 ), wxGBSpan( 1, 4 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mBtnCameraCutOut, wxGBPosition( 3, 4 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
 
     //row 4
+    mSizerNotebookCamera->Add( mTxtCameraHue, wxGBPosition( 4, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mTxtCameraHueDelta, wxGBPosition( 4, 1 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mTxtCameraBallMin, wxGBPosition( 4, 2 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mTxtCameraBallMax, wxGBPosition( 4, 3 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mBtnCameraDetectorSettings, wxGBPosition( 4, 4 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
 
 
     mSizerNotebookCamera->Add( 0, 0, wxGBPosition( 0, 0 ), wxGBSpan( 1, 5 ), wxALL|wxEXPAND, 5 );
-    mSizerNotebookCamera->Add( 0, 0, wxGBPosition( 4, 0 ), wxGBSpan( 1, 5 ), wxALL|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( 0, 0, wxGBPosition( 5, 0 ), wxGBSpan( 1, 5 ), wxALL|wxEXPAND, 5 );
     for (uint32_t i = 0; i < 5; i++) {
         mSizerNotebookCamera->AddGrowableCol(i);
         mSizerNotebookCamera->AddGrowableRow(i);
@@ -558,6 +572,35 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         logstd("Camera->Recalibrate clicked");
         std::string path = mTxtCameraCalibrationPath->GetValue().ToStdString();
         xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_RECALIBRATE, path);});
+    }
+        break;
+    case ID_BTN_CAMERA_CUT_TABLE:
+        logstd("Camera-> cut out table for detection");
+
+        xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_CUT_TABLE);});
+        break;
+    case ID_BTN_CAMERA_LOAD_DETECTOR_SETTINGS:
+    {
+        logstd("Camera->load new settings for ball detector");
+        long hue, hueDelta;
+        double min, max;
+        std::pair<int, int> color;
+        std::pair<float, float> size;
+        try {
+        mTxtCameraBallMax->GetValue().ToDouble(&max);
+        mTxtCameraBallMin->GetValue().ToDouble(&min);
+        mTxtCameraHue->GetValue().ToLong(&hue);
+        mTxtCameraHueDelta->GetValue().ToLong(&hueDelta);
+        color = {hue, hueDelta};
+        size = {min, max};
+
+        } catch ( const std::exception &e ) {
+            logwar(e.what());
+            return;
+        }
+
+
+        xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_LOAD_DETECTOR_SETTINGS, std::pair<std::pair<long, long>, std::pair<double, double>>(color, size));});
     }
         break;
     case ID_BTN_DATABASE_CONNECT:

@@ -57,6 +57,14 @@ public:
             logstd("Stopping camera...");
             return;
         }
+        if (id == BINDING_ID::ID_BTN_CAMERA_CUT_TABLE) {
+            logstd("taking picture from live camera and using it for table ROI");
+            mImagehandler->loadImage(mCamera->getImage());
+            mImagehandler->cutOutTable();
+            logstd("ImageHandler ROI has been updated");
+
+            return;
+        }
         if (id == BINDING_ID::ID_BTN_CAMERA_TRIG_FINDBALL) {
             if (withBall) {
                 withBall = false;
@@ -89,6 +97,22 @@ public:
         throw x_err::error(x_err::what::NO_IMPLEMENTATION);
     }
 
+
+
+    void guiButtonPressed(BINDING_ID id, std::pair<std::pair<long, long>, std::pair<double, double>> data)
+    {
+        if (id == BINDING_ID::ID_BTN_CAMERA_LOAD_DETECTOR_SETTINGS){
+            std::stringstream s;
+            s.str(std::string()); // Reset the stringstream
+            s << "updating values for detector: " << data.first.first << " || " << data.first.second << " || " << data.second.first << " || " << data.second.second;
+            logstd(s.str().c_str());
+
+            mImagehandler->ballColor(static_cast<int>(data.first.first), static_cast<int>(data.first.second)); //set what color ball we are looking for
+            mImagehandler->setMinMaxRadius(static_cast<float>(data.second.first), static_cast<float>(data.second.second)); //i cm
+            return;
+        }
+        throw x_err::error(x_err::what::NO_IMPLEMENTATION);
+    }
 
     void guiButtonPressed(BINDING_ID id, std::pair<double, uint64_t> data)
     {
