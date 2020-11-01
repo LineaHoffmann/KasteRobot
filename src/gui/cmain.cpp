@@ -185,14 +185,14 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     wxGridBagSizer *mSizerNotebookRobot = new wxGridBagSizer(0, 0);
     mSizerNotebookRobot->SetFlexibleDirection(wxBOTH);
     mSizerNotebookRobot->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
-    mSizerNotebookRobot->Add(mBtnRobotConnect, wxGBPosition(0, 0), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
-    mSizerNotebookRobot->Add(mBtnRobotDisconnect, wxGBPosition(0, 1), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
-    mSizerNotebookRobot->Add(mBtnRobotUpdate, wxGBPosition(0, 2), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
-    mSizerNotebookRobot->Add(mBtnRobotSendCmd, wxGBPosition(1, 0), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(mBtnRobotConnect, wxGBPosition(1, 0), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(mBtnRobotDisconnect, wxGBPosition(1, 1), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(mBtnRobotUpdate, wxGBPosition(1, 2), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(mBtnRobotSendCmd, wxGBPosition(0, 0), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
     mSizerNotebookRobot->Add(mBtnRobotSendPos, wxGBPosition(3, 0), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
-    mSizerNotebookRobot->Add(mTxtRobotIP, wxGBPosition(0, 3), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-    mSizerNotebookRobot->Add(mTxtRobotPort, wxGBPosition(0, 4), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-    mSizerNotebookRobot->Add(mTxtRobotCmd, wxGBPosition(1, 1), wxGBSpan(1, 4), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookRobot->Add(mTxtRobotIP, wxGBPosition(1, 3), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookRobot->Add(mTxtRobotPort, wxGBPosition(1, 4), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookRobot->Add(mTxtRobotCmd, wxGBPosition(0, 1), wxGBSpan(1, 4), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookRobot->Add(mTxtRobotX, wxGBPosition(2, 2), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
     mSizerNotebookRobot->Add(mTxtRobotY, wxGBPosition(3, 2), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
     mSizerNotebookRobot->Add(mTxtRobotZ, wxGBPosition(4, 2), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
@@ -228,7 +228,6 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mTxtCameraHueDelta = new wxTextCtrl(mNotebookCamera, wxID_ANY, "20");
     mTxtCameraBallMin = new wxTextCtrl(mNotebookCamera, wxID_ANY, "1.7");
     mTxtCameraBallMax = new wxTextCtrl(mNotebookCamera, wxID_ANY, "2.3");
-
     // Camera tab building - Static bitmap
     mBmpCameraStatus = new wxStaticBitmap(mNotebookCamera, wxID_ANY, GetIcon());
     mBmpCameraStatus->SetBackgroundColour(wxColor(255,0,0));
@@ -236,13 +235,11 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     wxGridBagSizer *mSizerNotebookCamera = new wxGridBagSizer(0, 0);
     mSizerNotebookCamera->SetFlexibleDirection( wxBOTH );
     mSizerNotebookCamera->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-
     //row 1
     mSizerNotebookCamera->Add( mBtnCameraStart, wxGBPosition( 1, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( mBtnCameraStop, wxGBPosition( 1, 1 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( mBtnCameraRecalibrate, wxGBPosition( 1, 2 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( mBmpCameraStatus, wxGBPosition( 1, 4 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
-
     //row 2
     mSizerNotebookCamera->Add( mTxtCameraCalibrationPath, wxGBPosition( 2, 0 ), wxGBSpan( 1, 3 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( mTxtCameraExposure, wxGBPosition( 2, 3 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
@@ -250,15 +247,12 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     //row 3
     mSizerNotebookCamera->Add( mBtnCameraFindBall, wxGBPosition( 3, 0 ), wxGBSpan( 1, 4 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( mBtnCameraCutOut, wxGBPosition( 3, 4 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
-
     //row 4
     mSizerNotebookCamera->Add( mTxtCameraHue, wxGBPosition( 4, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( mTxtCameraHueDelta, wxGBPosition( 4, 1 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( mTxtCameraBallMin, wxGBPosition( 4, 2 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( mTxtCameraBallMax, wxGBPosition( 4, 3 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( mBtnCameraDetectorSettings, wxGBPosition( 4, 4 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-
-
     mSizerNotebookCamera->Add( 0, 0, wxGBPosition( 0, 0 ), wxGBSpan( 1, 5 ), wxALL|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( 0, 0, wxGBPosition( 5, 0 ), wxGBSpan( 1, 5 ), wxALL|wxEXPAND, 5 );
     for (uint32_t i = 0; i < 5; i++) {
