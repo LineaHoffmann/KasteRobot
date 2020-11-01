@@ -45,9 +45,9 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mTextLog = new wxLogTextCtrl(mTextCtrl); // For writing to gui log system-wide, should be thread safe
     wxLog::SetActiveTarget(mTextLog);
     // Image viewing panel 1
-    mPanelView1 = new cImagePanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
+    mPanelView1 = new cImagePanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, "View 1");
     // Image viewing panel 2
-    mPanelView2 = new cImagePanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
+    mPanelView2 = new cImagePanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, "View 2");
     // Main grid sizer
     SetSizeHints( wxDefaultSize, wxDefaultSize );
     wxGridSizer* gridSizer;

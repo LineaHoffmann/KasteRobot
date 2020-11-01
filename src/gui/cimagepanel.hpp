@@ -14,8 +14,9 @@ class cImagePanel : public wxPanel
 public:
     cImagePanel(wxWindow *parent,
                 wxStandardID id = wxID_ANY,
-                wxPoint position = wxDefaultPosition,
-                wxSize size = wxDefaultSize);
+                const wxPoint &position = wxDefaultPosition,
+                const wxSize &size = wxDefaultSize,
+                const wxString &name = "");
     ~cImagePanel();
 
     void setNewImage(const wxImage& img);
