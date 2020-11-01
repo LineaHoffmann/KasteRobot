@@ -36,3 +36,5 @@ cv::Mat xController::getImage()
 
 //template <typename T>
 //void xController::guiButtonPressed(BINDING_ID id, T data)
+
+

@@ -11,6 +11,7 @@
 #include <utility>
 #include <type_traits>
 #include <mutex>
+#include <thread>
 
 
 #include "opencv2/core.hpp"
@@ -50,6 +51,11 @@ public:
     template<typename T = bool>
     void guiButtonPressed(BINDING_ID id, T data = false)
     {
+        if (id == BINDING_ID::ID_BTN_CAMERA_STOP) {
+            mCamera->shutdown();
+            logstd("Stopping camera...");
+            return;
+        }
         if (id == BINDING_ID::ID_BTN_TESTING_XYZ_VVA) {
             logstd("XYZ_VVA from xController");
             try {
@@ -71,6 +77,40 @@ public:
         throw x_err::error(x_err::what::NO_IMPLEMENTATION);
     }
 
+
+    void guiButtonPressed(BINDING_ID id, std::pair<double, uint64_t> data)
+    {
+        if (id == BINDING_ID::ID_BTN_CAMERA_START){
+            mCamera->setMyExposure(data.first);
+            mCamera->setFrameRate(data.second);
+            mCamera->start();
+            logstd("updating values and starting the camera");
+
+
+            return;
+        }
+        throw x_err::error(x_err::what::NO_IMPLEMENTATION);
+    }
+    void guiButtonPressed(BINDING_ID id, std::string data)
+    {
+        if (id == BINDING_ID::ID_BTN_CAMERA_RECALIBRATE) {
+            logstd("recalibrating linse destortion");
+
+            caliThread = new std::thread(xBaslerCam::liveCalibration, mCamera, data);
+
+            return;
+
+
+
+
+
+        }
+        throw x_err::error(x_err::what::NO_IMPLEMENTATION);
+
+    }
+
+
+
 private:
     std::shared_ptr<xBaslerCam> mCamera;
     std::shared_ptr<xUrControl> mRobot;
@@ -78,6 +118,9 @@ private:
     std::shared_ptr<xCollisionDetector> mCollisionDetector;
 
     std::mutex mMtx;
+    std::thread *caliThread;
+
+
 };
 
 #endif // XCONTROLLER_H

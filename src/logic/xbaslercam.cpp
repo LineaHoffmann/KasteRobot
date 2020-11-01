@@ -1,11 +1,38 @@
 #include "xbaslercam.hpp"
 #include <chrono>
 
+
+
+
+void xBaslerCam::liveCalibration(std::shared_ptr<xBaslerCam> liveCamera, std::string path)
+{
+    xBaslerCam tempCamera(path);
+    logstd("Calibration: start calculating mapping");
+    tempCamera.calibrate();
+
+    std::pair<cv::Mat, cv::Mat> test = tempCamera.getMapping();
+    liveCamera->updateMapping(test);
+    logstd("Calibration: Mapping updated");
+}
+
+
+void xBaslerCam::updateMapping(std::pair<cv::Mat, cv::Mat> newMapping)
+{
+    map1 = newMapping.first;
+    map2 = newMapping.second;
+}
+
+std::pair<cv::Mat, cv::Mat> xBaslerCam::getMapping()
+{
+    return std::pair<cv::Mat, cv::Mat>(map1, map2);
+}
+
 xBaslerCam::xBaslerCam(){
     // Atomic bool default values
     mIsRunning.exchange(false);
     mExit.exchange(false);
     mHasNewImage.exchange(false);
+    openCvImage = cv::imread("../resources/testImg.png");
 }
 xBaslerCam::xBaslerCam(std::string calibrationPath)
     : xBaslerCam() {
@@ -103,8 +130,9 @@ void xBaslerCam::calibrate()
     //std::cout << "distCoeffs : " << distCoeffs << std::endl;
     //std::cout << "Rotation vector : " << R << std::endl;
     //std::cout << "Translation vector : " << T << std::endl;
-
     cv::initUndistortRectifyMap(cameraMatrix, distCoeffs, cv::Mat(), cameraMatrix, cv::Size(openCvImage.cols,openCvImage.rows), CV_32FC1, map1, map2);
+    //std::cout << map1 << " || " << map2 << std::endl;
+
     isRectified  = true;
 }
 
@@ -291,4 +319,14 @@ void xBaslerCam::GrabPictures()
         // Rethrowing as logic error
         //throw x_err::error(x_err::what::CAMERA_GRAB_ERROR + e.what());
     }
+}
+
+void xBaslerCam::setFrameRate(uint64_t value)
+{
+    frameRate = value;
+}
+
+void xBaslerCam::setMyExposure(double value)
+{
+    myExposure = value;
 }

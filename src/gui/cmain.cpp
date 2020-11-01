@@ -520,16 +520,34 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_CLOSE);});
         break;
     case ID_BTN_CAMERA_START:
-        logstd("Camera->Connect clicked");
-        xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_START);});
+    {
+        logstd("Camera->Start clicked");
+        double expo;
+        unsigned long fps;
+        std::pair<double, uint64_t> data;
+        try {
+        mTxtCameraExposure->GetValue().ToDouble(&expo);
+        mTxtCameraFramerate->GetValue().ToULong(&fps);
+        data = {expo, static_cast<uint64_t>(fps)};
+        } catch ( const std::exception &e ) {
+            logwar(e.what());
+            return;
+        }
+
+        xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_START, data);});
+    }
         break;
     case ID_BTN_CAMERA_STOP:
-        logstd("Camera->Disconnect clicked");
+        logstd("Camera->Stop clicked");
+
         xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_STOP);});
         break;
     case ID_BTN_CAMERA_RECALIBRATE:
+    {
         logstd("Camera->Recalibrate clicked");
-        xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_RECALIBRATE);});
+        std::string path = mTxtCameraCalibrationPath->GetValue().ToStdString();
+        xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_RECALIBRATE, path);});
+    }
         break;
     case ID_BTN_DATABASE_CONNECT:
         logstd("Database->Connect clicked");

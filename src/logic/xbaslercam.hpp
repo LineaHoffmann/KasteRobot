@@ -26,6 +26,11 @@
 class xBaslerCam
 {
 public:
+    static void liveCalibration(std::shared_ptr<xBaslerCam> liveCamera, std::string path);
+
+    void updateMapping(std::pair<cv::Mat, cv::Mat> newMapping);
+    std::pair<cv::Mat, cv::Mat> getMapping();
+
     xBaslerCam();
     xBaslerCam(std::string calibrationPath);
     xBaslerCam(std::string calibrationPath, uint32_t exposure);
@@ -44,6 +49,10 @@ public:
     const cv::Mat getImage(); // get newest cv:Mat image (remapped) - THREADSAFE
 
     std::thread *baslerCamThread; //skal muligvis senere flyttes til private.
+
+    void setMyExposure(double value);
+
+    void setFrameRate(uint64_t value);
 
 private:
     void GrabPictures(); //polling pictures from cam to memory
