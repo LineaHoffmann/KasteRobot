@@ -8,9 +8,10 @@ wxEND_EVENT_TABLE()
 
 cImagePanel::cImagePanel(wxWindow *parent,
                          wxStandardID id,
-                         wxPoint position,
-                         wxSize size)
-    : wxPanel(parent, id, position, size, 0, "Camera View") {
+                         const wxPoint &position,
+                         const wxSize &size,
+                         const wxString &name)
+    : wxPanel(parent, id, position, size, 0, name) {
     // Load the default image as mCurrentImage, only valid images should overwrite it
     mCurrentImage = wxImage("../resources/defaultImage.png", wxBITMAP_TYPE_ANY);
     mNewImage = wxImage();
