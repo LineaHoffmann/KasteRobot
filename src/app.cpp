@@ -1,3 +1,4 @@
+#define __GXX_ABI_VERSION 1011
 #include "app.hpp"
 
 wxIMPLEMENT_APP(app);

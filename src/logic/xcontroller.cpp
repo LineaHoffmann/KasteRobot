@@ -21,7 +21,7 @@ xController::xController()
     // Robot
     try {
         mRobot = std::make_shared<xUrControl>();
-        mRobot->connect("127.0.0.1");
+        //mRobot->setConnect("127.0.0.1");
     } catch (x_err::error& e) {
         std::string s = "[ROBOT] ";
         s.append(e.what());

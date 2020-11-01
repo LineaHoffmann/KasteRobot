@@ -19,7 +19,6 @@ xUrControl::xUrControl(std::string IP)
         isConnected = true;
     } catch(std::exception &e){
         throw x_err::error(x_err::what::ROBOT_NOT_CONNECTED);
-        //std::rethrow_exception(mEptr);
     }
 }
 
@@ -27,12 +26,30 @@ void xUrControl::entryThread()
 {
     init();
     while (mCont){
+        if (mConnect) {
+            try{
+            connect(mIP);
+            mConnect = false;
+            } catch (x_err::error& e) {
+                std::string s("URControl: connection Failed: ");
+                s.append(e.what());
+                logerr(s.c_str());
+                mConnect = false;
+            }
+        }
 
+        if (mDisconnect) {
+            disconnect();
+            mDisconnect = false;
+        }
     }
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
+
 
 xUrControl::~xUrControl()
 {
+    //NOTE: make agreement as to whom calls these upon destruction.
     stopPolling();
     mUrControl->disconnect();
 
@@ -42,6 +59,34 @@ xUrControl::~xUrControl()
     if (mThreadData)            {delete mThreadData;}
     if (mUrControl)             {delete mUrControl;}
     if (mUrRecieve != nullptr)  {delete mUrRecieve;}
+}
+
+void xUrControl::setConnect(std::string IP)
+{
+    {std::lock_guard<std::mutex> ipLock(mMtx);
+    mIP = IP;
+    }
+    mConnect = true;
+    logstd("[ROBOT]: SetConnect flag succesfull");
+}
+
+void xUrControl::setDisconnect()
+{
+    mDisconnect = true;
+    logstd("[ROBOT]: SetDisconnect flag succesfull");
+}
+
+void xUrControl::setMove(std::vector<std::vector<double> > &q, double &acc, double &speed, xUrControl::moveEnum moveMode)
+{
+    {
+        std::lock_guard<std::mutex> setMoveLock(mMtx);
+        this->q = new std::vector<std::vector<double>>(q);
+    }
+    this->acc = acc;
+    this->speed = speed;
+    this->mMoveMode = moveMode;
+
+    mMove = true;
 }
 
 /**
@@ -55,6 +100,7 @@ void xUrControl::connect(std::string IP){
     if(mUrRecieve && mUrControl && !isConnected){
         mUrControl->reconnect();
         mUrRecieve->reconnect();
+        isConnected = true;
         logstd("Robot->Reconnected!");
     }
 
@@ -71,10 +117,7 @@ void xUrControl::connect(std::string IP){
             logstd("UR_Control: connect: RTDE Recieve connected");
 
         } catch (std::exception &e) {
-            //mEptr = std::current_exception();
-            //std::cout << "ur_rtde Recieve exception: " << e.what() << std::endl;
             throw x_err::error(e.what());
-            //std::rethrow_exception(mEptr);
             return;
         };
     }
@@ -83,12 +126,10 @@ void xUrControl::connect(std::string IP){
         try {
             mUrControl = new ur_rtde::RTDEControlInterface(IP);
             logstd("UR_Control: connect: RTDE control connected");
+            isConnected = true;
 
         } catch (std::exception &e) {
             throw x_err::error(e.what());
-//            mEptr = std::current_exception();
-//            std::cout << "ur_rtde Control exception: " << e.what() << std::endl;
-//            std::rethrow_exception(mEptr);
         };
     }
 }
@@ -104,46 +145,53 @@ void xUrControl::disconnect()
     }
 }
 
-bool xUrControl::move(std::vector<std::vector<double>> &q, double &speed, double &acc, xUrControl::moveEnum moveMode)
+std::atomic<int> xUrControl::getPollingRate() const
+{
+    return mPollingRate.load();
+}
+
+void xUrControl::move()
 {
     if (!isConnected) {
-        //std::cerr << "UR_Control::move: Host not connected!" << std::endl;
         throw x_err::error(x_err::what::ROBOT_NOT_CONNECTED);
-        //throw(UR_NotConnected());
-        return false;
+        return;
     }
 
     /*NOTE: if robot is connected, switch statement will choose correct movefunction to execute!
      * chosen as enum to ease calling from controller-class
      */
-    std::cout << "UR_Control::move: ";
-        switch (moveMode) {
+    if(q){
+        switch (mMoveMode) {
         case MOVE_JLIN:
             std::cout << "MOVE_JLIN: move commenced!" << std::endl;
-            if(mUrControl->moveJ(q[0], speed, acc)){
+            //std::vector<double> tempQ = q[0];
+            if(mUrControl->moveJ(q->at(0), speed, acc)){
                 std::cout << "MOVE_JLIN: move completed!" << std::endl;
-                return true;
             }
             break;
         case MOVE_JPATH :
             std::cout << "MOVE_JPATH: move commenced!" << std::endl;
-            if (mUrControl->moveJ(q)){
+            if (mUrControl->moveJ(*q)){
                 std::cout << "MOVE_JPATH: move completed!" << std::endl;
-                return true;
             }
             break;
         case MOVE_LFK:
             std::cout << "MOVE_LFK: move commenced!" << std::endl;
-            if (mUrControl->moveL_FK(q[0], speed, acc)){
+            if (mUrControl->moveL_FK(q->at(0), speed, acc)){
                 std::cout << "MOVE_LFK: move completed!" << std::endl;
-                return true;
             break;
         }
         default:
-            std::cerr << "Wrong mode set!" << std::endl;
+            throw (x_err::error(x_err::what::ROBOT_MOVE_NOT_FOUND));
             break;
+        }
+    } else {
+        throw (x_err::error(x_err::what::ROBOT_QVEC_NOT_FOUND));
     }
-    return false;
+    //reset params for move function
+    delete q;
+    mMoveMode=0;
+    mMove = false;
 }
 
 /**
@@ -279,16 +327,6 @@ const std::vector<double> &xUrControl::getLastPose()
 {
     return mURStruct->pose;
 }
-
-/**
- * @brief UR_Control::getPollingRate getting pollingrate in hz
- * @return pollingrate as integer representing polling rate in [Hz]
- */
-const int &xUrControl::getPollingRate() const
-{
-    return mPollingRate;
-}
-
 /**
  * @brief UR_Control::setPollingRate setting private parameter "pollingRate", and checking if its within limits of the robots pollingrate
  * @param pollingRate int in hertz [Hz] between 0 and 125 [Hz]
@@ -298,6 +336,6 @@ void xUrControl::setPollingRate(int pollingRate)
     if(pollingRate <= 125 && pollingRate > 0){
         mPollingRate = pollingRate;
     } else {
-        std::cerr << "Input not within specified range, polling rate not changed!" << std::endl;
+        logerr("Input not within specified range, polling rate not changed!");
     }
 }

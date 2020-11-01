@@ -30,6 +30,8 @@ struct what {
 
     inline static const std::string ROBOT_BAD_IP = "Connection to host could not be resolved! ";
     inline static const std::string ROBOT_NOT_CONNECTED = "Robot connections have not been established! ";
+    inline static const std::string ROBOT_QVEC_NOT_FOUND = "Robot q vector not found, move command rejected! ";
+    inline static const std::string ROBOT_MOVE_NOT_FOUND = "Robot Move mode not found, move command rejected! ";
 
     inline static const std::string CAMERA_GRAB_ERROR = "Error in camera image grabbing loop! ";
     inline static const std::string CAMERA_NOT_CONNECTED = "Camera is not connected! ";

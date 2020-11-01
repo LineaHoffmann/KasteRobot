@@ -43,14 +43,14 @@ public:
 
     ~xUrControl();
 
-    void connect(std::string IP);
-    void disconnect();
+    void setConnect(std::string IP);
+    void setDisconnect();
 
     //move ENUM
     enum moveEnum {MOVE_JLIN, MOVE_JPATH, MOVE_LFK, MOVE_TLIN, SERVOJ, SPEEDJ}; // WARNING: Update Enums to fit code, before final export:
 
     //move function to access private move functions of UR_RTDE
-    bool move(std::vector<std::vector<double>> &q, double &acc, double &speed, xUrControl::moveEnum moveMode);
+    void setMove(std::vector<std::vector<double>> &q, double &acc, double &speed, xUrControl::moveEnum moveMode);
 
     //read current pose in rads or deg
     std::vector<double> getCurrentPose();
@@ -65,11 +65,12 @@ public:
 
     const std::vector<double> &getLastPose();
 
-    const int &getPollingRate() const;
     void setPollingRate(int pollingRate);
 
     //returning pointer to the datastruct.
     UR_STRUCT getURStruct();
+
+    std::atomic<int> getPollingRate() const;
 
 private:
 
@@ -79,19 +80,29 @@ private:
     void initRobot(std::string IP);
     void entryThread();
 
-    //move with rad input
-    bool moveJ(const std::vector<double> &q);
-    bool moveJ(const std::vector<double> &q, double speed, double acceleration);
+    void move();
+
+    void connect(std::string IP);
+    void disconnect();
 
 
     //flags
-    bool isConnected = false;
-    std::atomic<bool> mCont;
+      std::atomic<bool> isConnected = false;
+      std::atomic<bool> mCont = true;
+      std::atomic<bool> mConnect = false;
+      std::atomic<bool> mDisconnect = false;
+      std::atomic<bool> mMove = false;
+      std::atomic<bool> mContinue = true;
 
     //Member Variables
-    bool mContinue = true;
-    int mPollingRate = 20; //defined in hz
-    std::string mIP = "127.0.0.0";
+
+          //Variables for Move function
+              std::vector<std::vector<double>> *q = nullptr;
+              std::atomic<int> mMoveMode;
+              std::atomic<double> acc, speed;
+
+    std::atomic<int> mPollingRate = 20;
+    std::string mIP = "127.0.0.1";
     std::vector<double> *mJoints = nullptr; //pointer to
 
     ur_rtde::RTDEControlInterface *mUrControl = nullptr;

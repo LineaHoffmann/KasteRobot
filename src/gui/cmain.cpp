@@ -162,8 +162,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mBtnRobotSendCmd = new wxButton(mNotebookRobot, ID_BTN_ROBOT_SEND_CMD, "Send CMD");
     mBtnRobotSendPos = new wxButton(mNotebookRobot, ID_BTN_ROBOT_SEND_POS, "Send Pos");
     // Robot tab building - Text controls
-    mTxtRobotIP = new wxTextCtrl(mNotebookRobot, wxID_ANY, "IP");
-    mTxtRobotPort = new wxTextCtrl(mNotebookRobot, wxID_ANY, "Port");
+    mTxtRobotIP = new wxTextCtrl(mNotebookRobot, wxID_ANY, "127.0.0.1");
     mTxtRobotCmd = new wxTextCtrl(mNotebookRobot, wxID_ANY, "Enter Commands here");
     mTxtRobotX = new wxTextCtrl(mNotebookRobot, wxID_ANY, "X");
     mTxtRobotY = new wxTextCtrl(mNotebookRobot, wxID_ANY, "Y");
@@ -191,7 +190,6 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mSizerNotebookRobot->Add(mBtnRobotSendCmd, wxGBPosition(0, 0), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
     mSizerNotebookRobot->Add(mBtnRobotSendPos, wxGBPosition(3, 0), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
     mSizerNotebookRobot->Add(mTxtRobotIP, wxGBPosition(1, 3), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-    mSizerNotebookRobot->Add(mTxtRobotPort, wxGBPosition(1, 4), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookRobot->Add(mTxtRobotCmd, wxGBPosition(0, 1), wxGBSpan(1, 4), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookRobot->Add(mTxtRobotX, wxGBPosition(2, 2), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
     mSizerNotebookRobot->Add(mTxtRobotY, wxGBPosition(3, 2), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
@@ -493,7 +491,11 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         break;
     case ID_BTN_ROBOT_CONNECT:
         logstd("Robot->Connect clicked");
-        xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_CONNECT);});
+        {
+        std::string ip;
+        ip = mTxtRobotIP->GetValue().ToStdString();
+        xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_CONNECT, ip);});
+        }
         break;
     case ID_BTN_ROBOT_DISCONNECT:
         logstd("Robot->Disconnect clicked");

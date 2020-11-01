@@ -53,6 +53,34 @@ public:
     void guiButtonPressed(BINDING_ID id, T data = false)
     {
         switch (id) {
+
+        //NOTE: ROBOT buttons implementation.
+        case ID_BTN_ROBOT_CONNECT:
+            logstd("Robot connect from xController");
+            try{
+                if constexpr (std::is_same_v<T, std::string>) {
+                    static_cast<std::string>(data);
+                    std::string ip(data);
+                    mRobot->setConnect(ip);
+                    return;
+                }
+            } catch ( const std::exception &e ) {
+                logwar(e.what());
+                return;
+            }
+
+
+        case ID_BTN_ROBOT_DISCONNECT:
+            logstd("Robot disconnect from xController");
+            try {
+                mRobot->setDisconnect();
+                return;
+            } catch (const std::exception &e) {
+                logwar (e.what());
+                return;
+            }
+
+        //NOTE: CAMERA buttons implementation
         case ID_BTN_CAMERA_START:
             logstd("updating values and starting the camera ..");
             if constexpr (std::is_same_v<T, std::pair<double, uint64_t>>) {
