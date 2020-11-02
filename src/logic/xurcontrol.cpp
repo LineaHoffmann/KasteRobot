@@ -49,10 +49,21 @@ void xUrControl::entryThread()
                 mDisconnect = false;
             }
         }
+
+        if (mMove) {
+            try {
+                logstd("ROBOT -> Move called");
+                move();
+            } catch (x_err::error& e) {
+                std::string s("URControl: Move Failed: ");
+                s.append(e.what());
+                logerr(s.c_str());
+                mMove = false;
+            }
+        }
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
-
 
 xUrControl::~xUrControl()
 {
@@ -94,6 +105,16 @@ void xUrControl::setMove(std::vector<std::vector<double> > &q, double &acc, doub
     this->mMoveMode = moveMode;
 
     mMove = true;
+    logstd("[ROBOT]: SetMove flag succesfull");
+}
+
+void xUrControl::setMove(xUrControl::moveEnum moveMode){
+    this->acc = ACC_DEF;
+    this->speed = SPEED_DEF;
+    this->mMoveMode = moveMode;
+
+    mMove = true;
+    logstd("[ROBOT]: SetMove flag succesfull");
 }
 
 /**
@@ -171,40 +192,51 @@ void xUrControl::move()
         return;
     }
 
+    logstd("ROBOT move function entered, connection ready!");
+
+    if (mMoveMode == HOME) {
+        logstd("MOVE_HOME: move commenced!");
+        mUrControl->moveL(HOMEQ, speed, acc);
+    } else if (mMoveMode == PICKUP)  {
+        logstd("MOVE_PICKUP: move commenced!");
+        mUrControl->moveL(PICKUPQ, speed, acc);
+    }
+    else {
     /*NOTE: if robot is connected, switch statement will choose correct movefunction to execute!
      * chosen as enum to ease calling from controller-class
      */
-    if(q){
-        switch (mMoveMode) {
-        case MOVE_JLIN:
-            std::cout << "MOVE_JLIN: move commenced!" << std::endl;
-            //std::vector<double> tempQ = q[0];
-            if(mUrControl->moveJ(q->at(0), speed, acc)){
-                std::cout << "MOVE_JLIN: move completed!" << std::endl;
-            }
-            break;
-        case MOVE_JPATH :
-            std::cout << "MOVE_JPATH: move commenced!" << std::endl;
-            if (mUrControl->moveJ(*q)){
-                std::cout << "MOVE_JPATH: move completed!" << std::endl;
-            }
-            break;
-        case MOVE_LFK:
-            std::cout << "MOVE_LFK: move commenced!" << std::endl;
-            if (mUrControl->moveL_FK(q->at(0), speed, acc)){
-                std::cout << "MOVE_LFK: move completed!" << std::endl;
-            break;
+        if(q){
+            switch (mMoveMode) {
+                case MOVE_JLIN:
+                    logstd( "MOVE_JLIN: move commenced!");
+                    //std::vector<double> tempQ = q[0];
+                    if(mUrControl->moveJ(q->at(0), speed, acc)){
+                        logstd("MOVE_JLIN: move completed!");
+                    }
+                    break;
+                case MOVE_JPATH :
+                    logstd("MOVE_JPATH: move commenced!");
+                    if (mUrControl->moveJ(*q)){
+                        logstd("MOVE_JPATH: move completed!");
+                    }
+                    break;
+                case MOVE_LFK: //Linear tool forward kinematics
+                    logstd("MOVE_LFK: move commenced!");
+                    if (mUrControl->moveL_FK(q->at(0), speed, acc)){
+                        logstd("MOVE_LFK: move completed!");
+                    break;
+                }
+                default:
+                    throw (x_err::error(x_err::what::ROBOT_MOVE_NOT_FOUND));
+                    break;
+                }
+        } else {
+            throw (x_err::error(x_err::what::ROBOT_QVEC_NOT_FOUND));
         }
-        default:
-            throw (x_err::error(x_err::what::ROBOT_MOVE_NOT_FOUND));
-            break;
-        }
-    } else {
-        throw (x_err::error(x_err::what::ROBOT_QVEC_NOT_FOUND));
     }
     //reset params for move function
     delete q;
-    mMoveMode=0;
+    mMoveMode = 0;
     mMove = false;
 }
 
