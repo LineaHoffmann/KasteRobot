@@ -156,12 +156,10 @@ private:
     wxButton *mBtnCameraFindBall;
     wxButton *mBtnCameraCutOut;
     wxButton *mBtnCameraDetectorSettings;
-
     wxTextCtrl *mTxtCameraHue;
     wxTextCtrl *mTxtCameraHueDelta;
     wxTextCtrl *mTxtCameraBallMin;
     wxTextCtrl *mTxtCameraBallMax;
-
     wxTextCtrl *mTxtCameraExposure;
     wxTextCtrl *mTxtCameraFramerate;
     wxTextCtrl *mTxtCameraCalibrationPath;

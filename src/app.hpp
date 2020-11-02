@@ -27,7 +27,7 @@ public:
     virtual bool OnInit();
 private:
 
-    cMain* guiMain = nullptr;
+    std::unique_ptr<cMain> guiMain;
 
     std::thread* thread = nullptr;
     void threadFunc();

@@ -14,8 +14,8 @@ app::~app()
     // Generally nothing GUI related should be manually destroyed
     // The wx package handles destruction of any elements it relies on
     // Everything else must go
-    mJoinThread.exchange(true);
 
+    mJoinThread.exchange(true);
     thread->join();
     delete thread;
 }
@@ -25,10 +25,10 @@ bool app::OnInit() {
     wxInitAllImageHandlers();
 
     // GUI start
-    guiMain = new cMain();
+    guiMain = std::make_unique<cMain>();
     guiMain->Show();
     logstd("Gui started .. ");
-    SetTopWindow(guiMain);
+    SetTopWindow(guiMain.get());
 
     mJoinThread.exchange(false);
     thread = new std::thread(&app::threadFunc, this);
