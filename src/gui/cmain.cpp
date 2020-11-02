@@ -264,11 +264,13 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mBtnGripperConnect = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_CONNECT, "Connect");
     mBtnGripperDisconnect = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_DISCONNECT, "Disconnect");
     mBtnGripperUpdate = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_UPDATE, "Update");
-    mBtnGripperOpen = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_OPEN, "Open");
-    mBtnGripperClose = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_CLOSE, "Close");
+    mBtnGripperRelease = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_RELEASE, "Release");
+    mBtnGripperGrip = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_GRIP, "Grip");
+    mBtnGripperSendCmd = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_SEND_CMD, "Send cmd");
     // Gripper tab building - Text controls
     mTxtGripperIP = new wxTextCtrl(mNotebookGripper, wxID_ANY, "IP");
     mTxtGripperPort = new wxTextCtrl(mNotebookGripper, wxID_ANY, "Port");
+    mTxtGripperCmd = new wxTextCtrl(mNotebookGripper, wxID_ANY, "Command");
     // Gripper tab building - Static bitmap
     mBmpGripperStatus = new wxStaticBitmap(mNotebookGripper, wxID_ANY, GetIcon());
     mBmpGripperStatus->SetBackgroundColour(wxColor(255,0,0));
@@ -279,13 +281,15 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mSizerNotebookGripper->Add( mBtnGripperConnect, wxGBPosition( 1, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookGripper->Add( mBtnGripperDisconnect, wxGBPosition( 1, 1 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookGripper->Add( mBtnGripperUpdate, wxGBPosition( 1, 2 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-    mSizerNotebookGripper->Add( mBtnGripperOpen, wxGBPosition( 3, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-    mSizerNotebookGripper->Add( mBtnGripperClose, wxGBPosition( 3, 1 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookGripper->Add( mBtnGripperRelease, wxGBPosition( 3, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookGripper->Add( mBtnGripperGrip, wxGBPosition( 3, 1 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookGripper->Add( mBtnGripperSendCmd, wxGBPosition( 4, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookGripper->Add( mTxtGripperIP, wxGBPosition( 1, 3 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookGripper->Add( mTxtGripperPort, wxGBPosition( 1, 4 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookGripper->Add( mTxtGripperCmd, wxGBPosition( 4, 1 ), wxGBSpan( 1, 4 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookGripper->Add( mBmpGripperStatus, wxGBPosition( 2, 0 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
     mSizerNotebookGripper->Add( 0, 0, wxGBPosition( 0, 0 ), wxGBSpan( 1, 5 ), wxALL|wxEXPAND, 5 );
-    mSizerNotebookGripper->Add( 0, 0, wxGBPosition( 4, 0 ), wxGBSpan( 1, 5 ), wxALL|wxEXPAND, 5 );
+    // mSizerNotebookGripper->Add( 0, 0, wxGBPosition( 4, 0 ), wxGBSpan( 1, 5 ), wxALL|wxEXPAND, 5 );
     for (uint32_t i = 0; i < 5; i++) {
         mSizerNotebookGripper->AddGrowableCol(i);
         mSizerNotebookGripper->AddGrowableRow(i);
@@ -525,13 +529,18 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         logstd("Gripper->Update clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_UPDATE);});
         break;
-    case ID_BTN_GRIPPER_OPEN:
-        logstd("Gripper->Open clicked");
-        xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_OPEN);});
+    case ID_BTN_GRIPPER_RELEASE:
+        logstd("Gripper->Release clicked");
+        xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_RELEASE);});
         break;
-    case ID_BTN_GRIPPER_CLOSE:
-        logstd("Gripper->Close clicked");
-        xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_CLOSE);});
+    case ID_BTN_GRIPPER_GRIP:
+        logstd("Gripper->Grip clicked");
+        xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_GRIP);});
+        break;
+    case ID_BTN_GRIPPER_SEND_CMD:
+        logstd("Gripper->Send command clicked"); {
+        std::string cmd = mTxtGripperCmd->GetValue().ToStdString();
+        xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_SEND_CMD, cmd);}); }
         break;
     case ID_BTN_CAMERA_START:
     {

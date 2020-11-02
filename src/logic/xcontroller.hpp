@@ -136,6 +136,14 @@ public:
             }
         }
             break;
+        case ID_BTN_GRIPPER_SEND_CMD:
+        {
+            if constexpr (std::is_same_v<T, std::string>) {
+                static_cast<std::string>(data);
+                //mGripper->writeRead(data);
+            }
+        }
+            break;
         case ID_BTN_TESTING_XYZ_VVA:
             logstd("XYZ_VVA from xController ..");
             try {

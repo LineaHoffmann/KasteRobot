@@ -170,10 +170,12 @@ private:
     wxButton *mBtnGripperConnect;
     wxButton *mBtnGripperDisconnect;
     wxButton *mBtnGripperUpdate;
-    wxButton *mBtnGripperOpen;
-    wxButton *mBtnGripperClose;
+    wxButton *mBtnGripperRelease;
+    wxButton *mBtnGripperGrip;
+    wxButton *mBtnGripperSendCmd;
     wxTextCtrl *mTxtGripperIP;
     wxTextCtrl *mTxtGripperPort;
+    wxTextCtrl *mTxtGripperCmd;
     wxStaticBitmap *mBmpGripperStatus;
     // DATABASE SUB PANEL ENTRIES
     wxButton *mBtnDatabaseConnect;
