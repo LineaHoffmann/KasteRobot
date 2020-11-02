@@ -98,7 +98,9 @@ public:
             logstd("Recalibrating lens destortion calibration ..");
             if constexpr (std::is_same_v<T, std::string>) {
                 static_cast<std::string>(data);
-                caliThread = new std::thread(xBaslerCam::liveCalibration, mCamera, data);
+                std::thread(xBaslerCam::liveCalibration, mCamera, data).detach();
+                //caliThread = new std::thread(xBaslerCam::liveCalibration, mCamera, data);
+                //caliThread->detach();
             }
             break;
         case ID_BTN_CAMERA_FINDBALL:
@@ -114,6 +116,8 @@ public:
             break;
         case ID_BTN_CAMERA_CUT_TABLE:
             logstd("taking picture from live camera and using it for table ROI");
+            mImagehandler->loadImage();
+
             mImagehandler->loadImage(mCamera->getImage());
             mImagehandler->cutOutTable();
             logstd("ImageHandler ROI has been updated");
