@@ -233,24 +233,20 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     wxGridBagSizer *mSizerNotebookCamera = new wxGridBagSizer(0, 0);
     mSizerNotebookCamera->SetFlexibleDirection( wxBOTH );
     mSizerNotebookCamera->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    //row 1
     mSizerNotebookCamera->Add( mBtnCameraStart, wxGBPosition( 1, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( mBtnCameraStop, wxGBPosition( 1, 1 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( mBtnCameraRecalibrate, wxGBPosition( 1, 2 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-    mSizerNotebookCamera->Add( mBmpCameraStatus, wxGBPosition( 1, 4 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
-    //row 2
+    mSizerNotebookCamera->Add( mBtnCameraDetectorSettings, wxGBPosition( 4, 4 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mBtnCameraFindBall, wxGBPosition( 3, 0 ), wxGBSpan( 1, 4 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mBtnCameraCutOut, wxGBPosition( 3, 4 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( mTxtCameraCalibrationPath, wxGBPosition( 2, 0 ), wxGBSpan( 1, 3 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( mTxtCameraExposure, wxGBPosition( 2, 3 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( mTxtCameraFramerate, wxGBPosition( 2, 4 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-    //row 3
-    mSizerNotebookCamera->Add( mBtnCameraFindBall, wxGBPosition( 3, 0 ), wxGBSpan( 1, 4 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-    mSizerNotebookCamera->Add( mBtnCameraCutOut, wxGBPosition( 3, 4 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
-    //row 4
     mSizerNotebookCamera->Add( mTxtCameraHue, wxGBPosition( 4, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( mTxtCameraHueDelta, wxGBPosition( 4, 1 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( mTxtCameraBallMin, wxGBPosition( 4, 2 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( mTxtCameraBallMax, wxGBPosition( 4, 3 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-    mSizerNotebookCamera->Add( mBtnCameraDetectorSettings, wxGBPosition( 4, 4 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookCamera->Add( mBmpCameraStatus, wxGBPosition( 1, 4 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( 0, 0, wxGBPosition( 0, 0 ), wxGBSpan( 1, 5 ), wxALL|wxEXPAND, 5 );
     mSizerNotebookCamera->Add( 0, 0, wxGBPosition( 5, 0 ), wxGBSpan( 1, 5 ), wxALL|wxEXPAND, 5 );
     for (uint32_t i = 0; i < 5; i++) {
@@ -440,6 +436,8 @@ void cMain::OnTimerInfoUpdate(wxTimerEvent &evt)
     // TODO: Write this
     // Collect info from all available object through
     // the logic controller, in a thread safe manner
+
+
 
     // POSIX resource use
     struct rusage use;
