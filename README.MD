@@ -1,3 +1,15 @@
+INSTALLING GCC9
+	DO THIS BEFORE INSTALLIGN WXWIDGETS
+	add package:
+		sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+		sudo apt install gcc-9 g++-9
+	configure alternatives 
+		sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 90 --slave /usr/bin/g++ g++ /usr/bin/g++-9 --		slave /usr/bin/gcov gcov /usr/bin/gcov-9
+	check default gcc compiler and choose gcc9
+		sudo update-alternatives --config gcc
+
+	Recompile wxWidgets eftar install, if already installed.
+
 INSTALLING WXWIDGETS
 	Get wxWidgets 3.0.5 Stable from https://www.wxwidgets.org/downloads/
 	Choose "Source for Linux, MacOS, etc"
