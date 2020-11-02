@@ -227,6 +227,8 @@ void xBaslerCam::GrabPictures()
                 if(mExit.load()) {
                     camera.Close();
                     mIsRunning.exchange(false);
+                    mExit.exchange(false);
+                    mHasNewImage.exchange(false);
                     return;
                 }
             } else {

@@ -71,7 +71,8 @@ bool ximageHandler::cutOutTable()
     //find corners of table
     int lastCount = 0;
     int thisCount;
-    int offset = 2;
+    int delta = 3;
+    int offset = 450;
     cv::Point topLeftCorner, topRightCorner, botLeftCorner, botRightCorner;
 
     for (int i = 0; i < grey.cols; i++){
@@ -85,7 +86,7 @@ bool ximageHandler::cutOutTable()
             }
 
         }
-        if(thisCount > offset*offset*10 && thisCount - lastCount < offset) {
+        if(thisCount > offset && thisCount - lastCount < delta) {
             break;
         }
         lastCount = thisCount;
@@ -101,7 +102,7 @@ bool ximageHandler::cutOutTable()
             }
 
         }
-        if(thisCount > offset*offset*10 && thisCount - lastCount < offset) {
+        if(thisCount > offset && thisCount - lastCount < delta) {
             break;
         }
         lastCount = thisCount;
@@ -209,26 +210,30 @@ std::pair<bool, cv::Mat> ximageHandler::detectBall()
     float thisRadius;
     //draw filled contours of whats left.
     cv::Mat drawing = table;
+    cv::Mat white = cv::Mat::ones(inputImage.rows, inputImage.cols, CV_8UC3);
     for(unsigned int i = 0; i< contours.size(); i++ )
     {
         cv::minEnclosingCircle(contours[i], thisCenterPixel, thisRadius);
 
         if (showResult) cv::circle(drawing, thisCenterPixel, thisRadius, cv::Scalar(0, 255, 0), 2 );
         if (showResult) cv::circle(drawing, robotBase, 85, cv::Scalar(255, 255, 255), 2 );
-        if (showResult) cv::imshow("ball", drawing);
+        if (debug) cv::imshow("ball", drawing);
         if (debug) std::cout << radius << std::endl;
+
+        cv::addWeighted(inputImage(ROI),0.1,drawing,0.9,0.0,inputImage(ROI));
+
 
 
         if (minMaxRadius.first < thisRadius && minMaxRadius.second > thisRadius){
             centerPixel = thisCenterPixel;
             radius = thisRadius;
-            return std::pair<bool, cv::Mat>(true, drawing);
+            return std::pair<bool, cv::Mat>(true, inputImage);
         }
 
 
 
     }
-        return std::pair<bool, cv::Mat>(false, cv::Mat());
+        return std::pair<bool, cv::Mat>(false, inputImage);
 }
 
 cv::Mat ximageHandler::getInputImage() const

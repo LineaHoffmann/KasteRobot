@@ -3,7 +3,7 @@
 xController::xController()
 {
     // Camera
-    mCamera = std::make_shared<xBaslerCam>("../resources/pylonimgs/*.bmp", 5000, 37);
+    mCamera = std::make_shared<xBaslerCam>("../resources/pylonimgs/*.bmp", 5000, 30);
     mCamera->start();
 
     //Imagehandler
@@ -11,6 +11,7 @@ xController::xController()
     mImagehandler->ballColor(10, 20); //set what color ball we are looking for
     mImagehandler->setMinMaxRadius(1.7, 2.3); //i cm
     mImagehandler->setRobotBase(42.2, 8.8); //i cm
+    mImagehandler->showResult = true;
 
 
 
