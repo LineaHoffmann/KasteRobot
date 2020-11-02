@@ -39,8 +39,15 @@ void xUrControl::entryThread()
         }
 
         if (mDisconnect) {
-            disconnect();
-            mDisconnect = false;
+            try{
+                disconnect();
+                mDisconnect = false;
+            } catch (x_err::error& e) {
+                std::string s("URControl: disconnect Failed: ");
+                s.append(e.what());
+                logerr(s.c_str());
+                mDisconnect = false;
+            }
         }
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -136,12 +143,19 @@ void xUrControl::connect(std::string IP){
 
 void xUrControl::disconnect()
 {
+    if(!mUrRecieve || !mUrControl){
+        throw x_err::error(x_err::what::ROBOT_NOT_CONNECTED);
+        return;
+    }
+
     std::lock_guard<std::mutex> lock(mMtx);
     if(isConnected){
         mUrControl->disconnect();
         mUrRecieve->disconnect();
         isConnected = false;
         logstd("UR_Control: disconnect: robot disconnected!");
+    } else {
+        logstd("UR_Control: disconnect: robot already disconnected!");
     }
 }
 
