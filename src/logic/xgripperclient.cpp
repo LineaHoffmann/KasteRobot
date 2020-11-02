@@ -1,6 +1,7 @@
 #include "xgripperclient.hpp"
 
 xGripperClient::xGripperClient() {
+    mTRuntime.exchange(true);
     this->mT1 = new std::thread(&xGripperClient::entryThread, this);
 }
 
@@ -10,8 +11,8 @@ void xGripperClient::entryThread() {
     logstd("Gripper client thread started .. ");
     xGripperClient::connectSocket("192.168.0.1", 1000);
 
-    while (true) {
-        // Do something
+    while (mTRuntime.load()) {
+
     }
 }
 
@@ -32,6 +33,7 @@ void xGripperClient::connectSocket(std::string ipAddress, int port) {
 xGripperClient::~xGripperClient() {
     std::string bye = "BYE()\r";
     send(mSock, bye.c_str(), bye.size() +1, 0);
+    mTRuntime.exchange(false);
     mT1->join();
     delete mT1;
 

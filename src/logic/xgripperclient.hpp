@@ -20,6 +20,7 @@
 #include <thread>
 #include <mutex>
 #include <iostream>
+#include <atomic>
 
 class xGripperClient
 {
@@ -39,6 +40,7 @@ private:
     sockaddr_in mHint;
     std::thread* mT1;
     std::mutex mMtx;
+    std::atomic<bool> mTRuntime;
 
     std::thread *mWorker;
 
