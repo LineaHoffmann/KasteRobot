@@ -15,6 +15,7 @@
 #include <utility>
 #include <thread>
 #include <mutex>
+#include <tuple>
 
 #include <ctime> // For timestamp
 #include <sys/resource.h> // For resource use tracking

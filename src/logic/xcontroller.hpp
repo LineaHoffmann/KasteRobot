@@ -122,15 +122,18 @@ public:
             break;
         case ID_BTN_CAMERA_LOAD_DETECTOR_SETTINGS:
         {
-            if constexpr (std::is_same_v<T, std::pair<std::pair<long, long>, std::pair<double, double>>>) {
-                static_cast<std::pair<std::pair<long, long>, std::pair<double, double>>>(data);
+            if constexpr (std::is_same_v<T, std::tuple<long, long, float, float>>) {
+                static_cast<std::tuple<long, long, float, float>>(data);
                 std::stringstream s;
                 s.str(std::string()); // Reset the stringstream
-                s << "updating values for detector: " << data.first.first << " || " << data.first.second << " || " << data.second.first << " || " << data.second.second;
+                s << "Updating values for camera detector: "
+                  << std::get<0>(data) << " || "
+                  << std::get<1>(data) << " || "
+                  << std::get<2>(data) << " || "
+                  << std::get<3>(data);
                 logstd(s.str().c_str());
-                mImagehandler->ballColor(static_cast<int>(data.first.first), static_cast<int>(data.first.second)); //set what color ball we are looking for
-                mImagehandler->setMinMaxRadius(static_cast<float>(data.second.first), static_cast<float>(data.second.second)); //i cm
-
+                mImagehandler->ballColor(std::get<0>(data), std::get<1>(data)); //set what color ball we are looking for
+                mImagehandler->setMinMaxRadius(std::get<2>(data), std::get<3>(data)); //i cm
             }
         }
             break;

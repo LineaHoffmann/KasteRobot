@@ -584,20 +584,12 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         logstd("Camera->load new settings for ball detector");
         long hue, hueDelta;
         double min, max;
-        std::pair<int, int> color;
-        std::pair<float, float> size;
-        try {
-            mTxtCameraBallMax->GetValue().ToDouble(&max);
-            mTxtCameraBallMin->GetValue().ToDouble(&min);
-            mTxtCameraHue->GetValue().ToLong(&hue);
-            mTxtCameraHueDelta->GetValue().ToLong(&hueDelta);
-            color = {hue, hueDelta};
-            size = {min, max};
-        } catch ( const std::exception &e ) {
-            logwar(e.what());
-            return;
-        }
-        xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_LOAD_DETECTOR_SETTINGS, std::pair<std::pair<long, long>, std::pair<double, double>>(color, size));});
+        mTxtCameraBallMax->GetValue().ToDouble(&max);
+        mTxtCameraBallMin->GetValue().ToDouble(&min);
+        mTxtCameraHue->GetValue().ToLong(&hue);
+        mTxtCameraHueDelta->GetValue().ToLong(&hueDelta);
+        std::tuple<long, long, float, float> data(hue, hueDelta, min, max);
+        xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_LOAD_DETECTOR_SETTINGS, data);});
     }
         break;
     case ID_BTN_DATABASE_CONNECT:

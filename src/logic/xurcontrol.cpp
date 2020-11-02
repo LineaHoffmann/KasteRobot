@@ -58,7 +58,7 @@ xUrControl::~xUrControl()
 {
     //NOTE: make agreement as to whom calls these upon destruction.
     stopPolling();
-    mUrControl->disconnect();
+    mUrControl->disconnect();   // WARNING [srp]: SEGV here on destruction in debug?
 
     //check if pointer types exists and delete if they exists.
     if (mURStruct)              {delete mURStruct;}
