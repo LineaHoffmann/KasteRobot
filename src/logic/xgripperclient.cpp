@@ -30,6 +30,8 @@ void xGripperClient::connectSocket(std::string ipAddress, int port) {
     }
 
 xGripperClient::~xGripperClient() {
+    std::string bye = "BYE()\r";
+    send(mSock, bye.c_str(), bye.size() +1, 0);
     mT1->join();
     delete mT1;
 
@@ -37,7 +39,7 @@ xGripperClient::~xGripperClient() {
 
 
 std::string xGripperClient::writeRead(std::string command) {
-    mCommand = command;
+    mCommand = command + "\r";
     char buf[32];
     int bytesRecieved = 0; //Resetting response length
     send(mSock, mCommand.c_str(), mCommand.size() + 1, 0); // Sending command
