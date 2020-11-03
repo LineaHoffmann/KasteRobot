@@ -173,6 +173,7 @@ void xUrControl::disconnect()
 
     std::lock_guard<std::mutex> lock(mMtx);
     if(isConnected){
+        mUrControl->stopScript();
         mUrControl->disconnect();
         mUrRecieve->disconnect();
         isConnected = false;
@@ -197,7 +198,7 @@ void xUrControl::move()
     try{
         if (mMoveMode == HOME) {
             logstd("MOVE_HOME: move commenced!");
-            mUrControl->moveL_FK(HOMEQ, speed, acc);
+            if(!mUrControl->moveL_FK(HOMEQ, speed, acc)){mUrControl->reuploadScript();}
         } else if (mMoveMode == PICKUP)  {
             logstd("MOVE_PICKUP: move commenced!");
             mUrControl->moveL_FK(PICKUPQ, speed, acc);
@@ -252,7 +253,7 @@ void xUrControl::move()
         }
     } catch (std::exception &e){
         logerr(e.what());
-        mUrControl->stopScript();
+        mUrControl->reuploadScript();
     }
     //reset params for move function
     delete q;
