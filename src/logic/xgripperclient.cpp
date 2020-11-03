@@ -27,7 +27,13 @@ void xGripperClient::connectSocket(std::string ipAddress, int port) {
     mHint.sin_port = htons(mPort);
     inet_pton(AF_INET, mIpAddress.c_str(), &mHint.sin_addr);
 
-    std::cout << connect(mSock, (sockaddr*)&mHint, sizeof(mHint)) << std::endl;
+    if (connect(mSock, (sockaddr*)&mHint, sizeof(mHint) == 0)) {
+    std::cout << "Gripper client connected" << std::endl;
+    }
+    else {
+        std::cout << "Gripper connection failed" <<std::endl;
+    }
+
 }
 
 xGripperClient::~xGripperClient() {
@@ -48,17 +54,18 @@ std::string xGripperClient::writeRead(std::string command) {
     send(mSock, mCommand.c_str(), mCommand.size() + 1, 0); // Sending command
 
 
-    //memset(buf, 0, 32);
+    memset(buf, 0, 32);
     bytesRecieved = recv(mSock, buf, 32, 0); //Reading response
     std::string mAnswer(buf);
     std::cout << mAnswer << std::endl;
 
 
 
-    //memset(buf, 0, 32);
+    memset(buf, 0, 32);
     bytesRecieved = recv(mSock, buf, 32, 0); //Reading response
     std::string test(buf);
     std::cout << test << std::endl;
+
 
 
     return mAnswer;
