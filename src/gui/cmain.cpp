@@ -374,7 +374,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     Centre(wxBOTH);
 
     // Starting timers
-    mTimerView1.Start(500);
+    mTimerView1.Start(40);
     mTimerInfo.Start(1000);
 
     // Starting with expanded treelist

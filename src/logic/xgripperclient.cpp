@@ -9,7 +9,7 @@ xGripperClient::xGripperClient() {
 void xGripperClient::entryThread() {
 
     logstd("Gripper client thread started .. ");
-    xGripperClient::connectSocket("192.168.0.1", 1000);
+    xGripperClient::connectSocket("192.168.100.10", 1000);
 
     while (mTRuntime.load()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
