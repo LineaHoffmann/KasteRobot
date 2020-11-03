@@ -88,6 +88,11 @@ bool xGripperClient::writeRead(std::string command) {
     logstd(test.c_str());
     return true;
 
+<<<<<<< Updated upstream
+=======
+
+    return mAnswer;
+>>>>>>> Stashed changes
 }
 
 
