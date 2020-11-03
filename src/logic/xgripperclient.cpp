@@ -9,7 +9,7 @@ xGripperClient::xGripperClient() {
 void xGripperClient::entryThread() {
 
     logstd("Gripper client thread started .. ");
-    xGripperClient::connectSocket("192.168.100.10", 1000);
+    xGripperClient::connectSocket("localhost", 1000);
 
     while (mTRuntime.load()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -36,17 +36,37 @@ void xGripperClient::connectSocket(std::string ipAddress, int port) {
 
 }
 
+void xGripperClient::disconnectGripper() {
+    if (connect(mSock, (sockaddr*)&mHint, sizeof(mHint) == 0)) {
+    send(mSock, mDisconnectCmd.c_str(), 7, 0);
+    logstd("Disconnected");
+    }
+    else {
+        logstd("No connection to disconnect");
+    }
+}
+
 xGripperClient::~xGripperClient() {
-    std::string bye = "BYE()\n";
-    send(mSock, bye.c_str(), bye.size() +1, 0);
+    disconnectGripper();
     mTRuntime.exchange(false);
     mT1->join();
     delete mT1;
 
 }
 
+void xGripperClient::grip() {
+    xGripperClient::writeRead("GRIP()");
+}
 
-std::string xGripperClient::writeRead(std::string command) {
+void xGripperClient::release() {
+    xGripperClient::writeRead("RELEASE()");
+}
+
+void xGripperClient::home() {
+    xGripperClient::writeRead("HOME()");
+}
+
+void xGripperClient::writeRead(std::string command) {
     mCommand = command + "\n";
     std::cout << mCommand << std::endl;
     char buf[32];
@@ -55,18 +75,14 @@ std::string xGripperClient::writeRead(std::string command) {
 
 
     memset(buf, 0, 32);
-    bytesRecieved = recv(mSock, buf, 32, 0); //Reading response
+    bytesRecieved = read(mSock, buf, 32); //Reading response
     std::string mAnswer(buf);
     std::cout << mAnswer << std::endl;
 
 
 
     memset(buf, 0, 32);
-    bytesRecieved = recv(mSock, buf, 32, 0); //Reading response
+    bytesRecieved = read(mSock, buf, 32); //Reading response
     std::string test(buf);
     std::cout << test << std::endl;
-
-
-
-    return mAnswer;
 }

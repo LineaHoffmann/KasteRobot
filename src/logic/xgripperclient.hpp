@@ -27,7 +27,11 @@ class xGripperClient
 public:
     xGripperClient();
     ~xGripperClient();
-    std::string writeRead(std::string mCommand);
+    void writeRead(std::string mCommand);
+    void disconnectGripper();
+    void grip();
+    void release();
+    void home();
 
 private:
     void connectSocket(std::string ipAddress, int port);
@@ -37,6 +41,7 @@ private:
 private:
     int mSock, mConnectS, mPort;
     std::string mIpAddress, mCommand, mUserInput, mAnswer;
+    std::string mDisconnectCmd = "BYE()\n";
     sockaddr_in mHint;
     std::thread* mT1;
     std::mutex mMtx;

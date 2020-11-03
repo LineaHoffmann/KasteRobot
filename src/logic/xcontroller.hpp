@@ -163,6 +163,26 @@ public:
             }
         }
             break;
+        case ID_BTN_GRIPPER_DISCONNECT:
+        {
+            mGripper->disconnectGripper();
+        }
+            break;
+        case ID_BTN_GRIPPER_GRIP:
+        {
+            mGripper->grip();
+        }
+            break;
+        case ID_BTN_GRIPPER_RELEASE:
+        {
+            mGripper->release();
+        }
+            break;
+       case ID_BTN_GRIPPER_HOME:
+        {
+            mGripper->home();
+        }
+            break;
         case ID_BTN_TESTING_XYZ_VVA:
             logstd("XYZ_VVA from xController ..");
             try {
