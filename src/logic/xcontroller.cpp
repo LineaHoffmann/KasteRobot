@@ -10,7 +10,7 @@ xController::xController()
     mImagehandler = std::make_shared<ximageHandler>(cv::imread("../resources/testImg.png"));
     mImagehandler->ballColor(10, 20); //set what color ball we are looking for
     mImagehandler->setMinMaxRadius(1.7, 2.3); //i cm
-    mImagehandler->setRobotBase(42.2, 8.8); //i cm
+    mImagehandler->setRobotBase(42.5, 9.5); //i cm
     mImagehandler->showResult = true;
 
 
@@ -20,9 +20,13 @@ xController::xController()
 
 
     // Robot
+    std::vector<std::vector<double>> q{{0,-1.5,0,-1.5,-1,0}};
+    double spd{0.5}, acc{0.5};
+
     try {
         mRobot = std::make_shared<xUrControl>();
         //mRobot->setConnect("127.0.0.1");
+        //mRobot->setMove(q, spd, acc,xUrControl::moveEnum::MOVE_JLIN);
     } catch (x_err::error& e) {
         std::string s = "[ROBOT] ";
         s.append(e.what());

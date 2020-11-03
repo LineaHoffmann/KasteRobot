@@ -36,6 +36,14 @@ struct UR_STRUCT {
 
 class xUrControl
 {
+    //Static pre-defines positions.
+    inline static const std::vector<double> HOMEQ{-1.15192, -1.5708,0,-1.5708,1.5708,0};
+    inline static const std::vector<double> PICKUPQ{-1.15192, -1.93487201,-2.09230071
+                                                    ,-0.733038,1.359437,0};
+
+    inline static const double SPEED_DEF{0.5};
+    inline static const double ACC_DEF {0.5};
+
 
 public:
     xUrControl();
@@ -47,10 +55,11 @@ public:
     void setDisconnect();
 
     //move ENUM
-    enum moveEnum {MOVE_JLIN, MOVE_JPATH, MOVE_LFK, MOVE_TLIN, SERVOJ, SPEEDJ}; // WARNING: Update Enums to fit code, before final export:
+    enum moveEnum {MOVE_JLIN, MOVE_JPATH, MOVE_JIK, MOVE_LFK, MOVE_L, MOVE_TLIN, SERVOJ, SPEEDJ, HOME, PICKUP}; // WARNING: Update Enums to fit code, before final export:
 
     //move function to access private move functions of UR_RTDE
-    void setMove(std::vector<std::vector<double>> &q, double &acc, double &speed, xUrControl::moveEnum moveMode);
+    void setMove(std::vector<std::vector<double> > q, double &acc, double &speed, xUrControl::moveEnum moveMode);
+    void setMove(xUrControl::moveEnum moveMode);
 
     //read current pose in rads or deg
     std::vector<double> getCurrentPose();

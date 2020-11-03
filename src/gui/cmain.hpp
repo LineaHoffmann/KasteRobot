@@ -140,6 +140,8 @@ private:
     wxButton *mBtnRobotUpdate;
     wxButton *mBtnRobotSendCmd;
     wxButton *mBtnRobotSendPos;
+    wxButton *mBtnRobotSendHome;
+    wxButton *mBtnRobotSendPickup;
     wxTextCtrl *mTxtRobotIP;
     wxTextCtrl *mTxtRobotPort;
     wxTextCtrl *mTxtRobotCmd;

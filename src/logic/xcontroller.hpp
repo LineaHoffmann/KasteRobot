@@ -80,6 +80,24 @@ public:
                 return;
             }
 
+        case ID_BTN_ROBOT_SEND_HOME:
+            logstd("Robot Moving to home from xController");
+            try{
+                mRobot->setMove(xUrControl::HOME);
+            }catch(const std::exception &e) {
+                logwar (e.what());
+            }
+            break;
+
+        case ID_BTN_ROBOT_SEND_PICKUP:
+            logstd("Robot Moving to Pickup from xController");
+            try {
+                mRobot->setMove(xUrControl::PICKUP);
+            } catch (const std::exception &e) {
+                logwar (e.what());
+            }
+            break;
+
         //NOTE: CAMERA buttons implementation
         case ID_BTN_CAMERA_START:
             logstd("updating values and starting the camera ..");

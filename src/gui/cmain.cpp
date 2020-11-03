@@ -133,35 +133,37 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mTreeRootCamera = new wxTreeListItem(mTreeList->AppendItem(root, "Camera"));
     mTreeRootGripper = new wxTreeListItem(mTreeList->AppendItem(root, "Gripper"));
     mTreeRootDatabase = new wxTreeListItem(mTreeList->AppendItem(root, "Database"));
-    // Sub levels - Robot
+    //INDEX: Sub levels - Robot
     mTreeRobotState = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootRobot, "State"));
     mTreeRobotIP = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootRobot, "IP"));
     mTreeRobotPort = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootRobot, "Port"));
     mTreeRobotPosition = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootRobot, "Position"));
-    // Sub levels - Camera
+    //INDEX: Sub levels - Camera
     mTreeCameraState = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootCamera, "State"));
     mTreeCameraExposure = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootCamera, "Exposure Time"));
     mTreeCameraFramerate = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootCamera, "Framerate"));
     mTreeCameraCalibrationPath = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootCamera, "Calibration Path"));
-    // Sub levels - Gripper
+    //INDEX: Sub levels - Gripper
     mTreeGripperState = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootGripper, "State"));
     mTreeGripperIP = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootGripper, "IP"));
     mTreeGripperPort = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootGripper, "Port"));
     mTreeGripperWidth = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootGripper, "Width"));
-    // Sub levels - Database
+    //INDEX: Sub levels - Database
     mTreeDatabaseState = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootDatabase, "State"));
     mTreeDatabaseIP = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootDatabase, "IP"));
     mTreeDatabasePort = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootDatabase, "Port"));
     mTreeDatabaseName = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootDatabase, "Name"));
     mTreeDatabaseSchema = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootDatabase, "Schema"));
 
-    // Robot tab building - Buttons
+    //INDEX: Robot tab building - Buttons
     mBtnRobotConnect = new wxButton(mNotebookRobot, ID_BTN_ROBOT_CONNECT, "Connect");
     mBtnRobotDisconnect = new wxButton(mNotebookRobot, ID_BTN_ROBOT_DISCONNECT, "Disconnect");
     mBtnRobotUpdate = new wxButton(mNotebookRobot, ID_BTN_ROBOT_UPDATE, "Update");
     mBtnRobotSendCmd = new wxButton(mNotebookRobot, ID_BTN_ROBOT_SEND_CMD, "Send CMD");
     mBtnRobotSendPos = new wxButton(mNotebookRobot, ID_BTN_ROBOT_SEND_POS, "Send Pos");
-    // Robot tab building - Text controls
+    mBtnRobotSendHome = new wxButton(mNotebookRobot, ID_BTN_ROBOT_SEND_HOME, "HOME");
+    mBtnRobotSendPickup = new wxButton(mNotebookRobot, ID_BTN_ROBOT_SEND_PICKUP, "PICKUP");
+    //INDEX: Robot tab building - Text controls
     mTxtRobotIP = new wxTextCtrl(mNotebookRobot, wxID_ANY, "127.0.0.1");
     mTxtRobotCmd = new wxTextCtrl(mNotebookRobot, wxID_ANY, "Enter Commands here");
     mTxtRobotX = new wxTextCtrl(mNotebookRobot, wxID_ANY, "X");
@@ -189,6 +191,8 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mSizerNotebookRobot->Add(mBtnRobotUpdate, wxGBPosition(1, 2), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
     mSizerNotebookRobot->Add(mBtnRobotSendCmd, wxGBPosition(0, 0), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
     mSizerNotebookRobot->Add(mBtnRobotSendPos, wxGBPosition(3, 0), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(mBtnRobotSendHome, wxGBPosition(4, 0), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookRobot->Add(mBtnRobotSendPickup, wxGBPosition(5, 0), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
     mSizerNotebookRobot->Add(mTxtRobotIP, wxGBPosition(1, 3), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookRobot->Add(mTxtRobotCmd, wxGBPosition(0, 1), wxGBSpan(1, 4), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookRobot->Add(mTxtRobotX, wxGBPosition(2, 2), wxGBSpan(1, 1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
@@ -374,7 +378,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     Centre(wxBOTH);
 
     // Starting timers
-    mTimerView1.Start(500);
+    mTimerView1.Start(40);
     mTimerInfo.Start(1000);
 
     // Starting with expanded treelist
@@ -510,6 +514,14 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
     case ID_BTN_ROBOT_SEND_POS:
         logstd("Robot->Send Position clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_SEND_POS);});
+        break;
+    case ID_BTN_ROBOT_SEND_HOME:
+        logstd("Robot->Send Home clicked");
+        xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_SEND_HOME);});
+        break;
+    case ID_BTN_ROBOT_SEND_PICKUP:
+        logstd("Robot->Send Pickup clicked");
+        xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_SEND_PICKUP);});
         break;
     case ID_BTN_GRIPPER_CONNECT:
         logstd("Gripper->Connect clicked");
