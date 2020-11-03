@@ -1,6 +1,7 @@
 def init():
 	textmsg("init commencing")
 	set_payload_mass(1.25)
-	set_tcp(p[0.,0.,.2,0.,0.,0.])
+	set_payload_CoG([0,0,.2])
+	set_tcp(p[0.,0.,.19,0.,0.,0.])
 	textmsg("init stopping")
 end
