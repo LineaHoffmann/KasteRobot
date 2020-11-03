@@ -515,7 +515,29 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         break;
     case ID_BTN_ROBOT_SEND_POS:
         logstd("Robot->Send Position clicked");
-        xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_SEND_POS);});
+        {
+        std::string s; //NOTE debugging purpose
+        std::vector<double> q;
+        double d;
+        mTxtRobotX->GetValue().ToDouble(&d);
+        q.push_back(d);
+        mTxtRobotY->GetValue().ToDouble(&d);
+        q.push_back(d);
+        mTxtRobotZ->GetValue().ToDouble(&d);
+        q.push_back(d);
+        mTxtRobotRX->GetValue().ToDouble(&d);
+        q.push_back(d);
+        mTxtRobotRY->GetValue().ToDouble(&d);
+        q.push_back(d);
+        mTxtRobotRZ->GetValue().ToDouble(&d);
+        q.push_back(d);
+
+//        for(double d : q) {
+//            s.append( std::to_string(d) + " | ");
+//        }
+//        logstd(s.c_str());
+        xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_SEND_POS, q);});
+        }
         break;
     case ID_BTN_ROBOT_SEND_HOME:
         logstd("Robot->Send Home clicked");

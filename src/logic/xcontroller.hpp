@@ -69,6 +69,29 @@ public:
                 return;
             }
 
+        case ID_BTN_ROBOT_SEND_POS:
+            logstd("Robot send pos from xController");
+        {
+            std::string s;
+            std::vector<std::vector<double>> q;
+            if constexpr (std::is_same_v<T, std::vector<double>>){
+                static_cast<std::vector<double>>(data);
+
+                q.push_back(data);
+
+                for (int i = 0; i < data.size(); ++i) {
+                    s.append(std::to_string(q[0].at(i)) + " | ");
+                }
+                logstd(s.c_str());
+
+                try {
+                mRobot->setMove(xUrControl::moveEnum::MOVE_L,q);
+                } catch (const std::exception &e) {
+                    logerr(e.what());
+                }
+            }
+        }
+            break;
 
         case ID_BTN_ROBOT_DISCONNECT:
             logstd("Robot disconnect from xController");
@@ -99,7 +122,7 @@ public:
             break;
 
         //NOTE: CAMERA buttons implementation
-        case ID_BTN_CAMERA_START:
+        case ID_BTN_CAMERA_START: //
             logstd("updating values and starting the camera ..");
             if constexpr (std::is_same_v<T, std::pair<double, uint64_t>>) {
                 static_cast<std::pair<double, uint64_t>>(data);

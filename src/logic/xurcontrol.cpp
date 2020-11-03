@@ -72,6 +72,7 @@ xUrControl::~xUrControl()
     mUrControl->disconnect();   // WARNING [srp]: SEGV here on destruction in debug?
 
     //check if pointer types exists and delete if they exists.
+    delete mDetector;
     if (mURStruct)              {delete mURStruct;}
     if (mJoints)                {delete mJoints;}
     if (mThreadData)            {delete mThreadData;}
@@ -81,7 +82,9 @@ xUrControl::~xUrControl()
 
 void xUrControl::setConnect(std::string IP)
 {
-    {std::lock_guard<std::mutex> ipLock(mMtx);
+    {
+    std::lock_guard<std::mutex> ipLock(mMtx);
+    logstd(mIP.c_str());
     mIP = IP;
     }
     mConnect = true;
@@ -94,7 +97,34 @@ void xUrControl::setDisconnect()
     logstd("[ROBOT]: SetDisconnect flag succesfull");
 }
 
-void xUrControl::setMove(std::vector<std::vector<double> > q, double &acc, double &speed, xUrControl::moveEnum moveMode)
+void xUrControl::setMove(xUrControl::moveEnum moveMode){
+    this->acc = ACC_DEF;
+    this->speed = SPEED_DEF;
+    this->mMoveMode = moveMode;
+
+    mMove = true;
+    logstd("[ROBOT]: SetMove flag succesfull");
+}
+
+void xUrControl::setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<double> > q)
+{
+    {
+        std::lock_guard<std::mutex> setMoveLock(mMtx);
+        this->q = new std::vector<std::vector<double>>(q);
+//        if(!mDetector->checkCollision(q[0])){    //TODO Mikkel, please make a check on the vector
+//            logerr("bad pose");
+//            return;
+//        };
+    }
+    this->acc = ACC_DEF;
+    this->speed = SPEED_DEF;
+    this->mMoveMode = moveMode;
+
+    mMove = true;
+    logstd("[ROBOT]: SetMove flag succesfull");
+}
+
+void xUrControl::setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<double> > q, double acc, double speed)
 {
     {
         std::lock_guard<std::mutex> setMoveLock(mMtx);
@@ -108,14 +138,6 @@ void xUrControl::setMove(std::vector<std::vector<double> > q, double &acc, doubl
     logstd("[ROBOT]: SetMove flag succesfull");
 }
 
-void xUrControl::setMove(xUrControl::moveEnum moveMode){
-    this->acc = ACC_DEF;
-    this->speed = SPEED_DEF;
-    this->mMoveMode = moveMode;
-
-    mMove = true;
-    logstd("[ROBOT]: SetMove flag succesfull");
-}
 
 /**
  * @brief connect tries to connect to robot meanwhile constructing the objects of ur_RTDE
@@ -128,11 +150,16 @@ void xUrControl::connect(std::string IP){
     if(mUrRecieve && mUrControl && !isConnected){
         mUrControl->reconnect();
         mUrRecieve->reconnect();
+        mUrControl->reuploadScript();
+
         isConnected = true;
+
         logstd("Robot->Reconnected!");
     }
 
+    logstd(IP.c_str());
     try {
+        logstd("[ROBOT] initializing");
         initRobot(IP);
     } catch (const x_err::error &e) {
         throw;
@@ -159,7 +186,9 @@ void xUrControl::connect(std::string IP){
             isConnected = true;
 
         } catch (std::exception &e) {
-            throw x_err::error(e.what());
+            std::string s = "[ROBOT] RTDE Control: ";
+            s.append(e.what());
+            throw x_err::error(s.c_str());
         };
     }
 }
@@ -173,7 +202,6 @@ void xUrControl::disconnect()
 
     std::lock_guard<std::mutex> lock(mMtx);
     if(isConnected){
-        mUrControl->stopScript();
         mUrControl->disconnect();
         mUrRecieve->disconnect();
         isConnected = false;
@@ -198,10 +226,13 @@ void xUrControl::move()
     try{
         if (mMoveMode == HOME) {
             logstd("MOVE_HOME: move commenced!");
-            if(!mUrControl->moveL_FK(HOMEQ, speed, acc)){mUrControl->reuploadScript();}
+            if(!mUrControl->moveJ(HOMEQ, speed, acc)){
+                logerr("Move home bad");
+                mUrControl->reuploadScript();
+            }
         } else if (mMoveMode == PICKUP)  {
             logstd("MOVE_PICKUP: move commenced!");
-            mUrControl->moveL_FK(PICKUPQ, speed, acc);
+            mUrControl->moveL(PICKUPQ, speed, acc);
         }
         else {
         /*NOTE: if robot is connected, switch statement will choose correct movefunction to execute!
@@ -333,6 +364,8 @@ void xUrControl::init()
     //datasharing struct
     mURStruct = new UR_STRUCT;
     isConnected = false;
+    mDetector = new xCollisionDetector;
+
 }
 
 /**
