@@ -18,8 +18,8 @@ void xGripperClient::entryThread() {
 
 
 void xGripperClient::connectSocket(std::string ipAddress, int port) {
-    int mSock = socket(AF_INET, SOCK_STREAM, 0);
-    int mPort = port;
+    mSock = socket(AF_INET, SOCK_STREAM, 0);
+    mPort = port;
     std::string mIpAddress = ipAddress;
 
     sockaddr_in mHint;
@@ -27,11 +27,11 @@ void xGripperClient::connectSocket(std::string ipAddress, int port) {
     mHint.sin_port = htons(mPort);
     inet_pton(AF_INET, mIpAddress.c_str(), &mHint.sin_addr);
 
-    connect(mSock, (sockaddr*)&mHint, sizeof(mHint));
-    }
+    std::cout << connect(mSock, (sockaddr*)&mHint, sizeof(mHint)) << std::endl;
+}
 
 xGripperClient::~xGripperClient() {
-    std::string bye = "BYE()\r";
+    std::string bye = "BYE()\n";
     send(mSock, bye.c_str(), bye.size() +1, 0);
     mTRuntime.exchange(false);
     mT1->join();
@@ -41,17 +41,25 @@ xGripperClient::~xGripperClient() {
 
 
 std::string xGripperClient::writeRead(std::string command) {
-    mCommand = command + "\r";
+    mCommand = command + "\n";
+    std::cout << mCommand << std::endl;
     char buf[32];
     int bytesRecieved = 0; //Resetting response length
     send(mSock, mCommand.c_str(), mCommand.size() + 1, 0); // Sending command
 
-    memset(buf, 0, 32);
+
+    //memset(buf, 0, 32);
     bytesRecieved = recv(mSock, buf, 32, 0); //Reading response
-        if (bytesRecieved == 0) {              //Waiting and retrying if no response
-            bytesRecieved = recv(mSock, buf, 32, 0);
-            usleep(250000);  //Microseconds; 0,25 second
-        }
-     std::string mAnswer(buf);
-     return mAnswer;
+    std::string mAnswer(buf);
+    std::cout << mAnswer << std::endl;
+
+
+
+    //memset(buf, 0, 32);
+    bytesRecieved = recv(mSock, buf, 32, 0); //Reading response
+    std::string test(buf);
+    std::cout << test << std::endl;
+
+
+    return mAnswer;
 }
