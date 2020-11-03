@@ -17,7 +17,7 @@
 <!--Work area-->
 	<Drawable name="Environment" refframe="WORLD">
      <RPY>90 0.0 90.0</RPY><Pos>0.0 0.0 0.0</Pos>
-      <Polytope file = "Workcell_semester3 v13.stl"/> 
+      <Polytope file = "Workcell.stl"/> 
     </Drawable>
 	
 
