@@ -55,10 +55,10 @@ public:
     void setDisconnect();
 
     //move ENUM
-    enum moveEnum {MOVE_JLIN, MOVE_JPATH, MOVE_LFK, MOVE_TLIN, SERVOJ, SPEEDJ, HOME, PICKUP}; // WARNING: Update Enums to fit code, before final export:
+    enum moveEnum {MOVE_JLIN, MOVE_JPATH, MOVE_JIK, MOVE_LFK, MOVE_L, MOVE_TLIN, SERVOJ, SPEEDJ, HOME, PICKUP}; // WARNING: Update Enums to fit code, before final export:
 
     //move function to access private move functions of UR_RTDE
-    void setMove(std::vector<std::vector<double>> &q, double &acc, double &speed, xUrControl::moveEnum moveMode);
+    void setMove(std::vector<std::vector<double> > q, double &acc, double &speed, xUrControl::moveEnum moveMode);
     void setMove(xUrControl::moveEnum moveMode);
 
     //read current pose in rads or deg

@@ -20,10 +20,13 @@ xController::xController()
 
 
     // Robot
+    std::vector<std::vector<double>> q{{0,-1.5,0,-1.5,-1,0}};
+    double spd{0.5}, acc{0.5};
+
     try {
         mRobot = std::make_shared<xUrControl>();
-        mRobot->setConnect("127.0.0.1");
-        mRobot->setMove(xUrControl::moveEnum::HOME);
+        //mRobot->setConnect("127.0.0.1");
+        //mRobot->setMove(q, spd, acc,xUrControl::moveEnum::MOVE_JLIN);
     } catch (x_err::error& e) {
         std::string s = "[ROBOT] ";
         s.append(e.what());
