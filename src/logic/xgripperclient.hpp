@@ -27,7 +27,7 @@ class xGripperClient
 public:
     xGripperClient();
     ~xGripperClient();
-    void writeRead(std::string mCommand);
+    bool writeRead(std::string mCommand);
     void disconnectGripper();
     void grip();
     void release();

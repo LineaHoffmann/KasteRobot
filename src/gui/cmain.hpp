@@ -174,6 +174,7 @@ private:
     wxButton *mBtnGripperRelease;
     wxButton *mBtnGripperGrip;
     wxButton *mBtnGripperSendCmd;
+    wxButton *mBtnGripperHome;
     wxTextCtrl *mTxtGripperIP;
     wxTextCtrl *mTxtGripperPort;
     wxTextCtrl *mTxtGripperCmd;

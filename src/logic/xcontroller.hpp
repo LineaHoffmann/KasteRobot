@@ -166,21 +166,25 @@ public:
         case ID_BTN_GRIPPER_DISCONNECT:
         {
             mGripper->disconnectGripper();
+            logstd("Gripper disconnected");
         }
             break;
         case ID_BTN_GRIPPER_GRIP:
         {
             mGripper->grip();
+            logstd("Gripper grip object");
         }
             break;
         case ID_BTN_GRIPPER_RELEASE:
         {
             mGripper->release();
+            logstd("Gripper released object");
         }
             break;
        case ID_BTN_GRIPPER_HOME:
         {
             mGripper->home();
+            logstd("Gripper homed");
         }
             break;
         case ID_BTN_TESTING_XYZ_VVA:

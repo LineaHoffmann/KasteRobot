@@ -266,6 +266,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mBtnGripperRelease = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_RELEASE, "Release");
     mBtnGripperGrip = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_GRIP, "Grip");
     mBtnGripperSendCmd = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_SEND_CMD, "Send cmd");
+    mBtnGripperHome = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_HOME, "Home");
     // Gripper tab building - Text controls
     mTxtGripperIP = new wxTextCtrl(mNotebookGripper, wxID_ANY, "IP");
     mTxtGripperPort = new wxTextCtrl(mNotebookGripper, wxID_ANY, "Port");
@@ -282,7 +283,8 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mSizerNotebookGripper->Add( mBtnGripperUpdate, wxGBPosition( 1, 2 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookGripper->Add( mBtnGripperRelease, wxGBPosition( 3, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookGripper->Add( mBtnGripperGrip, wxGBPosition( 3, 1 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-    mSizerNotebookGripper->Add( mBtnGripperSendCmd, wxGBPosition( 4, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookGripper->Add( mBtnGripperSendCmd, wxGBPosition( 4, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );    
+    mSizerNotebookGripper->Add( mBtnGripperHome, wxGBPosition( 3, 2 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookGripper->Add( mTxtGripperIP, wxGBPosition( 1, 3 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookGripper->Add( mTxtGripperPort, wxGBPosition( 1, 4 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookGripper->Add( mTxtGripperCmd, wxGBPosition( 4, 1 ), wxGBSpan( 1, 4 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
@@ -550,6 +552,13 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         std::string cmd = mTxtGripperCmd->GetValue().ToStdString();
         xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_SEND_CMD, cmd);});
     }
+        break;
+    case ID_BTN_GRIPPER_HOME:
+        {
+        logstd("Gripper->Home clicked");
+
+        xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_HOME);});
+        }
         break;
     case ID_BTN_CAMERA_START:
     {

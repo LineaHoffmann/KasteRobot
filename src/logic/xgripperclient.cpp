@@ -9,7 +9,7 @@ xGripperClient::xGripperClient() {
 void xGripperClient::entryThread() {
 
     logstd("Gripper client thread started .. ");
-    xGripperClient::connectSocket("localhost", 1000);
+    xGripperClient::connectSocket("192.168.100.10", 1000);
 
     while (mTRuntime.load()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -22,16 +22,15 @@ void xGripperClient::connectSocket(std::string ipAddress, int port) {
     mPort = port;
     std::string mIpAddress = ipAddress;
 
-    sockaddr_in mHint;
     mHint.sin_family = AF_INET;
     mHint.sin_port = htons(mPort);
     inet_pton(AF_INET, mIpAddress.c_str(), &mHint.sin_addr);
 
-    if (connect(mSock, (sockaddr*)&mHint, sizeof(mHint) == 0)) {
-    std::cout << "Gripper client connected" << std::endl;
+    if (connect(mSock, (sockaddr*)&mHint, sizeof(mHint)) == 0) {
+    logstd("Gripper client connected");
     }
     else {
-        std::cout << "Gripper connection failed" <<std::endl;
+        logstd("Gripper connection failed");
     }
 
 }
@@ -66,23 +65,38 @@ void xGripperClient::home() {
     xGripperClient::writeRead("HOME()");
 }
 
-void xGripperClient::writeRead(std::string command) {
+bool xGripperClient::writeRead(std::string command) {
     mCommand = command + "\n";
     std::cout << mCommand << std::endl;
     char buf[32];
     int bytesRecieved = 0; //Resetting response length
-    send(mSock, mCommand.c_str(), mCommand.size() + 1, 0); // Sending command
+    send(mSock, mCommand.c_str(), mCommand.size(), 0); // Sending command
 
 
     memset(buf, 0, 32);
     bytesRecieved = read(mSock, buf, 32); //Reading response
     std::string mAnswer(buf);
-    std::cout << mAnswer << std::endl;
-
+    logstd(mAnswer.c_str());
+    if (mAnswer[0] == 'E') {
+        return false;
+    }
 
 
     memset(buf, 0, 32);
     bytesRecieved = read(mSock, buf, 32); //Reading response
     std::string test(buf);
-    std::cout << test << std::endl;
+    logstd(test.c_str());
+    return true;
+
 }
+
+
+
+
+
+
+
+
+
+
+
