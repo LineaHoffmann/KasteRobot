@@ -141,7 +141,7 @@ public:
         {
             if constexpr (std::is_same_v<T, std::string>) {
                 static_cast<std::string>(data);
-                //mGripper->writeRead(data);
+                mGripper->writeRead(data);
             }
         }
             break;

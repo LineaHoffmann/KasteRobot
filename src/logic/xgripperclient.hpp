@@ -27,10 +27,10 @@ class xGripperClient
 public:
     xGripperClient();
     ~xGripperClient();
+    std::string writeRead(std::string mCommand);
 
 private:
     void connectSocket(std::string ipAddress, int port);
-    std::string writeRead(std::string mCommand);
     void entryThread();
     void startThread();
 
