@@ -89,7 +89,7 @@ void xController::testDetectAndPickUp()
         } catch (const x_err::error &e){
             logerr("Pickup pos failed");
         }
-        mGripper->home();
+        //mGripper->home();
 
         std::vector<double> pickupPosition = xMath::ball_position_to_robotframe(ballResult);
 
@@ -105,7 +105,7 @@ void xController::testDetectAndPickUp()
         }
 
         logstd("grip object...");
-        mGripper->grip();
+        //mGripper->grip();
 
         logstd("moving robot to throwing position");
         //flyt robotten til hjem position eller evt en prepickup position
@@ -115,8 +115,6 @@ void xController::testDetectAndPickUp()
         } catch (const x_err::error &e){
             logerr("homing failed");
         }
-        //mRobot->move()
-        //mRobot->HOME();  Jacob fix :D
 
         logstd("Sequenze succesfull");
         return;

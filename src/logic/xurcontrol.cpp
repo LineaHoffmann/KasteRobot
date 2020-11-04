@@ -36,6 +36,7 @@ void xUrControl::entryThread()
                 logerr(s.c_str());
                 mConnect = false;
             }
+            startPolling();
         }
 
         if (mDisconnect) {
@@ -213,7 +214,7 @@ void xUrControl::disconnect()
 
 std::atomic<bool> xUrControl::getIsBusy() const
 {
-    return mIsBusy.load();
+    return mMove.load();
 }
 
 std::atomic<int> xUrControl::getPollingRate() const
@@ -229,15 +230,23 @@ void xUrControl::move()
     }
 
     try{
+        mIsBusy = true;
         if (mMoveMode == HOME) {
             logstd("MOVE_HOME: move commenced!");
-            if(!mUrControl->moveJ(HOMEQ, speed, acc)){
+            if(mUrControl->moveJ(HOMEQ, speed, acc)){
+                logstd("MOVE_HOME: Completed");
+            }else{
                 logerr("Move home bad");
                 mUrControl->reuploadScript();
             }
         } else if (mMoveMode == PICKUP)  {
             logstd("MOVE_PICKUP: move commenced!");
-            mUrControl->moveL(PICKUPQ, speed, acc);
+            if (mUrControl->moveL(PICKUPQ, speed, acc)){
+                logstd("MOVE_PICKUP: Completed");
+            } else {
+                logerr("Move home bad");
+                mUrControl->reuploadScript();
+            }
         }
         else {
         /*NOTE: if robot is connected, switch statement will choose correct movefunction to execute!
@@ -353,8 +362,8 @@ void xUrControl::getData()
         mURStruct->isConnected = mUrRecieve->isConnected();
         mURStruct->pose = mUrRecieve->getActualTCPPose();
 
-        mIsBusy = (mUrRecieve->getRobotStatus() == 1) ? true : false;
-        std::cout << mIsBusy << std::endl;
+//        mIsBusy = (mUrRecieve->getRobotStatus() == 1) ? true : false;
+//        std::cout << mUrRecieve->getRobotMode() << std::endl;
 
         } //lock scope ends
 
