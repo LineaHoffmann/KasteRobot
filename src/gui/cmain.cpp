@@ -59,11 +59,6 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     gridSizer->Add( mPanelView2, 1, wxEXPAND | wxALL, 0 );
 
     // Notebook contents
-    wxBoxSizer *mSizerNotebookGeneral = new wxBoxSizer(wxVERTICAL);
-    //wxBoxSizer *mSizerNotebookRobot = new wxBoxSizer(wxHORIZONTAL);
-    //wxBoxSizer *mSizerNotebookGripper = new wxBoxSizer(wxHORIZONTAL);
-    //wxBoxSizer *mSizerNotebookCamera = new wxBoxSizer(wxHORIZONTAL);
-    wxBoxSizer *mSizerNotebookDatabase = new wxBoxSizer(wxHORIZONTAL);
     wxPanel *mNotebookGeneral = new wxPanel(mNotebook,
                                             wxID_ANY,
                                             wxDefaultPosition,
@@ -100,11 +95,6 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
                                              wxDefaultSize,
                                              wxTAB_TRAVERSAL | wxNO_BORDER,
                                              "Testing panel");
-    mNotebookGeneral->SetSizer(mSizerNotebookGeneral);
-    //mNotebookRobot->SetSizer(mSizerNotebookRobot);
-    //mNotebookGripper->SetSizer(mSizerNotebookGripper);
-    //mNotebookCamera->SetSizer(mSizerNotebookCamera);
-    mNotebookDatabase->SetSizer(mSizerNotebookDatabase);
     mNotebook->InsertPage(0,mNotebookGeneral, "General");
     mNotebook->InsertPage(1,mNotebookRobot, "Robot");
     mNotebook->InsertPage(2,mNotebookGripper, "Gripper");
@@ -112,6 +102,8 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mNotebook->InsertPage(4,mNotebookDatabase, "Database");
     mNotebook->InsertPage(5,mNotebookTesting, "Testing");
     // Tree list creation (shows in mNotebookGeneral tab)
+    wxBoxSizer *mSizerNotebookGeneral = new wxBoxSizer(wxVERTICAL);
+    mNotebookGeneral->SetSizer(mSizerNotebookGeneral);
     mTreeList = new wxTreeListCtrl(mNotebookGeneral,
                                              wxID_ANY,
                                              wxDefaultPosition,
@@ -137,7 +129,9 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mTreeRobotState = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootRobot, "State"));
     mTreeRobotIP = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootRobot, "IP"));
     mTreeRobotPort = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootRobot, "Port"));
-    mTreeRobotPosition = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootRobot, "Position"));
+    mTreeRobotTcpPosition = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootRobot, "TCP Position"));
+    mTreeRobotJointPosition = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootRobot, "Joint Positions"));
+    mTreeRobotPollingRate = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootRobot, "Polling Rate"));
     //INDEX: Sub levels - Camera
     mTreeCameraState = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootCamera, "State"));
     mTreeCameraExposure = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootCamera, "Exposure Time"));
@@ -150,7 +144,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mTreeGripperWidth = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootGripper, "Width"));
     //INDEX: Sub levels - Database
     mTreeDatabaseState = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootDatabase, "State"));
-    mTreeDatabaseIP = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootDatabase, "IP"));
+    mTreeDatabaseHost = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootDatabase, "IP"));
     mTreeDatabasePort = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootDatabase, "Port"));
     mTreeDatabaseName = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootDatabase, "Name"));
     mTreeDatabaseSchema = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootDatabase, "Schema"));
@@ -313,6 +307,8 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mNotebookGripper->Layout();
 
     // Database tab building
+    wxBoxSizer *mSizerNotebookDatabase = new wxBoxSizer(wxHORIZONTAL);
+    mNotebookDatabase->SetSizer(mSizerNotebookDatabase);
     mBtnDatabaseConnect = new wxButton(mNotebookDatabase, ID_BTN_GRIPPER_CONNECT, "Connect");
     mBtnDatabaseDisconnect = new wxButton(mNotebookDatabase, ID_BTN_GRIPPER_DISCONNECT, "Disconnect");
     mSizerNotebookDatabase->Add(mBtnDatabaseConnect);
@@ -400,6 +396,9 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     Layout();
     Centre(wxBOTH);
 
+    // Info struct for filling the tree list
+    info = new treeInfo;
+
     // Starting timers
     mTimerView1.Start(40);
     mTimerInfo.Start(1000);
@@ -461,10 +460,82 @@ void cMain::OnTimerView1Update(wxTimerEvent &evt)
 }
 void cMain::OnTimerInfoUpdate(wxTimerEvent &evt)
 {
-    // Updating event for refreshing the info tree
-    // TODO: Write this
-    // Collect info from all available object through
-    // the logic controller, in a thread safe manner
+    // Updating the treelist
+    mController->fillInfo(*info);
+    if (info->robotState == STATE::DEFAULT) {
+        mTreeList->SetItemText(*mTreeRobotState, 1, "Not initialized");
+    } else if (info->robotState == STATE::ROBOT_NOT_CONNECTED) {
+        mBmpRobotStatus->SetBackgroundColour(wxColour(255,0,0));
+        mTreeList->SetItemText(*mTreeRobotState, 1, "Not connected");
+    } else if (info->robotState == STATE::ROBOT_NOT_RUNNING) {
+        mBmpRobotStatus->SetBackgroundColour(wxColour(255,0,0));
+        mTreeList->SetItemText(*mTreeRobotState, 1, "Not running");
+    } else if (info->robotState == STATE::ROBOT_RUNNING) {
+        mBmpRobotStatus->SetBackgroundColour(wxColour(0,255,0));
+        mTreeList->SetItemText(*mTreeRobotState, 1, "Running");
+    }
+    mTreeList->SetItemText(*mTreeRobotIP, 1, info->robotIP);
+    mTreeList->SetItemText(*mTreeRobotPort, 1, std::to_string(info->robotPort));
+    std::stringstream s;
+    s << "X: " << info->robotTcpPosition[0] << " | "
+      << "Y: " << info->robotTcpPosition[1] << " | "
+      << "Z: " << info->robotTcpPosition[2] << " | "
+      << "RX: " << info->robotTcpPosition[3] << " | "
+      << "RY: " << info->robotTcpPosition[4] << " | "
+      << "RZ: " << info->robotTcpPosition[5];
+    mTreeList->SetItemText(*mTreeRobotTcpPosition, 1, s.str().c_str());
+    s.str(std::string());
+    s << "0: " << info->robotJointPosition[0] << " | "
+      << "1: " << info->robotJointPosition[1] << " | "
+      << "2: " << info->robotJointPosition[2] << " | "
+      << "3: " << info->robotJointPosition[3] << " | "
+      << "4: " << info->robotJointPosition[4] << " | "
+      << "5: " << info->robotJointPosition[5];
+    mTreeList->SetItemText(*mTreeRobotJointPosition, 1, s.str().c_str());
+    s.str(std::string());
+    mTreeList->SetItemText(*mTreeRobotPollingRate, 1, std::to_string(info->robotPollingRate));
+
+    if (info->cameraState == STATE::DEFAULT) {
+        mTreeList->SetItemText(*mTreeCameraState, 1, "Not initialized");
+    } else if (info->cameraState == STATE::CAMERA_NOT_CONNECTED) {
+        mBmpCameraStatus->SetBackgroundColour(wxColour(255,0,0));
+        mTreeList->SetItemText(*mTreeCameraState, 1, "Not connected");
+    } else if (info->cameraState == STATE::CAMERA_NOT_RUNNING) {
+        mBmpCameraStatus->SetBackgroundColour(wxColour(255,0,0));
+        mTreeList->SetItemText(*mTreeCameraState, 1, "Not running");
+    } else if (info->cameraState == STATE::CAMERA_RUNNING) {
+        mBmpCameraStatus->SetBackgroundColour(wxColour(0,255,0));
+        mTreeList->SetItemText(*mTreeCameraState, 1, "Running");
+    }
+    mTreeList->SetItemText(*mTreeCameraExposure, 1, std::to_string(info->cameraExposure));
+    mTreeList->SetItemText(*mTreeCameraFramerate, 1, std::to_string(info->cameraFramerate));
+
+    if (info->gripperState == STATE::DEFAULT) {
+        mTreeList->SetItemText(*mTreeGripperState, 1, "Not initialized");
+    } else if (info->gripperState == STATE::GRIPPER_NOT_CONNECTED) {
+        mBmpGripperStatus->SetBackgroundColour(wxColour(255,0,0));
+        mTreeList->SetItemText(*mTreeGripperState, 1, "Not connected");
+    } else if (info->gripperState == STATE::GRIPPER_RUNNING) {
+        mBmpGripperStatus->SetBackgroundColour(wxColour(0,255,0));
+        mTreeList->SetItemText(*mTreeGripperState, 1, "Running");
+    }
+    mTreeList->SetItemText(*mTreeGripperIP, 1, info->gripperIP);
+    mTreeList->SetItemText(*mTreeGripperPort, 1, std::to_string(info->gripperPort));
+    mTreeList->SetItemText(*mTreeGripperWidth, 1, std::to_string(info->gripperPosition));
+
+    if (info->databaseState == STATE::DEFAULT) {
+        mTreeList->SetItemText(*mTreeDatabaseState, 1, "Not initialized");
+    } else if (info->databaseState == STATE::DATABASE_NOT_CONNECTED) {
+        //mBmpDatabaseStatus->SetBackgroundColour(wxColour(255,0,0));
+        mTreeList->SetItemText(*mTreeDatabaseState, 1, "Not connected");
+    } else if (info->databaseState == STATE::DATABASE_RUNNING) {
+        //mBmpDatabaseStatus->SetBackgroundColour(wxColour(0,255,0));
+        mTreeList->SetItemText(*mTreeDatabaseState, 1, "Running");
+    }
+    mTreeList->SetItemText(*mTreeDatabaseHost, 1, info->databaseHost);
+    mTreeList->SetItemText(*mTreeDatabasePort, 1, std::to_string(info->databasePort));
+    mTreeList->SetItemText(*mTreeDatabaseName, 1, info->databaseUser);
+    mTreeList->SetItemText(*mTreeDatabaseSchema, 1, info->databaseSchema);
 
     // POSIX resource use
     struct rusage use;

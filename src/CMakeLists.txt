@@ -72,6 +72,8 @@ file(GLOB LOGIC_FILES
 
     ${PROJECT_SOURCE_DIR}/logic/xexceptions.hpp
 
+    ${PROJECT_SOURCE_DIR}/logic/xinfostruct.hpp
+
     ${PROJECT_SOURCE_DIR}/logic/xmath.cpp
     ${PROJECT_SOURCE_DIR}/logic/xmath.hpp
     )

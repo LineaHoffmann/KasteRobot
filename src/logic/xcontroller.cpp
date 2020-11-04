@@ -56,6 +56,11 @@ cv::Mat xController::getImage()
     } else return cv::Mat();
 }
 
+void xController::fillInfo(treeInfo &info)
+{
+    // TODO: Fill the info struct
+}
+
 //template <typename T>
 //void xController::guiButtonPressed(BINDING_ID id, T data)
 

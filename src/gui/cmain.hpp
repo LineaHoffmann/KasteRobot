@@ -83,6 +83,9 @@ private:
     // Pointer to logic controller object
     std::shared_ptr<xController> mController;
 
+    // Info sharings struct
+    treeInfo *info;
+
     // Main window
     cImagePanel *mPanelView1;  // Panel for view 1
     cImagePanel *mPanelView2;  // Panel for view 2
@@ -119,7 +122,9 @@ private:
     wxTreeListItem *mTreeRobotState;
     wxTreeListItem *mTreeRobotIP;
     wxTreeListItem *mTreeRobotPort;
-    wxTreeListItem *mTreeRobotPosition;
+    wxTreeListItem *mTreeRobotTcpPosition;
+    wxTreeListItem *mTreeRobotJointPosition;
+    wxTreeListItem *mTreeRobotPollingRate;
     wxTreeListItem *mTreeCameraState;
     wxTreeListItem *mTreeCameraExposure;
     wxTreeListItem *mTreeCameraFramerate;
@@ -129,7 +134,7 @@ private:
     wxTreeListItem *mTreeGripperPort;
     wxTreeListItem *mTreeGripperWidth;
     wxTreeListItem *mTreeDatabaseState;
-    wxTreeListItem *mTreeDatabaseIP;
+    wxTreeListItem *mTreeDatabaseHost;
     wxTreeListItem *mTreeDatabasePort;
     wxTreeListItem *mTreeDatabaseName;
     wxTreeListItem *mTreeDatabaseSchema;

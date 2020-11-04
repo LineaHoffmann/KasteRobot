@@ -12,13 +12,13 @@
 #include <type_traits>
 #include <mutex>
 #include <thread>
+#include <array>
 #include <tuple>
-
 
 #include "opencv2/core.hpp"
 #include "opencv2/opencv.hpp"
 
-#include "wx/wx.h"
+#include "wx/log.h"
 
 #include "xbaslercam.hpp"
 #include "xurcontrol.hpp"
@@ -29,6 +29,7 @@
 #include "ximagehandler.hpp"
 
 #include "xmath.hpp"
+#include "xinfostruct.hpp"
 
 class xController
 {
@@ -47,7 +48,7 @@ public:
     bool hasNewImage();
     cv::Mat getImage();
     // For GUI when updating info tree
-    void fillInfo(struct treeInfo); // TODO: Perhaps a struct to keep all info? Who knows
+    void fillInfo(treeInfo& info);
     // For GUI button calls. Don't actually do stuff here, only post the tasks!
     // The GUI thread does not like working in here
     template<typename T = bool>
