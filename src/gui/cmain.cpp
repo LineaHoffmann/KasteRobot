@@ -638,6 +638,11 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         });
     }
         break;
+    case ID_BTN_TESTING_DETECT_N_PICK:
+    {
+        xTry([&] {mController->guiButtonPressed(ID_BTN_TESTING_DETECT_N_PICK);});
+    }
+        break;
     default:
         logerr("An event fell through the button handler!");
         break;

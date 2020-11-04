@@ -60,3 +60,18 @@ cv::Mat xController::getImage()
 //void xController::guiButtonPressed(BINDING_ID id, T data)
 
 
+
+void testDetectAndPickUp()
+{
+
+
+
+
+
+
+
+
+
+
+
+}
