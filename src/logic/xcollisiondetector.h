@@ -22,10 +22,10 @@ public:
     xCollisionDetector(std::string filePath);
 
     void loadWorkcell(std::string filePath);
-    bool checkCollision(rw::math::Q jointConfig);//
+    bool checkCollision(rw::math::Q jointConfig);
     bool checkCollision(std::vector<std::vector<double>> jointConfigs);
+    bool checkCollision(std::vector<std::vector<double>> *jointConfigs);
     bool checkCollision(std::vector<rw::math::Q> jointConfigs);
-    //std::vector<rw::math::Q> findQFromTcp(std::vector<double> tcp);
 
 private:
     std::string filepath;
