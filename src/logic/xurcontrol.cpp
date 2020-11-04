@@ -106,15 +106,15 @@ void xUrControl::setMove(xUrControl::moveEnum moveMode){
     logstd("[ROBOT]: SetMove flag succesfull");
 }
 
-void xUrControl::setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<double> > q)
+void xUrControl::setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<double> > inputQ)
 {
     {
         std::lock_guard<std::mutex> setMoveLock(mMtx);
-        this->q = new std::vector<std::vector<double>>(q);
-//        if(!mDetector->checkCollision(q[0])){    //TODO Mikkel, please make a check on the vector
-//            logerr("bad pose");
-//            return;
-//        };
+        this->q = new std::vector<std::vector<double>>(inputQ);
+        if(!mDetector->checkCollision(this->q)){    //TODO Mikkel, please make a check on the vector
+            logerr("bad pose");
+            return;
+        };
     }
     this->acc = ACC_DEF;
     this->speed = SPEED_DEF;
