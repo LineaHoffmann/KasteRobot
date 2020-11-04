@@ -26,7 +26,7 @@ public:
 
 
     //takes balloutput from findball and converts it into a 3d point in the fram of det robotbase
-    static cv::Point3d ball_position_to_robotframe(std::tuple<bool, cv::Mat, cv::Point2f, float> data);
+    static std::vector<double> ball_position_to_robotframe(std::tuple<bool, cv::Mat, cv::Point2f, float> data);
 private:
     static double constexpr baseRadian = (-66) * (M_PI/180);
 

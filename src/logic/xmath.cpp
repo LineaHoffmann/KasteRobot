@@ -29,7 +29,7 @@ std::array<double, 3> xMath::distance3d_to_v0_xyAngle_czAngle(const std::array<d
     return std::array<double,3>{v0, theta_xy, theta_cz};
 }
 
-cv::Point3d xMath::ball_position_to_robotframe(std::tuple<bool, cv::Mat, cv::Point2f, float> data)
+std::vector<double> xMath::ball_position_to_robotframe(std::tuple<bool, cv::Mat, cv::Point2f, float> data)
 {
     if (std::get<0>(data)) {
         cv::Point3d pointRobot(std::get<2>(data).x, std::get<2>(data).y, (std::get<3>(data) - 3.5)); //-3.5 is for the base z offset
@@ -44,9 +44,19 @@ cv::Point3d xMath::ball_position_to_robotframe(std::tuple<bool, cv::Mat, cv::Poi
 
             pointRobot = rotationMatrix * pointRobot; //calc new values for position in baseframe
             pointRobot /= 10;; // point starts as cm, but needs to be in M.
-        return pointRobot;
+
+            //convert to vector
+            std::vector<double> pointAndRotation;
+            pointAndRotation.push_back(pointRobot.x);
+            pointAndRotation.push_back(pointRobot.y);
+            pointAndRotation.push_back(pointRobot.z);
+            pointAndRotation.push_back(0.720);
+            pointAndRotation.push_back(-3.062);
+            pointAndRotation.push_back(0.044);
+
+        return pointAndRotation;
 
     } else {
-        return cv::Point3d(0,0,0);
+        return std::vector<double>{0,0,0,0,0,0};
     }
 }
