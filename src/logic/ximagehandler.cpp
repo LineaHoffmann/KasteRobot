@@ -149,7 +149,7 @@ std::tuple<bool, cv::Mat, cv::Point2f, float> ximageHandler::findBallAndPosition
     if (result.first){
         std::stringstream s;
         s.str(std::string()); // Reset the stringstream
-        s << "ball position: " << std::get<1>(data) << " || radius: " << std::get<2>(data);
+        s << "ball position: " << std::get<2>(data) << " || radius: " << std::get<3>(data);
         logstd(s.str().c_str());
 
     }else {
