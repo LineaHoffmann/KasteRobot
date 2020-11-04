@@ -458,13 +458,11 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
     // Switchcase to the appropriate response
     switch (evt.GetId()) {
     case ID_MENU_SAVE_LOG:
-        logstd("Menu->Save Log clicked");
         xTry([&] {mController->guiButtonPressed(ID_MENU_SAVE_LOG);});
         // TODO: Pull current run entries from database
-        //       and dump to some file
+        //       and dump to some file?
         break;
     case ID_MENU_SAVE_SNAPSHOT:
-        logstd("Menu->Save Snapshot clicked");
     {
         wxCoord windowWidth, windowHeight;
         wxClientDC clientDC(this);
@@ -484,17 +482,13 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
     }
         break;
     case ID_MENU_EXIT:
-        // Sending to cout because the application will die now
-        std::cout << "Menu->Exit clicked" << std::endl;
         Close(true);
         evt.Skip();
         return;
     case ID_MENU_ABOUT:
-        logstd("Menu->About clicked");
         wxAboutBox(*mAboutBox);
         break;
     case ID_BTN_ROBOT_CONNECT:
-        logstd("Robot->Connect clicked");
         {
         std::string ip;
         ip = mTxtRobotIP->GetValue().ToStdString();
@@ -502,21 +496,16 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         }
         break;
     case ID_BTN_ROBOT_DISCONNECT:
-        logstd("Robot->Disconnect clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_DISCONNECT);});
         break;
     case ID_BTN_ROBOT_UPDATE:
-        logstd("Robot->Update clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_UPDATE);});
         break;
     case ID_BTN_ROBOT_SEND_CMD:
-        logstd("Robot->Send Command clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_SEND_CMD);});
         break;
     case ID_BTN_ROBOT_SEND_POS:
-        logstd("Robot->Send Position clicked");
         {
-        std::string s; //NOTE debugging purpose
         std::vector<double> q;
         double d;
         mTxtRobotX->GetValue().ToDouble(&d);
@@ -531,100 +520,68 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         q.push_back(d);
         mTxtRobotRZ->GetValue().ToDouble(&d);
         q.push_back(d);
-
-//        for(double d : q) {
-//            s.append( std::to_string(d) + " | ");
-//        }
-//        logstd(s.c_str());
         xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_SEND_POS, q);});
         }
         break;
     case ID_BTN_ROBOT_SEND_HOME:
-        logstd("Robot->Send Home clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_SEND_HOME);});
         break;
     case ID_BTN_ROBOT_SEND_PICKUP:
-        logstd("Robot->Send Pickup clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_SEND_PICKUP);});
         break;
     case ID_BTN_GRIPPER_CONNECT:
-        logstd("Gripper->Connect clicked");
-
         xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_CONNECT);});
         break;
     case ID_BTN_GRIPPER_DISCONNECT:
-        logstd("Gripper->Disconnect clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_DISCONNECT);});
         break;
     case ID_BTN_GRIPPER_UPDATE:
-        logstd("Gripper->Update clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_UPDATE);});
         break;
     case ID_BTN_GRIPPER_RELEASE:
-        logstd("Gripper->Release clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_RELEASE);});
         break;
     case ID_BTN_GRIPPER_GRIP:
-        logstd("Gripper->Grip clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_GRIP);});
         break;
     case ID_BTN_GRIPPER_SEND_CMD:
-        logstd("Gripper->Send command clicked");
     {
         std::string cmd = mTxtGripperCmd->GetValue().ToStdString();
         xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_SEND_CMD, cmd);});
     }
         break;
     case ID_BTN_GRIPPER_HOME:
-        {
-        logstd("Gripper->Home clicked");
-
         xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_HOME);});
-        }
         break;
     case ID_BTN_CAMERA_START:
     {
-        logstd("Camera->Start clicked");
         double expo;
         unsigned long fps;
         std::pair<double, uint64_t> data;
-        try {
         mTxtCameraExposure->GetValue().ToDouble(&expo);
         mTxtCameraFramerate->GetValue().ToULong(&fps);
         data = {expo, static_cast<uint64_t>(fps)};
-        } catch ( const std::exception &e ) {
-            logwar(e.what());
-            return;
-        }
-
         xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_START, data);});
     }
         break;
     case ID_BTN_CAMERA_STOP:
-        logstd("Camera->Stop clicked");
-
         xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_STOP);});
         break;
     case ID_BTN_CAMERA_FINDBALL:
-        logstd("Camera-> findball clicked");
-
         xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_FINDBALL);});
         break;
     case ID_BTN_CAMERA_RECALIBRATE:
     {
-        logstd("Camera->Recalibrate clicked");
         std::string path = mTxtCameraCalibrationPath->GetValue().ToStdString();
         xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_RECALIBRATE, path);});
     }
         break;
     case ID_BTN_CAMERA_CUT_TABLE:
-        logstd("Camera-> cut out table for detection");
 
         xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_CUT_TABLE);});
         break;
     case ID_BTN_CAMERA_LOAD_DETECTOR_SETTINGS:
     {
-        logstd("Camera->load new settings for ball detector");
         long hue, hueDelta;
         double min, max;
         mTxtCameraBallMax->GetValue().ToDouble(&max);
@@ -636,20 +593,16 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
     }
         break;
     case ID_BTN_DATABASE_CONNECT:
-        logstd("Database->Connect clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_DATABASE_CONNECT);});
         break;
     case ID_BTN_DATABASE_DISCONNECT:
-        logstd("Database->Disconnect clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_DATABASE_DISCONNECT);});
         break;
     case ID_BTN_DATABASE_UPDATE:
-        logstd("Database->Update clicked");
         xTry([&] {mController->guiButtonPressed(ID_BTN_DATABASE_UPDATE);});
         break;
     case ID_BTN_TESTING_XYZ_VVA:
     {
-        logstd("Testing->XYZ_VVA clicked");
         // Load data from testing fields of this math function
         double x, y, z, alow, ahigh, vlow, vhigh;
         mTxtTestMathInX->GetValue().ToDouble(&x);
