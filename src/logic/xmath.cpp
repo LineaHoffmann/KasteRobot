@@ -32,7 +32,7 @@ std::array<double, 3> xMath::distance3d_to_v0_xyAngle_czAngle(const std::array<d
 cv::Point3d xMath::ball_position_to_robotframe(std::tuple<bool, cv::Mat, cv::Point2f, float> data)
 {
     if (std::get<0>(data)) {
-        cv::Point3d pointRobot(std::get<2>(data).x, std::get<2>(data).y, std::get<3>(data));
+        cv::Point3d pointRobot(std::get<2>(data).x, std::get<2>(data).y, (std::get<3>(data) - 3.5)); //-3.5 is for the base z offset
 
      //       cos(-66)  -sin(-66)  0
      //       sin(-66)   cos(-66)  0 men da y akse skal flippes kan man tilføje (-) foran elementerne i denne række.

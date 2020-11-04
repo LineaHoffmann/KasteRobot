@@ -12,6 +12,7 @@
 #include <type_traits>
 #include <mutex>
 #include <thread>
+#include <tuple>
 
 
 #include "opencv2/core.hpp"
@@ -180,7 +181,7 @@ public:
             break;
         case ID_BTN_TESTING_DETECT_N_PICK:
         {
-            logstd("starting balldetection and pickup sequenze ");
+            logstd("starting balldetection and pickup sequenze...");
             testDetectAndPickUp();
         }
             break;

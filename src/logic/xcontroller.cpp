@@ -63,9 +63,38 @@ cv::Mat xController::getImage()
 
 void xController::testDetectAndPickUp()
 {
-    logstd("detect and pickup");
+    //flyt robotten til hjem position
+    //mRobot->move()
+    //mRobot->HOME();  Jacob fix :D
+    logstd("Robot Homed");
 
 
+    std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(mCamera->getImage());
+    if (std::get<0>(ballResult)){
+        logstd("Ball found, moving robot to pre pickup position");
+
+        //flyt robotten til det der prepickup position
+        //mRobot->PickUp
+        mGripper->home();
+
+        cv::Point3d pickupPosition = xMath.ball_position_to_robotframe(ballResult);
+
+        logstd("moving robot to pickup object");
+
+        //flyt robot til positionen i variablen pickupPosition
+        //mRobot->move()
 
 
+        logstd("grip object...");
+        mGripper->grip();
+
+        logstd("moving robot to throwing position");
+        //flyt robotten til hjem position eller evt en prepickup position
+        //mRobot->move()
+        //mRobot->HOME();  Jacob fix :D
+
+        logstd("Sequenze succesfull");
+        return;
+    }
+    logstd("Stopping detection and pickup sequenze");
 }
