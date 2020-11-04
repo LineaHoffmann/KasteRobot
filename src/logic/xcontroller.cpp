@@ -49,7 +49,7 @@ cv::Mat xController::getImage()
 {
     if (mCamera) {
         if(mWithBall.load()) {
-            return mImagehandler->findBallAndPosition(mCamera->getImage()).first;
+            return std::get<1>(mImagehandler->findBallAndPosition(mCamera->getImage()));
         } else {
             return mCamera->getImage();
         }

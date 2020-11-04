@@ -131,24 +131,24 @@ bool ximageHandler::cutOutTable()
     }
 }
 
-std::pair<cv::Mat, std::pair<cv::Point2f, float>> ximageHandler::findBallAndPosition(cv::Mat image)
+std::tuple<bool, cv::Mat, cv::Point2f, float> ximageHandler::findBallAndPosition(cv::Mat image)
 {
     loadImage(image);
     std::pair<bool, cv::Mat> result = detectBall();
-    if(result.first) {
-        std::pair<cv::Point2f, float> data(getPositionCM(),getRadiusCM());
+    std::tuple<bool, cv::Mat, cv::Point2f, float> data;
+        std::get<0>(data) = result.first;
+        std::get<1>(data) = result.second;
+        std::get<2>(data) = getPositionCM();
+        std::get<3>(data) = getRadiusCM();
 
         std::stringstream s;
         s.str(std::string()); // Reset the stringstream
-        s << "ball position: " << data.first << " || radius: " << data.second;
+        s << "ball position: " << std::get<1>(data) << " || radius: " << std::get<2>(data);
         logstd(s.str().c_str());
 
-        return std::pair<cv::Mat, std::pair<cv::Point2f, float>>(result.second, data);
-    } else {
+        return data;
         logstd("no ball found");
-        return std::pair<cv::Mat, std::pair<cv::Point2f, float>>(result.second, std::pair<cv::Point2f, float>(cv::Point2f(),0));
-
-    }
+        return data;
 }
 
 

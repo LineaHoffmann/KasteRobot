@@ -8,6 +8,7 @@
 #include <mutex>
 #include <thread>
 #include <opencv2/imgproc.hpp>
+#include <tuple>
 
 #ifndef LOG_DEFINES
 #define LOG_DEFINES 1
@@ -28,8 +29,10 @@ public:
     void loadImage(cv::Mat image);
     bool cutOutTable();
 
+
+
     //evt en funktion som samler alle loadimage, dectect, getcenter og transform i en funktion.
-    std::pair<cv::Mat, std::pair<cv::Point2f, float>> findBallAndPosition(cv::Mat image);
+    std::tuple<bool, cv::Mat, cv::Point2f, float>  findBallAndPosition(cv::Mat image);
 
     std::pair<bool, cv::Mat> detectBall();
     void ballColor(int hue, int spread);

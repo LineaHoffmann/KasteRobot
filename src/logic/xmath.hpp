@@ -4,6 +4,8 @@
 
 #include <array>
 #include <math.h>
+#include <opencv2/opencv.hpp>
+#include <tuple>
 
 #include "xexceptions.hpp"
 
@@ -21,6 +23,13 @@ public:
                                                                    const std::array<double,2> &velocityLim,
                                                                    double steps = 10,
                                                                    double g = 9.82);
+
+
+    //takes balloutput from findball and converts it into a 3d point in the fram of det robotbase
+    static cv::Point3d ball_position_to_robotframe(std::tuple<bool, cv::Mat, cv::Point2f, float> data);
+private:
+    double baseRadian = (-66) * (M_PI/180);
+
 };
 
 #endif // XMATH_H
