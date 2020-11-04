@@ -25,7 +25,7 @@
 #include "xgripperclient.hpp"
 #include "xexceptions.hpp"
 #include "../gui/cidbindings.hpp"
-#include "xcollisiondetector.h"
+#include "xcollisiondetector.hpp"
 #include "ximagehandler.hpp"
 
 #include "xmath.hpp"
@@ -179,9 +179,9 @@ public:
             logstd("Gripper homed");
         }
             break;
-        case ID_BTN_TESTING_DETECT_N_PICK:
+        case ID_BTN_TESTING_DETECT_PICK:
         {
-            logstd("starting balldetection and pickup sequenze...");
+            logstd("Starting ball detection and pick-up sequence ..");
             testDetectAndPickUp();
         }
             break;

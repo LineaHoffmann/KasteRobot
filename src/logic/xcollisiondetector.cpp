@@ -1,4 +1,4 @@
-#include "xcollisiondetector.h"
+#include "xcollisiondetector.hpp"
 
 
 xCollisionDetector::xCollisionDetector()

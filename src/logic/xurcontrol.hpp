@@ -24,7 +24,7 @@
 #include "wx/log.h"
 
 #include "xexceptions.hpp"
-#include "xcollisiondetector.h"
+#include "xcollisiondetector.hpp"
 
 //definition of data struct
 struct UR_STRUCT {
