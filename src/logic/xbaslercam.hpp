@@ -7,6 +7,7 @@
 #define logwar wxLogWarning
 #define logerr wxLogError
 #endif
+#include "wx/log.h"
 
 #include <thread>
 #include <mutex>
@@ -17,7 +18,7 @@
 #include "pylon/PylonIncludes.h"
 #include "opencv2/opencv.hpp"
 #include "opencv2/core.hpp"
-#include "wx/log.h"
+
 
 #include "xexceptions.hpp"
 
