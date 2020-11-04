@@ -214,8 +214,15 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     }
     mNotebookRobot->SetSizer(mSizerNotebookRobot);
     mNotebookRobot->Layout();
+    // Robot tab building - Tooltips
+    mBtnRobotConnect->SetToolTip("Connect to robot using the IP field");
+    mBtnRobotDisconnect->SetToolTip("Disconnect from the robot");
+    mBtnRobotUpdate->SetToolTip("Update connection using the IP field");
+    mBtnRobotSendCmd->SetToolTip("Send the command entered in the CMD field to the robot");
+    mBtnRobotSendPos->SetToolTip("Send the position entered in the X/Y/Z/RX/RY/RZ fields to the robot");
+    mBtnRobotSendHome->SetToolTip("Send the home position to the robot");
 
-    // Camera  tab building - Buttons
+    // Camera tab building - Buttons
     mBtnCameraStart = new wxButton(mNotebookCamera, ID_BTN_CAMERA_START, "Start");
     mBtnCameraStop = new wxButton(mNotebookCamera, ID_BTN_CAMERA_STOP, "Stop");
     mBtnCameraRecalibrate = new wxButton(mNotebookCamera, ID_BTN_CAMERA_RECALIBRATE, "Recalibrate");
@@ -337,6 +344,8 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mSizerNotebookTesting->Add( mTxtTestMathInVelocityHighLim, wxGBPosition( 2, 3 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mNotebookTesting->SetSizer(mSizerNotebookTesting);
     mNotebookTesting->Layout();
+    // Testing tab building - Tooltips
+    mBtnTestMathXYZtoVAA->SetToolTip("Try calculating from distance XYZ to velocity and XY/(XY)Z-directions");
 
     // About box creation
     mAboutBox = new wxAboutDialogInfo;

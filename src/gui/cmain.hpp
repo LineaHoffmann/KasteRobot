@@ -34,7 +34,8 @@
 #include "wx/statusbr.h"
 #include "wx/aboutdlg.h"
 #include "wx/artprov.h"
-#include <wx/gbsizer.h>
+#include "wx/gbsizer.h"
+#include "wx/tooltip.h"
 
 #include "opencv2/core.hpp"
 #include "opencv2/opencv.hpp"
@@ -107,7 +108,7 @@ private:
     wxTimer mTimerView1;
     //wxTimer mTimerView2;
     wxTimer mTimerInfo;
-
+    // Mutex, only for calls to Status Bar
     std::mutex mMtx;
 
     // Data entries for the tree view

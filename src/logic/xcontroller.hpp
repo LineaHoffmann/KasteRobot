@@ -71,7 +71,7 @@ public:
                 std::vector<std::vector<double>> q;
                 q.push_back(data);
                 std::string s;
-                for (int i = 0; i < data.size(); ++i) {
+                for (size_t i = 0; i < data.size(); ++i) {
                     s.append(std::to_string(q[0].at(i)) + " | ");
                 }
                 logstd(std::string("New TCP Position sent to robot: ").append(s).c_str());
