@@ -43,7 +43,7 @@ std::vector<double> xMath::ball_position_to_robotframe(std::tuple<bool, cv::Mat,
 
 
             pointRobot = rotationMatrix * pointRobot; //calc new values for position in baseframe
-            pointRobot /= 10;; // point starts as cm, but needs to be in M.
+            pointRobot /= 100; // point starts as cm, but needs to be in M.
 
             //convert to vector
             std::vector<double> pointAndRotation;
@@ -53,6 +53,16 @@ std::vector<double> xMath::ball_position_to_robotframe(std::tuple<bool, cv::Mat,
             pointAndRotation.push_back(0.720);
             pointAndRotation.push_back(-3.062);
             pointAndRotation.push_back(0.044);
+
+            std::stringstream s;
+                        s << "x: " << pointAndRotation[0] << " | y: "
+                          << pointAndRotation[1] << " | z: "
+                          << pointAndRotation[2] << " || rx: "
+                          << pointAndRotation[3] << " || ry: "
+                          << pointAndRotation[4] << " || rz: "
+                          << pointAndRotation[5];
+
+                        logstd(s.str().c_str());
 
         return pointAndRotation;
 

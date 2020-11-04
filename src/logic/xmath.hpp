@@ -2,10 +2,19 @@
 #define XMATH_H
 #pragma once
 
+#ifndef LOG_DEFINES
+#define LOG_DEFINES 1
+#define logstd wxLogMessage
+#define logwar wxLogWarning
+#define logerr wxLogError
+#endif
+
 #include <array>
 #include <math.h>
 #include <opencv2/opencv.hpp>
 #include <tuple>
+
+#include "wx/log.h"
 
 #include "xexceptions.hpp"
 

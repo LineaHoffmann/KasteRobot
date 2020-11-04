@@ -180,6 +180,8 @@ public:
             logstd("Gripper homed");
         }
             break;
+
+    //NOTE: TESTING BTN xController
         case ID_BTN_TESTING_DETECT_PICK:
         {
             logstd("Starting ball detection and pick-up sequence ..");

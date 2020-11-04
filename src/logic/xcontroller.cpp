@@ -7,7 +7,6 @@ xController::xController()
 
     // Camera
     mCamera = std::make_shared<xBaslerCam>("../resources/pylonimgs/*.bmp", 5000, 30);
-    mCamera->start();
 
     //Imagehandler
     mImagehandler = std::make_shared<ximageHandler>(cv::imread("../resources/testImg.png"));
@@ -36,7 +35,12 @@ xController::xController()
 
     // Gripper
     mGripper = std::make_shared<xGripperClient>();
+
+    //starting camera
+    mCamera->start();
 }
+
+
 xController::~xController() {};
 bool xController::hasNewImage()
 {
@@ -91,7 +95,10 @@ void xController::testDetectAndPickUp(std::shared_ptr<ximageHandler> mImagehandl
 
         //flyt robotten til det der prepickup position
         try {
-        mRobot->setMove(xUrControl::moveEnum::PICKUP);
+            mRobot->setMove(xUrControl::moveEnum::PICKUP);
+            while(mRobot->getIsBusy()){
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            }
         } catch (const x_err::error &e){
             logerr("Pickup pos failed");
         }
@@ -106,6 +113,9 @@ void xController::testDetectAndPickUp(std::shared_ptr<ximageHandler> mImagehandl
             q.push_back(pickupPosition);
             //flyt robot til positionen i variablen pickupPosition
             mRobot->setMove(xUrControl::moveEnum::MOVE_L, q);
+            while(mRobot->getIsBusy()){
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            }
         } catch (const x_err::error &e){
             logerr("homing failed");
         }
@@ -116,14 +126,20 @@ void xController::testDetectAndPickUp(std::shared_ptr<ximageHandler> mImagehandl
         logstd("moving robot to throwing position");
         //flyt robotten til hjem position eller evt en prepickup position
         try{
-        mRobot->setMove(xUrControl::moveEnum::HOME);
-        logstd("Robot Homed");
+            mRobot->setMove(xUrControl::moveEnum::HOME);
+            logstd("Robot Homing");
+        while(mRobot->getIsBusy()){
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
         } catch (const x_err::error &e){
             logerr("homing failed");
         }
 
         logstd("Sequenze succesfull");
-        return;
-    }
+
+    }else{
     logstd("Stopping detection and pickup sequenze");
+    }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 }

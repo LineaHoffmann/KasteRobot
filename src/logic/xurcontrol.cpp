@@ -99,19 +99,28 @@ void xUrControl::setDisconnect()
 }
 
 void xUrControl::setMove(xUrControl::moveEnum moveMode){
+    if (mMove){
+        logerr("[ROBOT]: setMove flag already set");
+        return;
+    }
     this->acc = ACC_DEF;
     this->speed = SPEED_DEF;
     this->mMoveMode = moveMode;
 
     mMove = true;
     logstd("[ROBOT]: SetMove flag succesfull");
+
 }
 
 void xUrControl::setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<double> > inputQ)
 {
+    if (mMove){
+        logerr("[ROBOT]: setMove flag already set");
+        return;
+    }
     {
         std::lock_guard<std::mutex> setMoveLock(mMtx);
-        this->q = new std::vector<std::vector<double>>(inputQ);
+        mQ = inputQ;
 //        if(!mDetector->checkCollision(this->q)){    //TODO Mikkel, please make a check on the vector
 //            logerr("bad pose");
 //            return;
@@ -125,11 +134,15 @@ void xUrControl::setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<
     logstd("[ROBOT]: SetMove flag succesfull");
 }
 
-void xUrControl::setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<double> > q, double acc, double speed)
+void xUrControl::setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<double> > inputQ, double acc, double speed)
 {
+    if (mMove){
+        logerr("[ROBOT]: setMove flag already set");
+        return;
+    }
     {
         std::lock_guard<std::mutex> setMoveLock(mMtx);
-        this->q = new std::vector<std::vector<double>>(q);
+        mQ = inputQ;
     }
     this->acc = acc;
     this->speed = speed;
@@ -230,7 +243,6 @@ void xUrControl::move()
     }
 
     try{
-        mIsBusy = true;
         if (mMoveMode == HOME) {
             logstd("MOVE_HOME: move commenced!");
             if(mUrControl->moveJ(HOMEQ, speed, acc)){
@@ -252,37 +264,37 @@ void xUrControl::move()
         /*NOTE: if robot is connected, switch statement will choose correct movefunction to execute!
          * chosen as enum to ease calling from controller-class
          */
-            if(q){
+            if(!mQ.empty()){
                 switch (mMoveMode) {
                     case MOVE_JLIN:
                         logstd( "MOVE_JLIN: move commenced!");
                         //std::vector<double> tempQ = q[0];
-                        if(mUrControl->moveJ(q->at(0), speed, acc)){
+                        if(mUrControl->moveJ(mQ[0], speed, acc)){
                             logstd("MOVE_JLIN: move completed!");
                         }
                         break;
                     case MOVE_JIK:
                         logstd( "MOVE_JIK: move commenced!");
                         //std::vector<double> tempQ = q[0];
-                            if(mUrControl->moveJ_IK(q->at(0), speed, acc)){
+                            if(mUrControl->moveJ_IK(mQ[0], speed, acc)){
                                 logstd("MOVE_JIK: move completed!");
                             }
                         break;
                     case MOVE_JPATH :
                         logstd("MOVE_JPATH: move commenced!");
-                        if (mUrControl->moveJ(*q)){
+                        if (mUrControl->moveJ(mQ)){
                             logstd("MOVE_JPATH: move completed!");
                         }
                         break;
                     case MOVE_LFK: //Linear tool forward kinematics
                         logstd("MOVE_LFK: move commenced!");
-                        if (mUrControl->moveL_FK(q->at(0), speed, acc)){
+                        if (mUrControl->moveL_FK(mQ[0], speed, acc)){
                             logstd("MOVE_LFK: move completed!");
                         break;
                     }
                     case MOVE_L: //Linear tool
                         logstd("MOVE_L: move commenced!");
-                        if (mUrControl->moveL(q->at(0), speed, acc)){
+                        if (mUrControl->moveL(mQ[0], speed, acc)){
                             logstd("MOVE_L: move completed!");
                         }
                         break;
@@ -301,7 +313,7 @@ void xUrControl::move()
         mUrControl->reuploadScript();
     }
     //reset params for move function
-    delete q;
+    mQ.clear();
     mMoveMode = 0;
     mMove = false;
 }

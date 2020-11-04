@@ -61,8 +61,8 @@ public:
 
     //move function to access private move functions of UR_RTDE
     void setMove(xUrControl::moveEnum moveMode);
-    void setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<double> > q);
-    void setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<double> > q, double acc, double speed);
+    void setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<double> > inputQ);
+    void setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<double> > inputQ, double acc, double speed);
 
 
 
@@ -114,7 +114,7 @@ private:
     //Member Variables
 
           //Variables for Move function
-              std::vector<std::vector<double>> *q = nullptr;
+              std::vector<std::vector<double>> mQ;
               std::atomic<int> mMoveMode;
               std::atomic<double> acc, speed;
 
