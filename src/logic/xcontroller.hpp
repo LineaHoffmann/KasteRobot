@@ -57,73 +57,44 @@ public:
         //NOTE: ROBOT buttons implementation.
         case ID_BTN_ROBOT_CONNECT:
             logstd("Robot connect from xController");
-            try{
-                if constexpr (std::is_same_v<T, std::string>) {
-                    static_cast<std::string>(data);
-                    std::string ip(data);
-                    mRobot->setConnect(ip);
-                    return;
-                }
-            } catch ( const std::exception &e ) {
-                logwar(e.what());
-                return;
+            if constexpr (std::is_same_v<T, std::string>) {
+                static_cast<std::string>(data);
+                std::string ip(data);
+                mRobot->setConnect(ip);
             }
-
+            break;
         case ID_BTN_ROBOT_SEND_POS:
             logstd("Robot send pos from xController");
         {
-            std::string s;
-            std::vector<std::vector<double>> q;
             if constexpr (std::is_same_v<T, std::vector<double>>){
                 static_cast<std::vector<double>>(data);
-
+                std::vector<std::vector<double>> q;
                 q.push_back(data);
-
+                std::string s;
                 for (int i = 0; i < data.size(); ++i) {
                     s.append(std::to_string(q[0].at(i)) + " | ");
                 }
-                logstd(s.c_str());
-
-                try {
+                logstd(std::string("New TCP Position sent to robot: ").append(s).c_str());
                 mRobot->setMove(xUrControl::moveEnum::MOVE_L,q);
-                } catch (const std::exception &e) {
-                    logerr(e.what());
-                }
             }
         }
             break;
-
         case ID_BTN_ROBOT_DISCONNECT:
             logstd("Robot disconnect from xController");
-            try {
-                mRobot->setDisconnect();
-                return;
-            } catch (const std::exception &e) {
-                logwar (e.what());
-                return;
-            }
-
+            mRobot->setDisconnect();
+            break;
         case ID_BTN_ROBOT_SEND_HOME:
             logstd("Robot Moving to home from xController");
-            try{
-                mRobot->setMove(xUrControl::HOME);
-            }catch(const std::exception &e) {
-                logwar (e.what());
-            }
+            mRobot->setMove(xUrControl::HOME);
             break;
-
         case ID_BTN_ROBOT_SEND_PICKUP:
             logstd("Robot Moving to Pickup from xController");
-            try {
-                mRobot->setMove(xUrControl::PICKUP);
-            } catch (const std::exception &e) {
-                logwar (e.what());
-            }
+            mRobot->setMove(xUrControl::PICKUP);
             break;
 
         //NOTE: CAMERA buttons implementation
         case ID_BTN_CAMERA_START: //
-            logstd("updating values and starting the camera ..");
+            logstd("Updating exposure and framerate, and starting the camera ..");
             if constexpr (std::is_same_v<T, std::pair<double, uint64_t>>) {
                 static_cast<std::pair<double, uint64_t>>(data);
                 mCamera->setMyExposure(data.first);
@@ -136,30 +107,27 @@ public:
             mCamera->shutdown();
             break;
         case ID_BTN_CAMERA_RECALIBRATE:
-            logstd("Recalibrating lens destortion calibration ..");
+            logstd("Recalibrating lens distortion ..");
             if constexpr (std::is_same_v<T, std::string>) {
                 static_cast<std::string>(data);
                 std::thread(xBaslerCam::liveCalibration, mCamera, data).detach();
-                //caliThread = new std::thread(xBaslerCam::liveCalibration, mCamera, data);
-                //caliThread->detach();
             }
             break;
         case ID_BTN_CAMERA_FINDBALL:
-            if (withBall) {
-                withBall = false;
+            if (mWithBall.load()) {
+                mWithBall.exchange(false);
                 logstd("Ball detection on live image turned off ..");
                 return;
             } else {
-                withBall = true;
+                mWithBall.exchange(true);
                 logstd("Ball detection on live image turned on ..");
                 return;
             }
             break;
         case ID_BTN_CAMERA_CUT_TABLE:
-            logstd("taking picture from live camera and using it for table ROI");
+            logstd("Updating table ROI using new picture from live camera ..");
             mImagehandler->loadImage(mCamera->getImage());
             mImagehandler->cutOutTable();
-            logstd("ImageHandler ROI has been updated");
             break;
         case ID_BTN_CAMERA_LOAD_DETECTOR_SETTINGS:
         {
@@ -168,9 +136,9 @@ public:
                 std::stringstream s;
                 s.str(std::string()); // Reset the stringstream
                 s << "Updating values for camera detector: "
-                  << std::get<0>(data) << " || "
-                  << std::get<1>(data) << " || "
-                  << std::get<2>(data) << " || "
+                  << std::get<0>(data) << " | "
+                  << std::get<1>(data) << " | "
+                  << std::get<2>(data) << " | "
                   << std::get<3>(data);
                 logstd(s.str().c_str());
                 mImagehandler->ballColor(std::get<0>(data), std::get<1>(data)); //set what color ball we are looking for
@@ -225,7 +193,7 @@ public:
                 }
             } catch ( const std::exception &e ) {
                 logwar(e.what());
-                return;
+                break;
             }
         default:
             throw x_err::error(x_err::what::NO_IMPLEMENTATION);
@@ -242,8 +210,8 @@ private:
     std::shared_ptr<xCollisionDetector> mCollisionDetector;
 
     std::mutex mMtx;
-    std::thread *caliThread;
-    bool withBall = false;
+    std::thread *mCameraCalibrationThread;
+    std::atomic<bool> mWithBall;
 
 
 };

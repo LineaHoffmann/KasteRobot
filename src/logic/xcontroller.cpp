@@ -2,6 +2,9 @@
 
 xController::xController()
 {
+    // Bool defaults
+    mWithBall.exchange(false);
+
     // Camera
     mCamera = std::make_shared<xBaslerCam>("../resources/pylonimgs/*.bmp", 5000, 30);
     mCamera->start();
@@ -45,7 +48,7 @@ bool xController::hasNewImage()
 cv::Mat xController::getImage()
 {
     if (mCamera) {
-        if(withBall) {
+        if(mWithBall.load()) {
             return mImagehandler->findBallAndPosition(mCamera->getImage()).first;
         } else {
             return mCamera->getImage();
