@@ -69,32 +69,52 @@ void xController::fillInfo(treeInfo &info)
 void xController::testDetectAndPickUp()
 {
     //flyt robotten til hjem position
-    //mRobot->move()
-    //mRobot->HOME();  Jacob fix :D
-    logstd("Robot Homed");
-
+    try{
+    mRobot->setMove(xUrControl::moveEnum::HOME);
+    logstd("Robot Homing");
+    while(mRobot->getIsBusy()){
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    } catch (const x_err::error &e){
+        logerr("homing failed");
+    }
 
     std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(mCamera->getImage());
     if (std::get<0>(ballResult)){
         logstd("Ball found, moving robot to pre pickup position");
 
         //flyt robotten til det der prepickup position
-        //mRobot->PickUp
+        try {
+        mRobot->setMove(xUrControl::moveEnum::PICKUP);
+        } catch (const x_err::error &e){
+            logerr("Pickup pos failed");
+        }
         mGripper->home();
 
         std::vector<double> pickupPosition = xMath::ball_position_to_robotframe(ballResult);
 
         logstd("moving robot to pickup object");
 
-        //flyt robot til positionen i variablen pickupPosition
-        //mRobot->move()
-
+        try {
+            std::vector<std::vector<double>> q;
+            q.push_back(pickupPosition);
+            //flyt robot til positionen i variablen pickupPosition
+            mRobot->setMove(xUrControl::moveEnum::MOVE_L, q);
+        } catch (const x_err::error &e){
+            logerr("homing failed");
+        }
 
         logstd("grip object...");
         mGripper->grip();
 
         logstd("moving robot to throwing position");
         //flyt robotten til hjem position eller evt en prepickup position
+        try{
+        mRobot->setMove(xUrControl::moveEnum::HOME);
+        logstd("Robot Homed");
+        } catch (const x_err::error &e){
+            logerr("homing failed");
+        }
         //mRobot->move()
         //mRobot->HOME();  Jacob fix :D
 

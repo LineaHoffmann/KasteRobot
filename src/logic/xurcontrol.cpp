@@ -111,10 +111,10 @@ void xUrControl::setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<
     {
         std::lock_guard<std::mutex> setMoveLock(mMtx);
         this->q = new std::vector<std::vector<double>>(inputQ);
-        if(!mDetector->checkCollision(this->q)){    //TODO Mikkel, please make a check on the vector
-            logerr("bad pose");
-            return;
-        };
+//        if(!mDetector->checkCollision(this->q)){    //TODO Mikkel, please make a check on the vector
+//            logerr("bad pose");
+//            return;
+//        };
     }
     this->acc = ACC_DEF;
     this->speed = SPEED_DEF;
@@ -209,6 +209,11 @@ void xUrControl::disconnect()
     } else {
         logstd("UR_Control: disconnect: robot already disconnected!");
     }
+}
+
+std::atomic<bool> xUrControl::getIsBusy() const
+{
+    return mIsBusy.load();
 }
 
 std::atomic<int> xUrControl::getPollingRate() const
@@ -330,12 +335,12 @@ void xUrControl::getData()
 {
 
     //preparing timers
-    // TODO: Use steady_clock instead, system_clock might not be as steady as one would think
-    std::chrono::system_clock::time_point timePoint;
+    // DONE: Use steady_clock instead, system_clock might not be as steady as one would think
+    std::chrono::steady_clock::time_point timePoint;
     long waitTime = 1000 / mPollingRate; //polling rate in millis
 
     while (mContinue) {
-        timePoint = std::chrono::system_clock::now() + std::chrono::milliseconds(waitTime);
+        timePoint = std::chrono::steady_clock::now() + std::chrono::milliseconds(waitTime);
 
         //lock Scope
         {
@@ -347,6 +352,9 @@ void xUrControl::getData()
         // TODO: define the struct and get the remaining struct members
         mURStruct->isConnected = mUrRecieve->isConnected();
         mURStruct->pose = mUrRecieve->getActualTCPPose();
+
+        mIsBusy = (mUrRecieve->getRobotStatus() == 1) ? true : false;
+        std::cout << mIsBusy << std::endl;
 
         } //lock scope ends
 

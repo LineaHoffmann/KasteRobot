@@ -86,6 +86,8 @@ public:
 
     std::atomic<int> getPollingRate() const;
 
+    std::atomic<bool> getIsBusy() const;
+
 private:
 
     //private functions
@@ -107,6 +109,7 @@ private:
       std::atomic<bool> mDisconnect = false;
       std::atomic<bool> mMove = false;
       std::atomic<bool> mContinue = true;
+      std::atomic<bool> mIsBusy = false;
 
     //Member Variables
 
