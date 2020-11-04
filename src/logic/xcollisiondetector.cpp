@@ -15,10 +15,10 @@ void xCollisionDetector::loadWorkcell(std::string filePath)
 {
     rw::models::WorkCell::Ptr workcell = rw::loaders::WorkCellLoader::Factory::load(filePath);
     if (workcell.isNull()) {
-        std::cout << "WorkCell could not be loaded." << std::endl;
+        logstd("Workcell could not be loaded");
     }
     else {
-        std::cout << "WorkCell succesfully loaded." << std::endl;
+        logstd("Workcell loaded succesfully");
     }
     state = workcell->getDefaultState();
     robot = workcell->findDevice<rw::models::SerialDevice>("UR5");
@@ -51,12 +51,12 @@ bool xCollisionDetector::checkCollision(std::vector<std::vector<double>> jointCo
     {
         if (checkCollision(vectorQ[i]))
         {
-            std::cout << "Collision detected" << std::endl;
+            logstd("Collision detected");
             return true;
         }
         else
         {
-            std::cout << "No collision detected" << std::endl;
+            logstd("No collision detected");
         }
     }
     return false;
@@ -76,12 +76,12 @@ bool xCollisionDetector::checkCollision(std::vector<std::vector<double>> *jointC
     {
         if (checkCollision(vectorQ[i]))
         {
-            std::cout << "Collision detected" << std::endl;
+            logstd("Collision detected");
             return true;
         }
         else
         {
-            std::cout << "No collision detected" << std::endl;
+            logstd("No collision detected");
         }
     }
     return false;
@@ -94,12 +94,12 @@ bool xCollisionDetector::checkCollision(std::vector<rw::math::Q> jointConfigs)
     {
         if (checkCollision(jointConfigs[i]))
         {
-            std::cout << "Collision detected" << std::endl;
+            logstd("Collision detected");
             return true;
         }
         else
         {
-            std::cout << "No collision detected" << std::endl;
+            logstd("No collision detected");
         }
     }
     return false;

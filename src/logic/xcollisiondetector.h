@@ -1,7 +1,16 @@
 #ifndef XCOLLISIONDETECTOR_H
 #define XCOLLISIONDETECTOR_H
 
+#ifndef LOG_DEFINES
+#define LOG_DEFINES 1
+#define logstd wxLogMessage
+#define logwar wxLogWarning
+#define logerr wxLogError
+#endif
+
+#include "wx/wx.h"
 #include <iostream>
+
 #include <rw/core.hpp>
 #include <rw/models.hpp>
 #include <rw/loaders.hpp>
@@ -13,7 +22,7 @@
 #include <rwlibs/proximitystrategies/ProximityStrategyYaobi.hpp>
 #include <rwlibs/pathplanners/sbl/SBLPlanner.hpp>
 
-#include <vector>
+
 
 class xCollisionDetector
 {
