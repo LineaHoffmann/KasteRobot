@@ -179,8 +179,10 @@ public:
         }
             break;
         case ID_BTN_TESTING_DETECT_N_PICK:
+        {
             logstd("starting balldetection and pickup sequenze ");
             testDetectAndPickUp();
+        }
             break;
         case ID_BTN_TESTING_XYZ_VVA:
             logstd("XYZ_VVA from xController ..");
@@ -206,8 +208,10 @@ public:
         return;
     }
 
+
 private:
     void testDetectAndPickUp();
+
 
     std::shared_ptr<ximageHandler> mImagehandler;
     std::shared_ptr<xBaslerCam> mCamera;

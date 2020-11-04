@@ -61,15 +61,9 @@ cv::Mat xController::getImage()
 
 
 
-void testDetectAndPickUp()
+void xController::testDetectAndPickUp()
 {
-
-
-
-
-
-
-
+    logstd("detect and pickup");
 
 
 
