@@ -183,7 +183,7 @@ public:
         case ID_BTN_TESTING_DETECT_PICK:
         {
             logstd("Starting ball detection and pick-up sequence ..");
-            testDetectAndPickUp();
+            std::thread(testDetectAndPickUp, mImagehandler, mCamera, mRobot, mGripper, mCollisionDetector).detach();
         }
             break;
         case ID_BTN_TESTING_XYZ_VVA:
@@ -210,9 +210,13 @@ public:
         return;
     }
 
-
+    static void testDetectAndPickUp(std::shared_ptr<ximageHandler> mImagehandler,
+                                    std::shared_ptr<xBaslerCam> mCamera,
+                                    std::shared_ptr<xUrControl> mRobot,
+                                    std::shared_ptr<xGripperClient> mGripper,
+                                    std::shared_ptr<xCollisionDetector> mCollisionDetector);
 private:
-    void testDetectAndPickUp();
+
 
 
     std::shared_ptr<ximageHandler> mImagehandler;

@@ -66,7 +66,11 @@ void xController::fillInfo(treeInfo &info)
 
 
 
-void xController::testDetectAndPickUp()
+void xController::testDetectAndPickUp(std::shared_ptr<ximageHandler> mImagehandler,
+                                      std::shared_ptr<xBaslerCam> mCamera,
+                                      std::shared_ptr<xUrControl> mRobot,
+                                      std::shared_ptr<xGripperClient> mGripper,
+                                      std::shared_ptr<xCollisionDetector> mCollisionDetector)
 {
     //flyt robotten til hjem position
     try{
@@ -79,7 +83,9 @@ void xController::testDetectAndPickUp()
         logerr("homing failed");
     }
 
-    std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(mCamera->getImage());
+    //std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(mCamera->getImage());
+    std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(cv::imread("../resources/ballimgs/remappedBall2.png"));
+
     if (std::get<0>(ballResult)){
         logstd("Ball found, moving robot to pre pickup position");
 
