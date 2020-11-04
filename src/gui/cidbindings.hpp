@@ -43,5 +43,5 @@ enum BINDING_ID {
     ID_BTN_DATABASE_UPDATE,
 
     ID_BTN_TESTING_XYZ_VVA,      // Testing Notebook panel buttons
-    ID_BTN_TESTING_DETECT_N_PICK
+    ID_BTN_TESTING_DETECT_PICK
 };
