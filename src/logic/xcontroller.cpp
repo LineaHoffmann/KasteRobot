@@ -77,7 +77,7 @@ void xController::testDetectAndPickUp()
         //mRobot->PickUp
         mGripper->home();
 
-        cv::Point3d pickupPosition = xMath.ball_position_to_robotframe(ballResult);
+        cv::Point3d pickupPosition = xMath::ball_position_to_robotframe(ballResult);
 
         logstd("moving robot to pickup object");
 
