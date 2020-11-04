@@ -192,6 +192,7 @@ private:
     wxStaticBitmap *mBmpDatabaseStatus;
     // TESTING SUB PANEL ENTRIES
     wxButton *mBtnTestMathXYZtoVAA;
+    wxButton *mBtnTestDETECTnPICK;
     wxTextCtrl *mTxtTestMathInX;
     wxTextCtrl *mTxtTestMathInY;
     wxTextCtrl *mTxtTestMathInZ;

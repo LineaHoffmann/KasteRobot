@@ -135,20 +135,29 @@ std::tuple<bool, cv::Mat, cv::Point2f, float> ximageHandler::findBallAndPosition
 {
     loadImage(image);
     std::pair<bool, cv::Mat> result = detectBall();
-    std::tuple<bool, cv::Mat, cv::Point2f, float> data;
-        std::get<0>(data) = result.first;
-        std::get<1>(data) = result.second;
-        std::get<2>(data) = getPositionCM();
-        std::get<3>(data) = getRadiusCM();
+    if (result.first){
 
+    }else {
+        logstd("no ball found");
+    }
+    std::tuple<bool, cv::Mat, cv::Point2f, float> data;
+    std::get<0>(data) = result.first;
+    std::get<1>(data) = result.second;
+    std::get<2>(data) = getPositionCM();
+    std::get<3>(data) = getRadiusCM();
+
+    if (result.first){
         std::stringstream s;
         s.str(std::string()); // Reset the stringstream
         s << "ball position: " << std::get<1>(data) << " || radius: " << std::get<2>(data);
         logstd(s.str().c_str());
 
-        return data;
+    }else {
         logstd("no ball found");
-        return data;
+    }
+
+
+    return data;
 }
 
 
@@ -215,25 +224,19 @@ std::pair<bool, cv::Mat> ximageHandler::detectBall()
     {
         cv::minEnclosingCircle(contours[i], thisCenterPixel, thisRadius);
 
-        if (showResult) cv::circle(drawing, thisCenterPixel, thisRadius, cv::Scalar(0, 255, 0), 2 );
-        if (showResult) cv::circle(drawing, robotBase, 85, cv::Scalar(255, 255, 255), 2 );
-        if (debug) cv::imshow("ball", drawing);
-        if (debug) std::cout << radius << std::endl;
-
-        cv::addWeighted(inputImage(ROI),0.1,drawing,0.9,0.0,inputImage(ROI));
-
-
-
-        if (minMaxRadius.first < thisRadius && minMaxRadius.second > thisRadius){
+        if ((minMaxRadius.first < thisRadius) && (minMaxRadius.second > thisRadius)){
             centerPixel = thisCenterPixel;
             radius = thisRadius;
+
+            if (showResult) cv::circle(drawing, thisCenterPixel, thisRadius, cv::Scalar(0, 255, 0), 2 );
+            if (showResult) cv::circle(drawing, robotBase, 85, cv::Scalar(255, 255, 255), 2 );
+            if (showResult) cv::addWeighted(inputImage(ROI),0.1,drawing,0.9,0.0,inputImage(ROI));
+
+
             return std::pair<bool, cv::Mat>(true, inputImage);
         }
-
-
-
     }
-        return std::pair<bool, cv::Mat>(false, inputImage);
+    return std::pair<bool, cv::Mat>(false, inputImage);
 }
 
 cv::Mat ximageHandler::getInputImage() const

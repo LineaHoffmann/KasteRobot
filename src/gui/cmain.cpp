@@ -265,6 +265,13 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     }
     mNotebookCamera->SetSizer( mSizerNotebookCamera );
     mNotebookCamera->Layout();
+    mTxtCameraCalibrationPath->SetToolTip("Set calibration path");
+    mTxtCameraExposure->SetToolTip("set exposure");
+    mTxtCameraFramerate->SetToolTip("set framerate");
+    mTxtCameraHue->SetToolTip("set detection hue");
+    mTxtCameraHueDelta->SetToolTip("set hue delta (+-value)");
+    mTxtCameraBallMin->SetToolTip("set minimum ball size");
+    mTxtCameraBallMax->SetToolTip("set maximum ball size");
 
     // Gripper tab building - Buttons
     mBtnGripperConnect = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_CONNECT, "Connect");
@@ -322,6 +329,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
 
     // Testing tab building - Buttons
     mBtnTestMathXYZtoVAA = new wxButton(mNotebookTesting, ID_BTN_TESTING_XYZ_VVA, "XYZ->VAA");
+    mBtnTestDETECTnPICK = new wxButton(mNotebookTesting, ID_BTN_TESTING_DETECT_N_PICK, "Detect and pick");
     // Testing tab building - Text Controls
     mTxtTestMathInX = new wxTextCtrl(mNotebookTesting, wxID_ANY, "X");
     mTxtTestMathInY = new wxTextCtrl(mNotebookTesting, wxID_ANY, "Y");
@@ -335,6 +343,8 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mSizerNotebookTesting->SetFlexibleDirection( wxBOTH );
     mSizerNotebookTesting->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     mSizerNotebookTesting->Add( mBtnTestMathXYZtoVAA, wxGBPosition( 0, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookTesting->Add( mBtnTestDETECTnPICK, wxGBPosition( 0, 5 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+
     mSizerNotebookTesting->Add( mTxtTestMathInX, wxGBPosition( 1, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookTesting->Add( mTxtTestMathInY, wxGBPosition( 2, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookTesting->Add( mTxtTestMathInZ, wxGBPosition( 3, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
@@ -346,6 +356,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mNotebookTesting->Layout();
     // Testing tab building - Tooltips
     mBtnTestMathXYZtoVAA->SetToolTip("Try calculating from distance XYZ to velocity and XY/(XY)Z-directions");
+    mBtnTestDETECTnPICK->SetToolTip("Will try and find a ball, and then go at try to pick it up (not done)");
 
     // About box creation
     mAboutBox = new wxAboutDialogInfo;
