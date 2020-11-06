@@ -28,15 +28,18 @@ public:
     xGripperClient();
     ~xGripperClient();
     bool writeRead(std::string mCommand);
+    std::string getAnswer();
     void disconnectGripper();
     void grip();
     void release();
     void home();
 
 private:
-    void connectSocket(std::string ipAddress, int port);
+    void connectSocket();
     void entryThread();
     void startThread();
+    void setIpPort(std::string, int);
+
 
 private:
     int mSock, mConnectS, mPort;
@@ -45,7 +48,8 @@ private:
     sockaddr_in mHint;
     std::thread* mT1;
     std::mutex mMtx;
-    std::atomic<bool> mTRuntime;
+    std::atomic<bool> mTRuntime, mReady, mConnected, mGripReq, mReleaseReq, mHomeReq,
+                      mConnectReq, mDisconnectReq, mUpdateReq;
 
     std::thread *mWorker;
 
