@@ -8,13 +8,16 @@ xGripperClient::xGripperClient() {
 
 
 void xGripperClient::entryThread() {
-    mConnected.exchange(false);
+    mConnected.exchange(false);                     //DEFAULT FLAG VALUES
     mConnectReq.exchange(false);
     mDisconnectReq.exchange(false);
     mGripReq.exchange(false);
     mReleaseReq.exchange(false);
     mHomeReq.exchange(false);
     mTRuntime.exchange(true);
+
+    mIpAddress = "192.168.100.10";
+    mPort = 1000;                                   //DEFAULT VALUES
 
     logstd("Gripper client thread started .. ");
 
@@ -59,7 +62,7 @@ void xGripperClient::entryThread() {
                 mDisconnectReq.exchange(false);
             }
         }
-        if (mUpdateReq.load()) {
+        if (mUpdateReq.load()) {                    //UPDATE IP/PORT
             if (!mConnected.load()) {
 
             }
@@ -119,8 +122,17 @@ void xGripperClient::home() {
 void xGripperClient::setIpPort(std::string ipAddress, int port) {
     mIpAddress = ipAddress;
     mPort = port;
+    // Medtag to parametre fra GUI?
+    //Threadsafe?
 }
 
+void xGripperClient::connectReq() {
+    mConnectReq.exchange(true);
+}
+
+void xGripperClient::disconnectReq() {
+    mDisconnectReq.exchange(true);
+}
 
 bool xGripperClient::writeRead(std::string command) {
     mCommand = command + "\n";

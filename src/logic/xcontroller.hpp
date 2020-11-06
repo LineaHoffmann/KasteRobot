@@ -158,7 +158,7 @@ public:
             break;
         case ID_BTN_GRIPPER_DISCONNECT:
         {
-            mGripper->disconnectGripper();
+            mGripper->disconnectReq();
             logstd("Gripper disconnected");
         }
             break;
@@ -178,6 +178,16 @@ public:
         {
             mGripper->home();
             logstd("Gripper homed");
+        }
+            break;
+        case ID_BTN_GRIPPER_CONNECT:
+        {
+            mGripper->connectReq();
+        }
+            break;
+        case ID_BTN_GRIPPER_UPDATE:
+        {
+
         }
             break;
 

@@ -277,8 +277,8 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mBtnGripperSendCmd = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_SEND_CMD, "Send cmd");
     mBtnGripperHome = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_HOME, "Home");
     // Gripper tab building - Text controls
-    mTxtGripperIP = new wxTextCtrl(mNotebookGripper, wxID_ANY, "IP");
-    mTxtGripperPort = new wxTextCtrl(mNotebookGripper, wxID_ANY, "Port");
+    mTxtGripperIP = new wxTextCtrl(mNotebookGripper, wxID_ANY, "192.168.100.10");
+    mTxtGripperPort = new wxTextCtrl(mNotebookGripper, wxID_ANY, "1000");
     mTxtGripperCmd = new wxTextCtrl(mNotebookGripper, wxID_ANY, "Command");
     // Gripper tab building - Static bitmap
     mBmpGripperStatus = new wxStaticBitmap(mNotebookGripper, wxID_ANY, GetIcon());
@@ -628,7 +628,10 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_DISCONNECT);});
         break;
     case ID_BTN_GRIPPER_UPDATE:
-        xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_UPDATE);});
+    {
+        std::string ip = mTxtGripperIP->GetValue().ToStdString();
+        xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_UPDATE, ip);});
+    }
         break;
     case ID_BTN_GRIPPER_RELEASE:
         xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_RELEASE);});

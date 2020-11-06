@@ -29,16 +29,20 @@ public:
     ~xGripperClient();
     bool writeRead(std::string mCommand);
     std::string getAnswer();
-    void disconnectGripper();
+
     void grip();
     void release();
     void home();
+    void disconnectReq();
+    void connectReq();
+    void setIpPort(std::string, int);
 
 private:
     void connectSocket();
+    void disconnectGripper();
     void entryThread();
     void startThread();
-    void setIpPort(std::string, int);
+
 
 
 private:
