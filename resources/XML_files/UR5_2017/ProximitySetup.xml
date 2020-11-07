@@ -1,12 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <ProximitySetup UseIncludeAll="true" UseExcludeStaticPairs="true">
- <Exclude PatternA="WSG50.Base" PatternB="WSG50.Finger1"/>
- <Exclude PatternA="WSG50.Base" PatternB="WSG50.Finger2"/>
- <Exclude PatternA="WSG50.Finger1" PatternB="WSG50.Finger2"/>
- <Exclude PatternA="UR5_2017.Base" PatternB="UR5_2017.Joint0"/>
- <Exclude PatternA="UR5_2017.Joint0" PatternB="UR5_2017.Joint1"/>
- <Exclude PatternA="UR5_2017.Joint1" PatternB="UR5_2017.Joint2"/>
- <Exclude PatternA="UR5_2017.Joint2" PatternB="UR5_2017.Joint3"/>
- <Exclude PatternA="UR5_2017.Joint3" PatternB="UR5_2017.Joint4"/>
- <Exclude PatternA="UR5_2017.Joint4" PatternB="UR5_2017.Flange"/>
+    <Exclude PatternA="Base" PatternB="Joint0"/>
+	<Exclude PatternA="Joint0" PatternB="Joint1"/>
+	<Exclude PatternA="Joint1" PatternB="Joint2"/>
+	<Exclude PatternA="Joint2" PatternB="Joint3"/>
+	<Exclude PatternA="Joint3" PatternB="Joint4"/>
+	<Exclude PatternA="Joint4" PatternB="Flange"/>
 </ProximitySetup>
+

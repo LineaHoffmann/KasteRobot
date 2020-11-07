@@ -1,0 +1,27 @@
+<WorkCell name="collisionv2">
+
+<Frame name="Environment" refframe="WORLD">
+  <RPY>90 0 0</RPY>
+  <Pos>-0.43 -0.92 -0.0505</Pos>
+  <Drawable name="Environment" refframe="Environment">
+   <RPY>-90 0 90</RPY>
+   <Pos>0 0 -9.99</Pos>
+   <Polytope file="Workcell.stl"/>
+  </Drawable>
+ </Frame>
+
+<Frame name="RobotBase" refframe="Environment">
+  <RPY>-114 0 0</RPY>
+  <Pos>0.92 -0.43 0.085</Pos>
+ </Frame>
+
+<Include file="UR5_2017/UR5.xml"/>
+
+<Frame name="Gripper" refframe="UR5_2017.Flange" type="Fixed">
+  <RPY>90 0 0</RPY>
+  <Pos>0 0 0.105</Pos>
+ </Frame>
+
+<Include file="wsg50/wsg50.xml"/>
+
+</WorkCell>
