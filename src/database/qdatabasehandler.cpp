@@ -36,7 +36,7 @@ Session *qDatabaseHandler::connect()
                     SessionOption::DB, mDatabase,
                     SessionOption::SSL_MODE, mSsl_mode
                     );
-        std::cout << "Session accepted ..." << std::endl;
+        std::cout << "qDatabaseHandler: Session accepted ..." << std::endl;
         //NOTE Lad det blive i kode, da tjek for xDevAPI
         RowResult res = mSession->sql("show variables like 'version'").execute();
         std::stringstream version;
@@ -48,7 +48,7 @@ Session *qDatabaseHandler::connect()
         }
 
     } catch (const std::exception &e) {
-        std::cerr << "Something didn't go well! " << e.what() << std::endl;
+        std::cerr << "qDatabaseHandler: Something didn't go well! " << e.what() << std::endl;
     }
     return mSession;
 }
@@ -56,25 +56,43 @@ Session *qDatabaseHandler::connect()
 bool qDatabaseHandler::disconnect()
 {
     // TODO make a check to see if session is there.
-    std::cout << "Closing session ..." << std::endl;
+    std::cout << "qDatabaseHandler: Closing session ..." << std::endl;
     mSession->close();
     return true;
 }
 
-bool qDatabaseHandler::showTables()
+
+// TODO find better name
+std::vector<Row> *qDatabaseHandler::showTables()
 {
-    // I assume there's already loaded the workshop database, called WORKSHOP
-    std::cout <<"Session accepted, creating collection..." <<std::endl;
+    // I assume there's already loaded the database
+    std::cout <<"qDatabaseHandler: Session accepted, creating collection..." <<std::endl;
     Schema schema = mSession->getSchema(mDatabase);
     std::vector<std::string> mSchVec = schema.getTableNames();
 
-    std::cout << "Listing found tables: " << std::endl;
+    std::cout << "qDatabaseHandler:Listing found tables: " << std::endl;
     for (uint32_t i = 0; i < mSchVec.size(); ++i) {
         std::cout << mSchVec.at(i) << " | ";
     } std::cout << std::endl;
 
+    SqlResult qSql = mSession->sql("SELECT * FROM workshop.bil").execute();
+    if(qSql.hasData() ? !1 : 1)
+    {
+        std::cout << "qDatabasehandler.cpp : No data recieved: " << qSql.hasData() << std::endl;
+    }
+    disconnect();
 
-    std::cout << "Show data in tabel: " << std::endl;
-    return true;
+    mRes = new std::vector<Row>(qSql.fetchAll());
+    // Prints the output to the terminal.
+    // TODO Save the data correct
+    for(Row row : *mRes)
+    {
+        for(uint32_t i = 0; i < row.colCount(); i++)
+        {
+            std::cout << row[i] << " | ";
+        }
+        std::cout << std::endl;
+    }
+    return mRes;
 
 }

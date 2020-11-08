@@ -3,6 +3,7 @@
 
 #include "mysql-cppconn-8/mysqlx/xdevapi.h"
 #include <iostream>
+#include <vector>
 
 using namespace mysqlx;
 
@@ -25,7 +26,7 @@ public:
     Session *connect();
     bool disconnect();
 
-    bool showTables();
+    std::vector<Row>* showTables();
 
 private:
     std::string mUser;
@@ -36,7 +37,7 @@ private:
     SSLMode mSsl_mode;
 
     Session *mSession = nullptr;
-//    Schema *mSchema = nullptr;
+    std::vector<Row> *mRes;
 };
 
 #endif // QDATABASEHANDLER_H
