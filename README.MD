@@ -1,74 +1,54 @@
-INSTALLING GCC9
-	DO THIS BEFORE INSTALLIGN WXWIDGETS
-	add package:
-		sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-		sudo apt install gcc-9 g++-9
-	configure alternatives 
-		sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 90 --slave /usr/bin/g++ g++ /usr/bin/g++-9 --		slave /usr/bin/gcov gcov /usr/bin/gcov-9
-	check default gcc compiler and choose gcc9
-		sudo update-alternatives --config gcc
+REVISED REINSTALL GUIDE [08/11/2020]
+<<<< COMMON FOR ALL UBUNTU INSTALLS >>>>
+	sudo apt-get install build-essential libboost-all-dev cmake
+	sudo apt-get install git qt5default qtcreator
+	sudo apt-get install libssl-dev libopengl-dev kcachegrind valgrind
+	sudo snap install gitkraken --classic
+	sudo apt-get install python3-pip plantuml
+	sudo pip3 install hpp3plantuml
+	sudo apt-get install wx-common libwxbase3.0-dev libwxgtk-media3.0-gtk3-dev libwxgtk3.0-gtk3-dev
+	sudo apt-get install libopencv-dev
+	
+	<<<< project_pkgs >>>>
+	sudo dpkg -i pylon_6.1.1.19861-deb0_amd64.deb
 
-	Recompile wxWidgets eftar install, if already installed.
+<<<< FOR UBUNTU 18.04 >>>>
+<<<< /project_pkgs/mysqlcppconn8 >>>>
+	sudo dpkg -i mysql-apt-config_0.8.15-1_all.deb
+	sudo apt-get install mysql-community-client-plugins
+	sudo dpkg -i libmysqlcppconn7_8.0.22-1ubuntu18.04_amd64.deb
+	sudo dpkg -i libmysqlcppconn7-dbgsym_8.0.22-1ubuntu18.04_amd64.deb
+	sudo dpkg -i libmysqlcppconn8-2_8.0.22-1ubuntu18.04_amd64.deb
+	sudo dpkg -i libmysqlcppconn8-2-dbgsym_8.0.22-1ubuntu18.04_amd64.deb
 
-INSTALLING WXWIDGETS
-	Get wxWidgets 3.0.5 Stable from https://www.wxwidgets.org/downloads/
-	Choose "Source for Linux, MacOS, etc"
-	Extract to ~/wxWidgets-3.0.5
-	In a terminal run
-		cd wxWidgets-3.0.5
-		mkdir gtkbuild
-		cd gtkbuild
-		../configure --enable-unicode --with-gtk=3 --enable-debug
-		make (evt med -jN, hvor N er antal cores, det tager ret lang tid med kun 1)
-		sudo make install
-		make clean
-		sudo ldconfig
-	Check install with 
-		wx-config --version
+<<<< FOR UBUNTU 20.04 >>>>
+<<<< /project_pkgs/mysqlcppconn8 >>>>
+	sudo dpkg -i mysql-apt-config_0.8.15-1_all.deb
+	sudo apt-get install mysql-community-client-plugins
+	sudo dpkg -i libmysqlcppconn7_8.0.22-1ubuntu20.04_amd64.deb
+	sudo dpkg -i libmysqlcppconn7-dbgsym_8.0.22-1ubuntu20.04_amd64.deb
+	sudo dpkg -i libmysqlcppconn8-2_8.0.22-1ubuntu20.04_amd64.deb
+	sudo dpkg -i libmysqlcppconn8-2-dbgsym_8.0.22-1ubuntu20.04_amd64.deb
 
-INSTALLING MYSQL WITH MYSQLCPPCONN8 AND XDEVAPI
+<<<< COMMON FOR ALL UBUNTU INSTALLS >>>>
+	sudo apt-get install mysql-community-server mysql-community-client mysql-workbench-community
+	sudo add-apt-repository ppa:sdurobotics/robwork
+	sudo add-apt-repository ppa:sdurobotics/ur-rtde
+	sudo apt-get update
+	sudo apt-get install librtde-dev libsdurw-all-dev libsdurwhw-all-dev libsdurws-all-dev libsdurwsim-add-dev
 
-	UNINSTALL ALL MYSQL PACKAGES FIRST!
-	Using apt-get (the -get part matters here):
-		sudo apt-get purge libmysqlcppconn*
-		sudo apt-get purge mysql-*
+!! Project should compile in Qt Creator directly after git pull !!  
+!! Only SQL Server setup and URSIM not installed at this point! !! 
 
-	This will also hit unintentional stuff and remove OpenCV
-	Just reinstall using
-		sudo apt-get install libopencv-dev
-
-	Go to 
-		https://dev.mysql.com/downloads/repo/apt/
-	Download file
-		mysql-apt-config_0.8.15-1_all.deb
-	Go to
-		https://dev.mysql.com/downloads/connector/cpp/
-	Select "Ubuntu Linux" and the correct (18.04 64bit) version
-	Download ALL 5 files!
-	In terminal: (The order is VERY IMPORTANT!)
-		cd Downloads
-		sudo dpkg -i mysql-apt-config_0.8.15-1_all.deb
-		sudo apt-get update
-		sudo apt-get upgrade
-		sudo apt install mysql-community-client-plugins
-		sudo dpkg -i libmysqlcppconn7_8.0.22-1ubuntu18.04_amd64.deb
-		sudo dpkg -i libmysqlcppconn7-dbgsym_8.0.22-1ubuntu18.04_amd64.deb
-		sudo dpkg -i libmysqlcppconn8-2_8.0.22-1ubuntu18.04_amd64.deb
-		sudo dpkg -i libmysqlcppconn8-2-dbgsym_8.0.22-1ubuntu18.04_amd64.deb
-		sudo dpkg -i libmysqlcppconn-dev_8.0.22-1ubuntu18.04_amd64.deb
-		sudo apt-get install libssl-dev openssl
-	The MySql C++ Connector should be installed now.
 	For server/client/workbench, run:
-		sudo apt-get install mysql-*community*
-	For compilation, add mysqlcppconn8, ssl, pthread, resolv and crypto in includes. 
-	Header should be in "mysql-cppconn-8/mysqlx/xdevapi.h"
+		sudo apt-get install mysql-community-server mysql-community-client mysql-workbench-community
 
 	To set up the server for connections, in terminal:
 		sudo mysql_sercure_installation
 	Don't use password validation
 	Set a non-blank root password
 	After this, in terminal:
-		sudo mysql
+		mysql -u root -p
 			mysql> CREATE USER 'username'@'host' IDENTIFIED WITH mysql_native_password BY 'password';
 	Replace the following: 
 	username with the wanted login username, 
@@ -87,27 +67,6 @@ INSTALLING MYSQL WITH MYSQLCPPCONN8 AND XDEVAPI
 		mysql -u username -p
 	Try opening the MySql Workbench. Remeber to add the key for the root user if not asked. 
 
-INSTALLING UR_RTDE
-	Run this in terminal
-		sudo add-apt-repository ppa:sdurobotics/ur-rtde
-		sudo apt-get update
-		sudo apt-get install librtde librtde-dev libboost-all-dev
-
-INSTALLING ROBWORKS
-	Run in terminal
-		sudo add-apt-repository ppa:sdurobotics/robwork
-		sudo apt-get update
-		sudo apt-get install libsdurw-all-dev libsdurws-all-dev libsdurwhw-all-dev libsdurwsim-all-dev
-
-INSTALLING OPENCV AND PYLON
-	In terminal, run
-		sudo apt-get install libopencv-dev
- 	download deb (Linux x64 .deb) package from:
-		https://www.baslerweb.com/en/sales-support/downloads/software-downloads/
-	Install using EITHER the package manager interface or the following
-		sudo dpkg -i ~/Downloads/pylon_X.X.X.XXXXX-deb0_amd64.deb
-	Where the X's are the version you downloaded
-
 INSTALLING URSIM
 	download package from:
 		https://www.universal-robots.com/download/?option=89457#section16632
@@ -125,8 +84,5 @@ INSTALLING URSIM
 		sudo ursim-3.X.X.XXXXX/start-ursim.sh UR5
 
 USING THE UML GENERATOR SCRIPT
-	Run in terminal (Beware of pip in first line, apt in second):
-		sudo pip install hpp2plantuml
-		sudo apt install plantuml
 	To run the script, enter the UML subfolder and run:
 		./hpp2uml_script.sh

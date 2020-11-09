@@ -1,18 +1,18 @@
-cmake_minimum_required(VERSION 3.10.2) # Ubuntu 18.04 default right now? My 20.04 is 3.16.3
+cmake_minimum_required(VERSION 3.10.2)
 project(KasteRobot)
 
 # Using C++17
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Building as debug for now (my robworks is not though, may be a problem)
+# Building as debug for now
 set(CMAKE_BUILD_TYPE Debug)
 
 # wxWidgets library
 find_package(wxWidgets REQUIRED COMPONENTS net core base)
 include("${wxWidgets_USE_FILE}")
 
-# MySQL xDevAPI dependency
+# MySQL xDevAPI library
 find_package(OpenSSL REQUIRED)
 
 # OpenCV library
@@ -33,13 +33,13 @@ include_directories(${ROBWORK_INCLUDE_DIRS})
 # UR_RTDE library
 find_package(ur_rtde REQUIRED)
 
-# USE EXPLICIT GLOBBING! please ..
+# SRC GLOB
 file(GLOB SRC
     ${PROJECT_SOURCE_DIR}/app.cpp
     ${PROJECT_SOURCE_DIR}/app.hpp
     )
 
-# GUI layer source files GLOB
+# GUI GLOB
 file(GLOB GUI_FILES
     ${PROJECT_SOURCE_DIR}/gui/cmain.cpp
     ${PROJECT_SOURCE_DIR}/gui/cmain.hpp
@@ -50,7 +50,7 @@ file(GLOB GUI_FILES
     ${PROJECT_SOURCE_DIR}/gui/cidbindings.hpp
     )
 
-# Logic layer source files GLOB
+# Logic GLOB
 file(GLOB LOGIC_FILES
     ${PROJECT_SOURCE_DIR}/logic/xcontroller.cpp
     ${PROJECT_SOURCE_DIR}/logic/xcontroller.hpp
@@ -78,15 +78,13 @@ file(GLOB LOGIC_FILES
     ${PROJECT_SOURCE_DIR}/logic/xmath.hpp
     )
 
-# Database layer source files GLOB
+# Database GLOB
 file (GLOB DB_FILES
      ${PROJECT_SOURCE_DIR}/database/qdatabasehandler.cpp
      ${PROJECT_SOURCE_DIR}/database/qdatabasehandler.hpp
     )
 
 # Creating executable, linked with source files
-# CMake complains here: Files in some directories may conflict with implicit libraries (librtde.so.1.3 in /usr/lib/x86_64-linux-gnu hidden by /usr/local/lib)
-# Might be a local mistake on my machine due to multiples of the same lib
 add_executable(${PROJECT_NAME} ${SRC} ${GUI_FILES} ${LOGIC_FILES} ${DB_FILES})
 
 # Some more wxWidgets compiling stuff (wx-config --cxxflags)
@@ -98,6 +96,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE mysqlcppconn8 OpenSSL::SSL resolv 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${Pylon_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${OpenCV_LIBS})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${ROBWORK_LIBRARIES})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${wxWidgets_LIBRARIES}) # Not doing enough, next line corrects that (from wx-config --libs)
 target_link_libraries(${PROJECT_NAME} PRIVATE ur_rtde::rtde)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${wxWidgets_LIBRARIES}) # Not doing enough, next line corrects that (from wx-config --libs)
 target_link_libraries(${PROJECT_NAME} PRIVATE -L/usr/local/lib -pthread -lwx_gtk3u_xrc-3.0 -lwx_gtk3u_html-3.0 -lwx_gtk3u_qa-3.0 -lwx_gtk3u_adv-3.0 -lwx_gtk3u_core-3.0 -lwx_baseu_xml-3.0 -lwx_baseu_net-3.0 -lwx_baseu-3.0)
