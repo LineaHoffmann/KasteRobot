@@ -36,6 +36,7 @@ public:
     void disconnectReq();
     void connectReq();
     void setIpPort(std::pair<std::string, int>);
+    bool isReady();
 
 private:
     void connectSocket();

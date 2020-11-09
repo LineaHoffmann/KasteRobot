@@ -174,9 +174,12 @@ std::string xGripperClient::getAnswer() {
     return answer;
 }
 
-
-
-
+bool xGripperClient::isReady() {
+    if (mReady.load()) {
+        return true;
+    }
+    else {return false;}
+}
 
 
 
