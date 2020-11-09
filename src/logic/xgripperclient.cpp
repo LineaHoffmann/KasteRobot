@@ -17,7 +17,7 @@ void xGripperClient::entryThread() {
     mUpdateReq.exchange(false);
     mTRuntime.exchange(true);
 
-    mIpAddress = "192.168.100.10";
+    mIpAddress = "192.168.100.20";
     mPort = 1000;                                   //DEFAULT VALUES
 
     logstd("Gripper client thread started .. ");
@@ -137,6 +137,7 @@ void xGripperClient::disconnectReq() {
 }
 
 bool xGripperClient::writeRead(std::string command) {
+    mReady.exchange(false);
     mCommand = command + "\n";
     std::cout << mCommand << std::endl;
     char buf[32];
@@ -149,6 +150,7 @@ bool xGripperClient::writeRead(std::string command) {
     mAnswer = answer;
     logstd(mAnswer.c_str());
     if (mAnswer[0] == 'E') {
+        mReady.exchange(true);
         return false;
     }
 
@@ -157,6 +159,7 @@ bool xGripperClient::writeRead(std::string command) {
     read(mSock, buf, 32); //Reading response
     std::string test(buf);
     logstd(test.c_str());
+    mReady.exchange(true);
     return true;
 
 }

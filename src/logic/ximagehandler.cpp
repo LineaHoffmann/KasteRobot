@@ -31,9 +31,10 @@ bool ximageHandler::cutOutTable()
     cv::cvtColor( inputImage, grey, cv::COLOR_BGR2GRAY ); //Convert to gray
     cv::Mat kernell(5,5, CV_8U, cv::Scalar(1));
     cv::morphologyEx(grey, grey, cv::MORPH_GRADIENT, kernell); //det smart
-    //if (debug) cv::imshow( "closedimggrey", grey);
+    //if (debug)
+    //cv::imshow( "closedimggrey", grey);
 
-    cv::threshold(grey, grey, 35, 255, cv::THRESH_BINARY_INV);
+    cv::threshold(grey, grey, 25, 255, cv::THRESH_BINARY_INV);
 
     //remove noice
     cv::Mat kernel (2, 2, CV_8U, cv::Scalar(1));
@@ -125,7 +126,7 @@ bool ximageHandler::cutOutTable()
         //pixel to cm hackerway
         pixToCm = table.cols / tableWidth;
 
-        //if (showResult) cv::imshow("table", table);
+        //if (showResult)cv::imshow("table", table);
         return 1;
     } else {
         return 0;

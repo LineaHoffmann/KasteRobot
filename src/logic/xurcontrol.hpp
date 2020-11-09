@@ -38,12 +38,12 @@ struct UR_STRUCT {
 class xUrControl
 {
     //Static pre-defines positions.
-   // inline static const std::vector<double> HOMEQ{-1.15192, -1.39626,-0.39392081,-1.5708,1.5708,0};
+    //inline static const std::vector<double> HOMEQ{-1.15192, -1.39626,-0.39392081,-1.5708,1.5708,0};
     inline static const std::vector<double> HOMEQ{-1.15192, -1.39626,-0.39392081, -1.5708,1.5708,1.5708};
 
 
-//    inline static const std::vector<double> PICKUPQ{.07327, -.43385,0.1
-//                                                    ,0.720,-3.062,0.044};
+    //inline static const std::vector<double> PICKUPQ{.07327, -.43385,0.1
+      //                                              ,0.720,-3.062,0.044};
     inline static const std::vector<double> PICKUPQ{.07327, -.43385,0.1
                                                     ,1.778,2.562,0.-0.01};
 

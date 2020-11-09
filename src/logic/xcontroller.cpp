@@ -125,6 +125,7 @@ void xController::testDetectAndPickUp(std::shared_ptr<ximageHandler> mImagehandl
 
         logstd("grip object...");
         mGripper->grip();
+        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 
         logstd("moving robot to throwing position");
         mRobot->setMove(xUrControl::moveEnum::PICKUP);
