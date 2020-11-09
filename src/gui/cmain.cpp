@@ -629,8 +629,12 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         break;
     case ID_BTN_GRIPPER_UPDATE:
     {
+        long temp;
         std::string ip = mTxtGripperIP->GetValue().ToStdString();
-        xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_UPDATE, ip);});
+        mTxtGripperPort->GetValue().ToLong(&temp);
+        int port = temp;
+        std::pair<std::string, int> data(ip, port);
+        xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_UPDATE, data);});
     }
         break;
     case ID_BTN_GRIPPER_RELEASE:

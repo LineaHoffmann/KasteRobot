@@ -35,7 +35,7 @@ public:
     void home();
     void disconnectReq();
     void connectReq();
-    void setIpPort(std::string, int);
+    void setIpPort(std::pair<std::string, int>);
 
 private:
     void connectSocket();
@@ -54,6 +54,7 @@ private:
     std::mutex mMtx;
     std::atomic<bool> mTRuntime, mReady, mConnected, mGripReq, mReleaseReq, mHomeReq,
                       mConnectReq, mDisconnectReq, mUpdateReq;
+    std::pair<std::string, int> mIpPort;
 
     std::thread *mWorker;
 

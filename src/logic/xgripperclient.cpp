@@ -14,6 +14,7 @@ void xGripperClient::entryThread() {
     mGripReq.exchange(false);
     mReleaseReq.exchange(false);
     mHomeReq.exchange(false);
+    mUpdateReq.exchange(false);
     mTRuntime.exchange(true);
 
     mIpAddress = "192.168.100.10";
@@ -119,11 +120,12 @@ void xGripperClient::home() {
     mHomeReq.exchange(true);
 }
 
-void xGripperClient::setIpPort(std::string ipAddress, int port) {
-    mIpAddress = ipAddress;
-    mPort = port;
-    // Medtag to parametre fra GUI?
-    //Threadsafe?
+void xGripperClient::setIpPort(std::pair<std::string, int> ipPort) {
+    {
+    std::lock_guard<std::mutex>ipPortLock(mMtx);
+    mIpAddress = ipPort.first;
+    mPort = ipPort.second;
+    }
 }
 
 void xGripperClient::connectReq() {
