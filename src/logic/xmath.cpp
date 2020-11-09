@@ -32,7 +32,7 @@ std::array<double, 3> xMath::distance3d_to_v0_xyAngle_czAngle(const std::array<d
 std::vector<double> xMath::ball_position_to_robotframe(std::tuple<bool, cv::Mat, cv::Point2f, float> data)
 {
     if (std::get<0>(data)) {
-        cv::Point3d pointRobot(std::get<2>(data).x, std::get<2>(data).y, (std::get<3>(data) - 3.5)); //-3.5 is for the base z offset
+        cv::Point3d pointRobot(std::get<2>(data).x, std::get<2>(data).y, (std::get<3>(data) - 4.5)); //-3.5 is for the base z offset
 
      //       cos(-66)  -sin(-66)  0
      //       sin(-66)   cos(-66)  0 men da y akse skal flippes kan man tilføje (-) foran elementerne i denne række.
@@ -43,6 +43,7 @@ std::vector<double> xMath::ball_position_to_robotframe(std::tuple<bool, cv::Mat,
 
 
             pointRobot = rotationMatrix * pointRobot; //calc new values for position in baseframe
+
             pointRobot /= 100; // point starts as cm, but needs to be in M.
 
             //convert to vector
@@ -50,9 +51,12 @@ std::vector<double> xMath::ball_position_to_robotframe(std::tuple<bool, cv::Mat,
             pointAndRotation.push_back(pointRobot.x);
             pointAndRotation.push_back(pointRobot.y);
             pointAndRotation.push_back(pointRobot.z);
-            pointAndRotation.push_back(0.720);
-            pointAndRotation.push_back(-3.062);
-            pointAndRotation.push_back(0.044);
+            //pointAndRotation.push_back(0.720);
+            //pointAndRotation.push_back(-3.062);
+            //pointAndRotation.push_back(0.044);
+            pointAndRotation.push_back(1.778);
+            pointAndRotation.push_back(2.577);
+            pointAndRotation.push_back(-0.010);
 
             std::stringstream s;
                         s << "x: " << pointAndRotation[0] << " | y: "

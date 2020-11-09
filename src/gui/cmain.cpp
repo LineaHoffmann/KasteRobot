@@ -227,8 +227,8 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mTxtCameraExposure = new wxTextCtrl(mNotebookCamera, wxID_ANY, "5000");
     mTxtCameraFramerate = new wxTextCtrl(mNotebookCamera, wxID_ANY, "30");
     mTxtCameraCalibrationPath = new wxTextCtrl(mNotebookCamera, wxID_ANY, "../resources/pylonimgs/*.bmp");
-    mTxtCameraHue = new wxTextCtrl(mNotebookCamera, wxID_ANY, "10");
-    mTxtCameraHueDelta = new wxTextCtrl(mNotebookCamera, wxID_ANY, "20");
+    mTxtCameraHue = new wxTextCtrl(mNotebookCamera, wxID_ANY, "25");
+    mTxtCameraHueDelta = new wxTextCtrl(mNotebookCamera, wxID_ANY, "15");
     mTxtCameraBallMin = new wxTextCtrl(mNotebookCamera, wxID_ANY, "1.7");
     mTxtCameraBallMax = new wxTextCtrl(mNotebookCamera, wxID_ANY, "2.3");
     // Camera tab building - Static bitmap

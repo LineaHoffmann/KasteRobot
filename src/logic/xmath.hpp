@@ -37,7 +37,8 @@ public:
     //takes balloutput from findball and converts it into a 3d point in the fram of det robotbase
     static std::vector<double> ball_position_to_robotframe(std::tuple<bool, cv::Mat, cv::Point2f, float> data);
 private:
-    static double constexpr baseRadian = (-66) * (M_PI/180);
+    //-22.25 grader for at koordinatsæt passer til robot base
+    static double constexpr baseRadian = (-22.25) * (M_PI/180);
 
 };
 
