@@ -29,9 +29,12 @@
 //definition of data struct
 struct UR_STRUCT {
 
-    std::vector<double> pose{0};
+    int robotState;
     bool isConnected = false;
     std::string IP;
+    uint16_t robotPollingRate{0};
+    std::array<float, 6> robotTcpPosition{0,0,0,0,0,0};
+    std::array<float, 6> robotJointPosition{0,0,0,0,0,0};
 
 };
 
@@ -82,8 +85,6 @@ public:
     void startPolling();
     void stopPolling();
 
-    const std::vector<double> &getLastPose();
-
     void setPollingRate(int pollingRate);
 
     //returning pointer to the datastruct.
@@ -132,7 +133,7 @@ private:
 
     xCollisionDetector *mDetector;
 
-    UR_STRUCT *mURStruct = nullptr;
+    UR_STRUCT mURStruct;
 
     std::exception_ptr mEptr = nullptr;
 

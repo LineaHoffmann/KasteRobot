@@ -74,7 +74,7 @@ xUrControl::~xUrControl()
 
     //check if pointer types exists and delete if they exists.
     delete mDetector;
-    if (mURStruct)              {delete mURStruct;}
+    //if (mURStruct)              {delete mURStruct;}
     if (mJoints)                {delete mJoints;}
     if (mThreadData)            {delete mThreadData;}
     if (mUrControl)             {delete mUrControl;}
@@ -168,7 +168,7 @@ void xUrControl::connect(std::string IP){
 
         isConnected = true;
 
-        logstd("Robot->Reconnected!");
+        logstd("[ROBOT] Reconnected!");
     }
 
     logstd(IP.c_str());
@@ -182,7 +182,7 @@ void xUrControl::connect(std::string IP){
     if(!mUrRecieve){
         try {
             mUrRecieve = new ur_rtde::RTDEReceiveInterface(IP);
-            mURStruct->IP = IP;
+            mURStruct.IP = IP;
             logstd("UR_Control: connect: RTDE Recieve connected");
 
         } catch (std::exception &e) {
@@ -371,11 +371,21 @@ void xUrControl::getData()
 
         //get values from RTDE
         // TODO: define the struct and get the remaining struct members
-        mURStruct->isConnected = mUrRecieve->isConnected();
-        mURStruct->pose = mUrRecieve->getActualTCPPose();
+        mURStruct.isConnected = mUrRecieve->isConnected();
+        isConnected = mUrRecieve->isConnected(); //updating internal connection flag.
 
-//        mIsBusy = (mUrRecieve->getRobotStatus() == 1) ? true : false;
-//        std::cout << mUrRecieve->getRobotMode() << std::endl;
+//        for (int i{0}; i < 6; ++i){
+//            mURStruct->robotTcpPosition[i] = mUrRecieve->getActualTCPPose().at(i);
+//        }
+//        for (int i{0}; i < 6; ++i){
+//            mURStruct->robotJointPosition[i] = mUrRecieve->getActualQ().at(i);
+//        }
+
+//        mURStruct->robotState = mUrRecieve->getRobotMode();
+
+//        mURStruct->robotPollingRate = getPollingRate();
+        mURStruct.IP = getIP();
+
 
         } //lock scope ends
 
@@ -391,7 +401,6 @@ void xUrControl::getData()
 void xUrControl::init()
 {
     //datasharing struct
-    mURStruct = new UR_STRUCT;
     isConnected = false;
     mDetector = new xCollisionDetector;
 
@@ -418,8 +427,13 @@ void xUrControl::initRobot(std::string IP)
  * @return pointer to the URStruct, for data exchange
  */
 UR_STRUCT xUrControl::getURStruct() {
+
+    if(!isConnected){
+        throw x_err::error(x_err::what::ROBOT_NOT_CONNECTED);
+    }
+
     std::lock_guard<std::mutex> dataLock(mMtx);
-    return *mURStruct;
+    return mURStruct;
 }
 
 /**
@@ -448,14 +462,6 @@ void xUrControl::stopPolling()
     }
 }
 
-/**
- * @brief UR_Control::getLastPose getting last postion stored in the URStruct
- * @return return vector with latest saved position from the URStruct
- */
-const std::vector<double> &xUrControl::getLastPose()
-{
-    return mURStruct->pose;
-}
 /**
  * @brief UR_Control::setPollingRate setting private parameter "pollingRate", and checking if its within limits of the robots pollingrate
  * @param pollingRate int in hertz [Hz] between 0 and 125 [Hz]

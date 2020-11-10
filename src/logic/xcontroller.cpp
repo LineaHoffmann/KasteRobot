@@ -65,11 +65,31 @@ cv::Mat xController::getImage()
 void xController::fillInfo(treeInfo &info)
 {
     // TODO: Fill the info struct
+//    try {
+//    UR_STRUCT robot(mRobot->getURStruct());
+//        info.robotIP = robot.IP;
+////        info.robotJointPosition = robot.robotJointPosition;
+////        info.robotTcpPosition = robot.robotTcpPosition;
+////        info.robotPollingRate = robot.robotPollingRate;
+
+////        if(robot.robotState == 7){
+////            info.robotState = ROBOT_RUNNING;
+////        } else if (!robot.isConnected){
+////            info.robotState = ROBOT_NOT_CONNECTED;
+////        } else {
+////            info.robotState = ROBOT_NOT_RUNNING;
+////        }
+//    } catch (...){
+//        std::string s = "[fillInfo] ";
+//        //s.append(e.what());
+//        logerr(s.c_str());
+//    }
+
+
 }
 
 //template <typename T>
 //void xController::guiButtonPressed(BINDING_ID id, T data)
-
 
 
 void xController::testDetectAndPickUp(std::shared_ptr<ximageHandler> mImagehandler,
