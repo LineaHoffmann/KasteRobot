@@ -94,6 +94,8 @@ public:
 
     std::atomic<bool> getIsBusy() const;
 
+    bool getIsConnected() const;
+
 private:
 
     //private functions

@@ -17,8 +17,6 @@ xController::xController()
 
     mImagehandler->showResult = true;
 
-
-
     //robworks
     mCollisionDetector = std::make_shared<xCollisionDetector>("../resources/XML_files/Collision v1.wc.xml");
 
@@ -29,11 +27,14 @@ xController::xController()
 
     try {
         mRobot = std::make_shared<xUrControl>();
+        mRobot->setConnect("127.0.0.1");
     } catch (x_err::error& e) {
         std::string s = "[ROBOT] ";
         s.append(e.what());
         logerr(s.c_str());
     }
+
+
 
     // Gripper
     mGripper = std::make_shared<xGripperClient>();
@@ -65,25 +66,26 @@ cv::Mat xController::getImage()
 void xController::fillInfo(treeInfo &info)
 {
     // TODO: Fill the info struct
-//    try {
-//    UR_STRUCT robot(mRobot->getURStruct());
-//        info.robotIP = robot.IP;
-////        info.robotJointPosition = robot.robotJointPosition;
-////        info.robotTcpPosition = robot.robotTcpPosition;
-////        info.robotPollingRate = robot.robotPollingRate;
+    if(mRobot && mRobot->getIsConnected()){
+        try{
+        UR_STRUCT robot(mRobot->getURStruct());
 
-////        if(robot.robotState == 7){
-////            info.robotState = ROBOT_RUNNING;
-////        } else if (!robot.isConnected){
-////            info.robotState = ROBOT_NOT_CONNECTED;
-////        } else {
-////            info.robotState = ROBOT_NOT_RUNNING;
-////        }
-//    } catch (...){
-//        std::string s = "[fillInfo] ";
-//        //s.append(e.what());
-//        logerr(s.c_str());
-//    }
+        if (robot.robotState == 7){
+            info.robotState = ROBOT_RUNNING;
+        } else {
+            info.robotState = ROBOT_NOT_RUNNING;
+        }
+
+        info.robotIP = mRobot->getIP();
+        info.robotJointPosition = robot.robotJointPosition;
+        info.robotTcpPosition = robot.robotTcpPosition;
+        info.robotPollingRate = robot.robotPollingRate;
+        } catch (const std::exception &e) {
+            std::cout << "error handled: " << e.what() << std::endl;
+        }
+    } else{
+        info.robotState = ROBOT_NOT_CONNECTED;
+    }
 
 
 }

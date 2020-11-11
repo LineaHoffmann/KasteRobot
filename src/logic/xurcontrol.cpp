@@ -31,7 +31,7 @@ void xUrControl::entryThread()
             connect(mIP);
             mConnect = false;
             } catch (x_err::error& e) {
-                std::string s("URControl: connection Failed: ");
+                std::string s("[ROBOT] URControl: connection Failed: ");
                 s.append(e.what());
                 logerr(s.c_str());
                 mConnect = false;
@@ -44,7 +44,7 @@ void xUrControl::entryThread()
                 disconnect();
                 mDisconnect = false;
             } catch (x_err::error& e) {
-                std::string s("URControl: disconnect Failed: ");
+                std::string s("[ROBOT] URControl: disconnect Failed: ");
                 s.append(e.what());
                 logerr(s.c_str());
                 mDisconnect = false;
@@ -53,10 +53,10 @@ void xUrControl::entryThread()
 
         if (mMove) {
             try {
-                logstd("ROBOT -> Move called");
+                logstd("[ROBOT] Move called");
                 move();
             } catch (x_err::error& e) {
-                std::string s("URControl: Move Failed: ");
+                std::string s("[ROBOT] URControl: Move Failed: ");
                 s.append(e.what());
                 logerr(s.c_str());
                 mMove = false;
@@ -94,6 +94,7 @@ void xUrControl::setConnect(std::string IP)
 
 void xUrControl::setDisconnect()
 {
+    mUrControl->stopScript();
     mDisconnect = true;
     logstd("[ROBOT]: SetDisconnect flag succesfull");
 }
@@ -164,46 +165,44 @@ void xUrControl::connect(std::string IP){
     if(mUrRecieve && mUrControl && !isConnected){
         mUrControl->reconnect();
         mUrRecieve->reconnect();
-        mUrControl->reuploadScript();
 
         isConnected = true;
 
         logstd("[ROBOT] Reconnected!");
-    }
-
-    logstd(IP.c_str());
-    try {
-        logstd("[ROBOT] initializing");
-        initRobot(IP);
-    } catch (const x_err::error &e) {
-        throw;
-    }
-
-    if(!mUrRecieve){
+    } else {
         try {
-            mUrRecieve = new ur_rtde::RTDEReceiveInterface(IP);
-            mURStruct.IP = IP;
-            logstd("UR_Control: connect: RTDE Recieve connected");
+            logstd("[ROBOT] initializing robot parameters");
+            initRobot(IP);
+        } catch (const x_err::error &e) {
+            throw;
+        }
 
-        } catch (std::exception &e) {
-            std::string s = "[ROBOT] RTDE Recieve: ";
-            s.append(e.what());
-            throw x_err::error(s.c_str());
-            return;
-        };
-    }
+        if(!mUrRecieve){
+            try {
+                mUrRecieve = new ur_rtde::RTDEReceiveInterface(IP);
+                mURStruct.IP = IP;
+                logstd("[ROBOT] connect: RTDE Recieve connected");
 
-    if(!mUrControl){
-        try {
-            mUrControl = new ur_rtde::RTDEControlInterface(IP);
-            logstd("UR_Control: connect: RTDE control connected");
-            isConnected = true;
+            } catch (std::exception &e) {
+                std::string s = "[ROBOT] RTDE Recieve: ";
+                s.append(e.what());
+                throw x_err::error(s.c_str());
+                return;
+            };
+        }
 
-        } catch (std::exception &e) {
-            std::string s = "[ROBOT] RTDE Control: ";
-            s.append(e.what());
-            throw x_err::error(s.c_str());
-        };
+        if(!mUrControl){
+            try {
+                mUrControl = new ur_rtde::RTDEControlInterface(IP);
+                logstd("[ROBOT] connect: RTDE control connected");
+                isConnected = true;
+
+            } catch (std::exception &e) {
+                std::string s = "[ROBOT] RTDE Control: ";
+                s.append(e.what());
+                throw x_err::error(s.c_str());
+            };
+        }
     }
 }
 
@@ -219,10 +218,15 @@ void xUrControl::disconnect()
         mUrControl->disconnect();
         mUrRecieve->disconnect();
         isConnected = false;
-        logstd("UR_Control: disconnect: robot disconnected!");
+        logstd("[ROBOT] disconnect: robot disconnected!");
     } else {
-        logstd("UR_Control: disconnect: robot already disconnected!");
+        logstd("[ROBOT] disconnect: robot already disconnected!");
     }
+}
+
+bool xUrControl::getIsConnected() const
+{
+    return isConnected.load();
 }
 
 std::atomic<bool> xUrControl::getIsBusy() const
@@ -244,19 +248,19 @@ void xUrControl::move()
 
     try{
         if (mMoveMode == HOME) {
-            logstd("MOVE_HOME: move commenced!");
+            logstd("[ROBOT] MOVE_HOME: move commenced!");
             if(mUrControl->moveJ(HOMEQ, speed, acc)){
-                logstd("MOVE_HOME: Completed");
+                logstd("[ROBOT] MOVE_HOME: Completed");
             }else{
-                logerr("Move home bad");
+                logerr("[ROBOT] Move home bad");
                 mUrControl->reuploadScript();
             }
         } else if (mMoveMode == PICKUP)  {
-            logstd("MOVE_PICKUP: move commenced!");
+            logstd("[ROBOT] MOVE_PICKUP: move commenced!");
             if (mUrControl->moveL(PICKUPQ, speed, acc)){
-                logstd("MOVE_PICKUP: Completed");
+                logstd("[ROBOT] MOVE_PICKUP: Completed");
             } else {
-                logerr("Move home bad");
+                logerr("[ROBOT] Move home bad");
                 mUrControl->reuploadScript();
             }
         }
@@ -267,35 +271,35 @@ void xUrControl::move()
             if(!mQ.empty()){
                 switch (mMoveMode) {
                     case MOVE_JLIN:
-                        logstd( "MOVE_JLIN: move commenced!");
+                        logstd( "[ROBOT] MOVE_JLIN: move commenced!");
                         //std::vector<double> tempQ = q[0];
                         if(mUrControl->moveJ(mQ[0], speed, acc)){
-                            logstd("MOVE_JLIN: move completed!");
+                            logstd("[ROBOT] MOVE_JLIN: move completed!");
                         }
                         break;
                     case MOVE_JIK:
-                        logstd( "MOVE_JIK: move commenced!");
+                        logstd( "[ROBOT] MOVE_JIK: move commenced!");
                         //std::vector<double> tempQ = q[0];
                             if(mUrControl->moveJ_IK(mQ[0], speed, acc)){
-                                logstd("MOVE_JIK: move completed!");
+                                logstd("[ROBOT] MOVE_JIK: move completed!");
                             }
                         break;
                     case MOVE_JPATH :
-                        logstd("MOVE_JPATH: move commenced!");
+                        logstd("[ROBOT] MOVE_JPATH: move commenced!");
                         if (mUrControl->moveJ(mQ)){
-                            logstd("MOVE_JPATH: move completed!");
+                            logstd("[ROBOT] MOVE_JPATH: move completed!");
                         }
                         break;
                     case MOVE_LFK: //Linear tool forward kinematics
-                        logstd("MOVE_LFK: move commenced!");
+                        logstd("[ROBOT] MOVE_LFK: move commenced!");
                         if (mUrControl->moveL_FK(mQ[0], speed, acc)){
-                            logstd("MOVE_LFK: move completed!");
+                            logstd("[ROBOT] MOVE_LFK: move completed!");
                         break;
                     }
                     case MOVE_L: //Linear tool
-                        logstd("MOVE_L: move commenced!");
+                        logstd("[ROBOT] MOVE_L: move commenced!");
                         if (mUrControl->moveL(mQ[0], speed, acc)){
-                            logstd("MOVE_L: move completed!");
+                            logstd("[ROBOT] MOVE_L: move completed!");
                         }
                         break;
                     default:
@@ -374,17 +378,19 @@ void xUrControl::getData()
         mURStruct.isConnected = mUrRecieve->isConnected();
         isConnected = mUrRecieve->isConnected(); //updating internal connection flag.
 
-//        for (int i{0}; i < 6; ++i){
-//            mURStruct->robotTcpPosition[i] = mUrRecieve->getActualTCPPose().at(i);
-//        }
-//        for (int i{0}; i < 6; ++i){
-//            mURStruct->robotJointPosition[i] = mUrRecieve->getActualQ().at(i);
-//        }
+        for (int i{0}; i < 6; ++i){
+            mURStruct.robotTcpPosition[i] = mUrRecieve->getActualTCPPose().at(i);
+        }
+        for (int i{0}; i < 6; ++i){
+            mURStruct.robotJointPosition[i] = mUrRecieve->getActualQ().at(i);
+        }
 
-//        mURStruct->robotState = mUrRecieve->getRobotMode();
+        mURStruct.robotState = mUrRecieve->getRobotMode();
 
-//        mURStruct->robotPollingRate = getPollingRate();
-        mURStruct.IP = getIP();
+        //std::cout << mUrRecieve->getSafetyMode() << " | "; can be used to discover safety mode and warn user
+
+        mURStruct.robotPollingRate = getPollingRate();
+        mURStruct.IP = mIP;
 
 
         } //lock scope ends
