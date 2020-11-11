@@ -460,6 +460,10 @@ void cMain::OnTimerView1Update(wxTimerEvent &evt)
 }
 void cMain::OnTimerInfoUpdate(wxTimerEvent &evt)
 {
+    if (!mController) {
+        evt.Skip();
+        return; // Skip if the controller isn't created
+    }
     // Updating the treelist
     mController->fillInfo(*info);
     if (info->robotState == STATE::DEFAULT) {
