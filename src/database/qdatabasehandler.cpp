@@ -65,34 +65,41 @@ bool qDatabaseHandler::disconnect()
 // TODO find better name
 std::vector<Row> *qDatabaseHandler::showTables()
 {
-    // I assume there's already loaded the database
-    std::cout <<"qDatabaseHandler: Session accepted, creating collection..." <<std::endl;
-    Schema schema = mSession->getSchema(mDatabase);
-    std::vector<std::string> mSchVec = schema.getTableNames();
+    mSchema = new Schema(mSession->getSchema(mDatabase));
+    //Schema qSchema = mSession->getSchema(mDatabase);
 
-    std::cout << "qDatabaseHandler:Listing found tables: " << std::endl;
-    for (uint32_t i = 0; i < mSchVec.size(); ++i) {
-        std::cout << mSchVec.at(i) << " | ";
-    } std::cout << std::endl;
-
-    SqlResult qSql = mSession->sql("SELECT * FROM workshop.bil").execute();
-    if(qSql.hasData() ? !1 : 1)
+    // Accessing an exsisting table
+    // TODO Make table variable, so can be changed from input
+    mTable = new Table(mSchema->getTable("throw!"));
+    //Table qTable = mSchema->getTable("throw");
+    if(mTable->isView())
     {
-        std::cout << "qDatabasehandler.cpp : No data recieved: " << qSql.hasData() << std::endl;
+        std::cout << "qDatabasehandler: Something is wrong, isVeiw() " << std::endl;
     }
+
+    // Sql call, find rows.
+    RowResult qResult = mTable->select("*").execute();
     disconnect();
 
-    mRes = new std::vector<Row>(qSql.fetchAll());
-    // Prints the output to the terminal.
-    // TODO Save the data correct
+    mRes = new std::vector<Row>(qResult.fetchAll());
     for(Row row : *mRes)
-    {
-        for(uint32_t i = 0; i < row.colCount(); i++)
-        {
-            std::cout << row[i] << " | ";
-        }
-        std::cout << std::endl;
-    }
+            {
+                for(uint32_t i = 0; i < row.colCount(); i++)
+                {
+                    std::cout << row[i] << " | ";
+                }
+                std::cout << std::endl;
+            }
+
     return mRes;
+
+}
+
+bool qDatabaseHandler::qInsert()
+{
+    // NOTE check with count, if new row added
+    mTable->insert().execute();
+
+    return true;
 
 }

@@ -7,15 +7,6 @@
 
 using namespace mysqlx;
 
-/**
- * @brief The qDatabaseHandler class
- *  // NOTE TEST: app.cpp
-    qDatabaseHandler dbTest("lineah", "admin", "localhost","workshop", 33060);
-    dbTest.connect();
-    dbTest.showTables();
-    dbTest.disconnect();
- */
-
 class qDatabaseHandler
 {
 public:
@@ -27,6 +18,7 @@ public:
     bool disconnect();
 
     std::vector<Row>* showTables();
+    bool qInsert();
 
 private:
     std::string mUser;
@@ -37,6 +29,8 @@ private:
     SSLMode mSsl_mode;
 
     Session *mSession = nullptr;
+    Schema *mSchema = nullptr;
+    Table *mTable = nullptr;
     std::vector<Row> *mRes;
 };
 
