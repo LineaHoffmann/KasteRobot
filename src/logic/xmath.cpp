@@ -1,4 +1,6 @@
 #include "xmath.hpp"
+#include <cmath>
+#include <rw/math.hpp>
 
 
 std::array<double, 3> xMath::distance3d_to_v0_xyAngle_czAngle(const std::array<double, 3> &distanceXYZ,
@@ -29,6 +31,43 @@ std::array<double, 3> xMath::distance3d_to_v0_xyAngle_czAngle(const std::array<d
     return std::array<double,3>{v0, theta_xy, theta_cz};
 }
 
+void xMath::calculateTCPRotation(std::vector<double> &position)
+{
+    double roll = -90;
+    double pitch = 0;
+    double yaw = -180;
+
+    double radius = sqrt(position[0]*position[0]+position[1]*position[1]);
+
+    if (radius > 0.10 && radius < 0.20){
+            yaw += (0.1-radius)*(20/0.01);
+    } else if (radius > 0.700 && radius < 0.850) {
+            yaw -= (radius-0.700) * (0.150/20);
+    }
+
+    if (radius > 0.10 && radius < 0.20){
+        roll += atan2(position[1]*10,position[0]*10);
+    }
+
+    roll *=     (M_PI/180);
+    pitch *=    (M_PI/180);
+    yaw *=      (M_PI/180);
+
+
+    rw::math::RPY rpy(roll, pitch, yaw);
+
+    rw::math::Rotation3Dd rotMatrix = rpy.toRotation3D();
+
+    //decomposing x y and z rotations
+    position[3] = atan2(rotMatrix(2,1), rotMatrix(2,2));
+    position[4] = atan2(-rotMatrix(2,0), sqrt(rotMatrix(2,1)*rotMatrix(2,1) + rotMatrix(2,2)*rotMatrix(2,2)));
+    position[5] = atan2(rotMatrix(1,0), rotMatrix(0,0));
+
+    std::cout << rpy << " | " << radius << " | " << position[1] << " | " << position[0] << std::endl;
+    std::cout << rotMatrix << std::endl;
+
+}
+
 std::vector<double> xMath::ball_position_to_robotframe(std::tuple<bool, cv::Mat, cv::Point2f, float> data)
 {
     if (std::get<0>(data)) {
@@ -57,6 +96,8 @@ std::vector<double> xMath::ball_position_to_robotframe(std::tuple<bool, cv::Mat,
             pointAndRotation.push_back(1.778);
             pointAndRotation.push_back(2.577);
             pointAndRotation.push_back(-0.010);
+
+            calculateTCPRotation(pointAndRotation);
 
             std::stringstream s;
                         s << "x: " << pointAndRotation[0] << " | y: "

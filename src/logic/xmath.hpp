@@ -33,6 +33,8 @@ public:
                                                                    double steps = 10,
                                                                    double g = 9.82);
 
+    static void calculateTCPRotation(std::vector<double> &position);
+
 
     //takes balloutput from findball and converts it into a 3d point in the fram of det robotbase
     static std::vector<double> ball_position_to_robotframe(std::tuple<bool, cv::Mat, cv::Point2f, float> data);
