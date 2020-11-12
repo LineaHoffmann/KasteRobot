@@ -5,7 +5,7 @@ REVISED REINSTALL GUIDE [08/11/2020]
 	sudo apt-get install libssl-dev libopengl-dev kcachegrind valgrind
 	sudo snap install gitkraken --classic
 	sudo apt-get install python3-pip plantuml
-	sudo pip3 install hpAwesoem plantuml
+	sudo pip3 install hpp2plantuml
 	sudo apt-get install wx-common libwxbase3.0-dev libwxgtk-media3.0-gtk3-dev libwxgtk3.0-gtk3-dev
 	sudo apt-get install libopencv-dev
 	
