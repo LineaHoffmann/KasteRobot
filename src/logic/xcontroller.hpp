@@ -62,7 +62,10 @@ public:
             if constexpr (std::is_same_v<T, std::string>) {
                 static_cast<std::string>(data);
                 std::string ip(data);
+
+                if(mRobot){
                 mRobot->setConnect(ip);
+                }
             }
             break;
         case ID_BTN_ROBOT_SEND_POS:
@@ -77,21 +80,29 @@ public:
                     s.append(std::to_string(q[0].at(i)) + " | ");
                 }
                 logstd(std::string("New TCP Position sent to robot: ").append(s).c_str());
+                if(mRobot){
                 mRobot->setMove(xUrControl::moveEnum::MOVE_L,q);
+                }
             }
         }
             break;
         case ID_BTN_ROBOT_DISCONNECT:
             logstd("Robot disconnect from xController");
+            if(mRobot){
             mRobot->setDisconnect();
+            }
             break;
         case ID_BTN_ROBOT_SEND_HOME:
             logstd("Robot Moving to home from xController");
+            if(mRobot){
             mRobot->setMove(xUrControl::HOME);
+            }
             break;
         case ID_BTN_ROBOT_SEND_PICKUP:
             logstd("Robot Moving to Pickup from xController");
+            if(mRobot){
             mRobot->setMove(xUrControl::PICKUP);
+            }
             break;
 
         //NOTE: CAMERA buttons implementation

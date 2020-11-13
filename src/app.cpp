@@ -47,9 +47,9 @@ void app::threadFunc() {
     std::shared_ptr<xController> controller = std::make_shared<xController>();
     guiMain->setLogicControllerPointer(controller);
 
-    qDatabaseHandler dbTest("lineah", "admin", "localhost", "kasteRobot", 33060);
-    dbTest.connect();
-    dbTest.getDbData("throw");
+    //qDatabaseHandler dbTest("lineah", "admin", "localhost", "kasteRobot", 33060);
+    //dbTest.connect();
+    //dbTest.getDbData("throw");
 
 
 

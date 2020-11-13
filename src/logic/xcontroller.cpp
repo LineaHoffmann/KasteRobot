@@ -109,8 +109,8 @@ void xController::testDetectAndPickUp(std::shared_ptr<ximageHandler> mImagehandl
 
 
     mGripper->home();
-    std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(mCamera->getImage());
-    //std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(cv::imread("../resources/ballimgs/remappedBall2.png"));
+    //std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(mCamera->getImage());
+    std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(cv::imread("../resources/ballimgs/remappedBall1.png"));
 
     if (std::get<0>(ballResult)){
         logstd("Ball found, moving robot to pre pickup position");

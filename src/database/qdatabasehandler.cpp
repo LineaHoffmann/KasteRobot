@@ -103,14 +103,14 @@ std::vector<Row> *qDatabaseHandler::getDbData(std::string tableName)
 }
 
 // NOTE Should maybe be different functions woth different calls?
-bool qDatabaseHandler::writeSql(std::vector inputList)
-{
-    //TODO Seperate the input vector/list.
+//bool qDatabaseHandler::writeSql(std::vector inputList) //WARNING must add type specifier for the vector, therefor commented.
+//{
+//    //TODO Seperate the input vector/list.
 
 
 
 
-}
+//}
 
 bool qDatabaseHandler::qInsert()
 {

@@ -1,6 +1,5 @@
 #include "xmath.hpp"
-#include <cmath>
-#include <rw/math.hpp>
+
 
 
 std::array<double, 3> xMath::distance3d_to_v0_xyAngle_czAngle(const std::array<double, 3> &distanceXYZ,
@@ -31,40 +30,48 @@ std::array<double, 3> xMath::distance3d_to_v0_xyAngle_czAngle(const std::array<d
     return std::array<double,3>{v0, theta_xy, theta_cz};
 }
 
-void xMath::calculateTCPRotation(std::vector<double> &position)
+rw::math::Rotation3D<> xMath::calculateTCPRotation(const rw::math::Vector3D<> &vect)
 {
-    double roll = 0;
-    double pitch = 0;
-    double yaw = 0;
-    double radius = sqrt(position[0]*position[0]+position[1]*position[1]);
 
-    if (radius > 0.10 && radius < 0.20){
-            yaw = (0.1-radius)*(20/0.01);
-    } else if (radius > 0.700 && radius < 0.850) {
-            yaw = (radius-0.700) * (0.150/20);
+    double thetax{0}, thetay{-180}, thetaz{0}, radius;
+
+    radius = 10 * sqrt(pow(vect[0],2)+pow(vect[1],2));
+
+    if (radius > 700 && radius < 950){
+        double a = 35./(950-700);
+        thetax = (radius-700)*a;
+    } else if (radius > 100 && radius < 300){
+        double a = 35./(300-100);
+        thetax = -(300-radius)*a;
+        thetay = (300-radius)*a;
     }
 
-    if (radius > 0.10 && radius < 0.20){
-        roll += atan2(position[1]*10,position[0]*10);
-    }
+    thetaz = atan2(vect[1], vect[0]);
+//    if(radius > 100 && radius < 300){
+//        thetaz = atan2(vect[1], vect[0]);
+//    }
 
-    roll    *=  (M_PI/180);
-    pitch   *=  (M_PI/180);
-    yaw     *=  (M_PI/180);
+    thetax *= M_PI/180;
+    thetay *= M_PI/180;
 
+    rw::math::Rotation3D rotationZ(cos(thetaz), -sin(thetaz),   .0,
+                                   sin(thetaz),  cos(thetaz),   .0,
+                                            .0,           .0,   1.);
 
-    rw::math::RPY rpy(roll, pitch, yaw);
+    rw::math::Rotation3D rotationY(cos(thetay),     .0, -sin(thetay),
+                                            .0,     1.,           .0,
+                                   sin(thetay),     .0, cos(thetay));
 
-    rw::math::Rotation3Dd rotMatrix = rpy.toRotation3D();
+    rw::math::Rotation3D rotationX(1.,          0.,           0.,
+                                   0., cos(thetax), -sin(thetax),
+                                   0., sin(thetax),  cos(thetax));
 
-    //decomposing x y and z rotations
-    position[3] = -M_PI + atan2(rotMatrix(2,1), rotMatrix(2,2));
-    position[4] = -(M_PI)+atan2(-rotMatrix(2,0), sqrt(rotMatrix(2,1)*rotMatrix(2,1) + rotMatrix(2,2)*rotMatrix(2,2)));
-    position[5] = atan2(rotMatrix(1,0), rotMatrix(0,0));
+    rw::math::Rotation3D totalRotation = rotationZ*rotationY*rotationX;
 
-    std::cout << rpy << " | " << radius << " | " << position[1] << " | " << position[0] << std::endl;
-    std::cout << rotMatrix << std::endl;
+    std::cout << "radius: " << radius << " ThetaX: " << thetax << " ThetaY: " << thetay << " ThetaZ: " << thetaz << " vect: " << vect << std::endl;
+//    std::cout << totalRotation << std::endl;
 
+    return totalRotation;
 }
 
 std::vector<double> xMath::ball_position_to_robotframe(std::tuple<bool, cv::Mat, cv::Point2f, float> data)
@@ -75,28 +82,48 @@ std::vector<double> xMath::ball_position_to_robotframe(std::tuple<bool, cv::Mat,
      //       cos(-66)  -sin(-66)  0
      //       sin(-66)   cos(-66)  0 men da y akse skal flippes kan man tilføje (-) foran elementerne i denne række.
      //          0         0       1
-            cv::Matx33d rotationMatrix(  cos(baseRadian), -sin(baseRadian), 0.0,
-                                        -sin(baseRadian), -cos(baseRadian), 0.0,
-                                                    0.0,               0.0, 1.0 );
+            rw::math::Rotation3D rotationMatrix( cos(baseRadian), -sin(baseRadian), 0.0,
+                                                -sin(baseRadian), -cos(baseRadian), 0.0,
+                                                             0.0,              0.0, 1.0 );
+
+            rw::math::Vector3D<double> position(pointRobot.x,pointRobot.y,pointRobot.z);
+
+            std::cout << "pre-transform: " << position << std::endl;
+
+            rw::math::Rotation3D rotationTCP = calculateTCPRotation(position);
+
+            position = rotationMatrix * (position/100);
+
+            rw::math::Transform3D transform(position, rotationTCP);
+
+            rw::math::Pose6D pose(transform);
+
+            std::cout << transform << " | " << pose <<  std::endl;
+
+            std::vector<double> pointAndRotation;
+
+            for (size_t i = 0; i < 6; ++i) {
+                pointAndRotation.push_back(pose(i));
+            }
 
 
-            pointRobot = rotationMatrix * pointRobot; //calc new values for position in baseframe
+            //pointRobot = rotationMatrix * pointRobot; //calc new values for position in baseframe
 
-            pointRobot /= 100; // point starts as cm, but needs to be in M.
+            //pointRobot /= 100; // point starts as cm, but needs to be in M.
 
             //convert to vector
-            std::vector<double> pointAndRotation;
-            pointAndRotation.push_back(pointRobot.x);
-            pointAndRotation.push_back(pointRobot.y);
-            pointAndRotation.push_back(pointRobot.z);
-            pointAndRotation.push_back(0.720);
-            pointAndRotation.push_back(-3.062);
-            pointAndRotation.push_back(0.044);
-//            pointAndRotation.push_back(1.778);
-//            pointAndRotation.push_back(2.577);
-//            pointAndRotation.push_back(-0.010);
+//            std::vector<double> pointAndRotation;
+//            pointAndRotation.push_back(pointRobot.x);
+//            pointAndRotation.push_back(pointRobot.y);
+//            pointAndRotation.push_back(pointRobot.z);
+//            pointAndRotation.push_back(0.720);
+//            pointAndRotation.push_back(-3.062);
+//            pointAndRotation.push_back(0.044);
+////            pointAndRotation.push_back(1.778);
+////            pointAndRotation.push_back(2.577);
+////            pointAndRotation.push_back(-0.010);
 
-            //calculateTCPRotation(pointAndRotation);
+
 
             std::stringstream s;
                         s << "x: " << pointAndRotation[0] << " | y: "

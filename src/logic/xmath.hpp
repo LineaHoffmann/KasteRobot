@@ -13,6 +13,8 @@
 #include <math.h>
 #include <opencv2/opencv.hpp>
 #include <tuple>
+#include <cmath>
+#include <rw/math.hpp>
 
 #include "wx/log.h"
 
@@ -33,10 +35,10 @@ public:
                                                                    double steps = 10,
                                                                    double g = 9.82);
 
-    static void calculateTCPRotation(std::vector<double> &position);
+    static rw::math::Rotation3D<> calculateTCPRotation(const rw::math::Vector3D<> &vect);
 
 
-    //takes balloutput from findball and converts it into a 3d point in the fram of det robotbase
+    //takes balloutput from findball and converts it into a 3d point in the frame of det robotbase
     static std::vector<double> ball_position_to_robotframe(std::tuple<bool, cv::Mat, cv::Point2f, float> data);
 private:
     //-22.25 grader for at koordinatsæt passer til robot base

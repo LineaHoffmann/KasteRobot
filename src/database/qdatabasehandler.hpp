@@ -17,13 +17,13 @@ public:
     Session *connect();
     bool disconnect();
 
-<<<<<<< Updated upstream
+
     std::vector<Row>* showTables();
     bool qInsert();
-=======
+
     std::vector<Row>* getDbData(std::string tableName);
-    bool writeSql(std::vector inputList);
->>>>>>> Stashed changes
+    //bool writeSql(std::vector inputList); //WARNING must add type specifier for the vector, therefor commented.
+
 
 private:
     std::string mUser;
