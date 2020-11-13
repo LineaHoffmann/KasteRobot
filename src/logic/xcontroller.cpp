@@ -27,7 +27,7 @@ xController::xController()
 
     try {
         mRobot = std::make_shared<xUrControl>();
-        mRobot->setConnect("127.0.0.1");
+        //mRobot->setConnect("127.0.0.1");
     } catch (x_err::error& e) {
         std::string s = "[ROBOT] ";
         s.append(e.what());
@@ -156,7 +156,7 @@ void xController::testDetectAndPickUp(std::shared_ptr<ximageHandler> mImagehandl
         }
 
         std::vector<std::vector<double>> kast;
-        kast.push_back(std::vector<double>{-1.15192, -1.39626,0.0, 0.0,1.5708,1.5708});
+        kast.push_back(std::vector<double>{-1.15192, -1.39626,0.0, -1.5708,1.5708,0});
 
         //flyt robotten til hjem position eller evt en prepickup position
             mRobot->setMove(xUrControl::moveEnum::MOVE_JLIN, kast,3,3);
