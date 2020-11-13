@@ -1,13 +1,8 @@
 #include "qdatabasehandler.hpp"
 
-
-
 qDatabaseHandler::qDatabaseHandler()
 {
-
 }
-
-
 
 qDatabaseHandler::qDatabaseHandler(std::string user, std::string password, std::string host, std::string database, uint32_t port) : qDatabaseHandler()
 {
@@ -37,6 +32,7 @@ Session *qDatabaseHandler::connect()
                     SessionOption::SSL_MODE, mSsl_mode
                     );
         std::cout << "qDatabaseHandler: Session accepted ..." << std::endl;
+
         //NOTE Lad det blive i kode, da tjek for xDevAPI
         RowResult res = mSession->sql("show variables like 'version'").execute();
         std::stringstream version;
@@ -47,6 +43,14 @@ Session *qDatabaseHandler::connect()
           std::cout << "Server is not high enough version! Must be 8 or above!" << std::endl;
         }
 
+        // Checks if mDatabse is the default schema, and sets it if not.
+        std::string defaultSchema = mSession->getDefaultSchemaName();
+        if(defaultSchema != mDatabase)
+        {
+            mSession->sql("USE " + mDatabase);
+        }
+
+
     } catch (const std::exception &e) {
         std::cerr << "qDatabaseHandler: Something didn't go well! " << e.what() << std::endl;
     }
@@ -56,14 +60,18 @@ Session *qDatabaseHandler::connect()
 bool qDatabaseHandler::disconnect()
 {
     // TODO make a check to see if session is there.
+    // Clode() returns void
     std::cout << "qDatabaseHandler: Closing session ..." << std::endl;
     mSession->close();
     return true;
 }
 
-
-// TODO find better name
-std::vector<Row> *qDatabaseHandler::showTables()
+/**
+ * @brief qDatabaseHandler::getDbData
+ * @param tableName, the table you wish to collect data from
+ * @return vector *mRes, contains data from sql query
+ */
+std::vector<Row> *qDatabaseHandler::getDbData(std::string tableName)
 {
     mSchema = new Schema(mSession->getSchema(mDatabase));
     //Schema qSchema = mSession->getSchema(mDatabase);
@@ -92,6 +100,15 @@ std::vector<Row> *qDatabaseHandler::showTables()
             }
 
     return mRes;
+}
+
+// NOTE Should maybe be different functions woth different calls?
+bool qDatabaseHandler::writeSql(std::vector inputList)
+{
+    //TODO Seperate the input vector/list.
+
+
+
 
 }
 

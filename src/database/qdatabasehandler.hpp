@@ -17,8 +17,13 @@ public:
     Session *connect();
     bool disconnect();
 
+<<<<<<< Updated upstream
     std::vector<Row>* showTables();
     bool qInsert();
+=======
+    std::vector<Row>* getDbData(std::string tableName);
+    bool writeSql(std::vector inputList);
+>>>>>>> Stashed changes
 
 private:
     std::string mUser;

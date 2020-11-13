@@ -1,6 +1,8 @@
 //#define __GXX_ABI_VERSION 1011
 #include "app.hpp"
 
+#include "database/qdatabasehandler.hpp" // NOTE TEST
+
 wxIMPLEMENT_APP(app);
 
 // This class is the application itself
@@ -44,6 +46,11 @@ void app::threadFunc() {
 
     std::shared_ptr<xController> controller = std::make_shared<xController>();
     guiMain->setLogicControllerPointer(controller);
+
+    qDatabaseHandler dbTest("lineah", "admin", "localhost", "kasteRobot", 33060);
+    dbTest.connect();
+    dbTest.getDbData("throw");
+
 
 
     while (!mJoinThread.load()) {
