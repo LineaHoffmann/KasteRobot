@@ -12,9 +12,11 @@ qDatabaseHandler::~qDatabaseHandler()
 Session *qDatabaseHandler::connect()
 {
     try {
+        // Testing purpose.
         std::cout << "Connecting to MySQL server with:" << std::endl;
         std::cout << mUser << ":" << mPassword << "@" << mHost << ":" << mPort << std::endl;;
         std::cout << "on database: " << mDatabase << std::endl;
+
         if (mSsl_mode == SSLMode::DISABLED) std::cout << "SSL is disabled." << std::endl;
         mSession = new Session(
                     SessionOption::USER, mUser,
@@ -35,28 +37,16 @@ Session *qDatabaseHandler::connect()
         if (major_version < 8) {
           std::cout << "Server is not high enough version! Must be 8 or above!" << std::endl;
         }
-
-        // Checks if mDatabse is the default schema, and sets it if not.
-        std::string defaultSchema = mSession->getDefaultSchemaName();
-        if(defaultSchema != mDatabase)
-        {
-            mSession->sql("USE " + mDatabase);
-        }
-
-
     } catch (const std::exception &e) {
         std::cerr << "qDatabaseHandler: Something didn't go well! " << e.what() << std::endl;
     }
     return mSession;
 }
 
-bool qDatabaseHandler::disconnect()
+void qDatabaseHandler::disconnect()
 {
-    // TODO make a check to see if session is there.
-    // Clode() returns void
     std::cout << "qDatabaseHandler: Closing session ..." << std::endl;
     mSession->close();
-    return true;
 }
 
 void qDatabaseHandler::setDatabaseCredentials(std::tuple<std::string, std::string, std::string, std::string, uint32_t> credentialsInput)
@@ -66,10 +56,6 @@ void qDatabaseHandler::setDatabaseCredentials(std::tuple<std::string, std::strin
     mHost = std::get<2>(credentialsInput);
     mDatabase = std::get<3>(credentialsInput);
     mPort = std::get<4>(credentialsInput);
-
-    //Test, checks variables
-    std::cout << mUser << " : " << mPassword << " : " << mHost << " : "
-              << mDatabase << " : " << mPort << std::endl;
 
     connect();
 

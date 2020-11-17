@@ -14,7 +14,7 @@ public:
     ~qDatabaseHandler();
 
     Session *connect();
-    bool disconnect();
+    void disconnect();
 
     void setDatabaseCredentials(std::tuple<std::string, std::string, std::string, std::string, uint32_t> credentialsInput);
 

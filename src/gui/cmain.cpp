@@ -697,7 +697,6 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         break;
     case ID_BTN_DATABASE_CONNECT:
     {
-        logstd("connect pressed");
         std::string user, password, host, database;
         long port;
         user = mTxtDatabaseUser->GetValue().ToStdString();
@@ -708,9 +707,6 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         std::tuple<std::string, std::string, std::string, std::string, uint32_t> inputData(user,password,host,database,(uint32_t) port);
         xTry([&] {mController->guiButtonPressed(ID_BTN_DATABASE_CONNECT, inputData);});
     }
-
-
-
         break;
     case ID_BTN_DATABASE_DISCONNECT:
         xTry([&] {mController->guiButtonPressed(ID_BTN_DATABASE_DISCONNECT);});
