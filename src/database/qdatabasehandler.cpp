@@ -4,16 +4,9 @@ qDatabaseHandler::qDatabaseHandler()
 {
 }
 
-qDatabaseHandler::qDatabaseHandler(std::string user, std::string password, std::string host, std::string database, uint32_t port) : qDatabaseHandler()
-{
-    mUser = user; mPassword = password; mHost = host; mDatabase = database; mPort = port;
-    mSsl_mode = SSLMode::DISABLED;
-
-}
 
 qDatabaseHandler::~qDatabaseHandler()
 {
-
 }
 
 Session *qDatabaseHandler::connect()
@@ -66,6 +59,22 @@ bool qDatabaseHandler::disconnect()
     return true;
 }
 
+void qDatabaseHandler::setDatabaseCredentials(std::tuple<std::string, std::string, std::string, std::string, uint32_t> credentialsInput)
+{
+    mUser = std::get<0>(credentialsInput);
+    mPassword = std::get<1>(credentialsInput);
+    mHost = std::get<2>(credentialsInput);
+    mDatabase = std::get<3>(credentialsInput);
+    mPort = std::get<4>(credentialsInput);
+
+    //Test, checks variables
+    std::cout << mUser << " : " << mPassword << " : " << mHost << " : "
+              << mDatabase << " : " << mPort << std::endl;
+
+    connect();
+
+}
+
 /**
  * @brief qDatabaseHandler::getDbData
  * @param tableName, the table you wish to collect data from
@@ -101,16 +110,6 @@ std::vector<Row> *qDatabaseHandler::getDbData(std::string tableName)
 
     return mRes;
 }
-
-// NOTE Should maybe be different functions woth different calls?
-//bool qDatabaseHandler::writeSql(std::vector inputList) //WARNING must add type specifier for the vector, therefor commented.
-//{
-//    //TODO Seperate the input vector/list.
-
-
-
-
-//}
 
 bool qDatabaseHandler::qInsert()
 {

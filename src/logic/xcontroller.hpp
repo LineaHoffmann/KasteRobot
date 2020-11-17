@@ -31,6 +31,8 @@
 #include "xmath.hpp"
 #include "xinfostruct.hpp"
 
+#include "../database/qdatabasehandler.hpp"
+
 class xController
 {
 public:
@@ -229,6 +231,20 @@ public:
                 logwar(e.what());
                 break;
             }
+
+            // Databse Buttuns implementation
+        case ID_BTN_DATABASE_CONNECT:
+            logstd("Connecting to database");
+            try{
+            if constexpr (std::is_same_v<T, std::tuple<std::string, std::string, std::string, std::string, uint32_t>>){
+                static_cast<std::tuple<std::string, std::string, std::string, std::string, uint32_t>>(data);
+                mDatabase->setDatabaseCredentials(data);
+                }
+                return;
+            } catch(const std::exception &e){
+                logwar(e.what());
+                break;
+            }
         default:
             throw x_err::error(x_err::what::NO_IMPLEMENTATION);
             break;
@@ -250,6 +266,7 @@ private:
     std::shared_ptr<xUrControl> mRobot;
     std::shared_ptr<xGripperClient> mGripper;
     std::shared_ptr<xCollisionDetector> mCollisionDetector;
+    std::shared_ptr<qDatabaseHandler> mDatabase;
 
     std::mutex mMtx;
     std::thread *mCameraCalibrationThread;

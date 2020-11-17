@@ -39,6 +39,9 @@ xController::xController()
     // Gripper
     mGripper = std::make_shared<xGripperClient>();
 
+    // Database
+    mDatabase = std::make_shared<qDatabaseHandler>();
+
     //starting camera
     mCamera->start();
 }

@@ -11,11 +11,12 @@ class qDatabaseHandler
 {
 public:
     qDatabaseHandler();
-    qDatabaseHandler(std::string user, std::string password, std::string host, std::string database, uint32_t port);
     ~qDatabaseHandler();
 
     Session *connect();
     bool disconnect();
+
+    void setDatabaseCredentials(std::tuple<std::string, std::string, std::string, std::string, uint32_t> credentialsInput);
 
 
     std::vector<Row>* showTables();
@@ -31,7 +32,7 @@ private:
     std::string mHost;
     std::string mDatabase;
     uint32_t mPort;
-    SSLMode mSsl_mode;
+    SSLMode mSsl_mode = SSLMode::DISABLED;
 
     Session *mSession = nullptr;
     Schema *mSchema = nullptr;

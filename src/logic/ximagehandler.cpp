@@ -1,8 +1,5 @@
 #include "ximagehandler.hpp"
 
-
-
-
 ximageHandler::ximageHandler()
 {
 

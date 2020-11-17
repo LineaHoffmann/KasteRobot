@@ -309,8 +309,8 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     // Database tab building
     wxBoxSizer *mSizerNotebookDatabase = new wxBoxSizer(wxHORIZONTAL);
     mNotebookDatabase->SetSizer(mSizerNotebookDatabase);
-    mBtnDatabaseConnect = new wxButton(mNotebookDatabase, ID_BTN_GRIPPER_CONNECT, "Connect");
-    mBtnDatabaseDisconnect = new wxButton(mNotebookDatabase, ID_BTN_GRIPPER_DISCONNECT, "Disconnect");
+    mBtnDatabaseConnect = new wxButton(mNotebookDatabase, ID_BTN_DATABASE_CONNECT, "Connect");
+    mBtnDatabaseDisconnect = new wxButton(mNotebookDatabase, ID_BTN_DATABASE_DISCONNECT, "Disconnect");
     mSizerNotebookDatabase->Add(mBtnDatabaseConnect);
     mSizerNotebookDatabase->Add(mBtnDatabaseDisconnect);
     mTxtDatabaseIP = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "IP");
@@ -696,7 +696,21 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
     }
         break;
     case ID_BTN_DATABASE_CONNECT:
-        xTry([&] {mController->guiButtonPressed(ID_BTN_DATABASE_CONNECT);});
+    {
+        logstd("connect pressed");
+        std::string user, password, host, database;
+        long port;
+        user = mTxtDatabaseUser->GetValue().ToStdString();
+        password = mTxtDatabasePassword->GetValue().ToStdString();
+        host = mTxtDatabaseIP->GetValue().ToStdString();
+        database = mTxtDatabaseSchema->GetValue().ToStdString();
+        mTxtDatabasePort->GetValue().ToLong(&port);
+        std::tuple<std::string, std::string, std::string, std::string, uint32_t> inputData(user,password,host,database,(uint32_t) port);
+        xTry([&] {mController->guiButtonPressed(ID_BTN_DATABASE_CONNECT, inputData);});
+    }
+
+
+
         break;
     case ID_BTN_DATABASE_DISCONNECT:
         xTry([&] {mController->guiButtonPressed(ID_BTN_DATABASE_DISCONNECT);});
