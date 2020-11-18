@@ -76,6 +76,8 @@ file(GLOB LOGIC_FILES
 
     ${PROJECT_SOURCE_DIR}/logic/xmath.cpp
     ${PROJECT_SOURCE_DIR}/logic/xmath.hpp
+
+    ${PROJECT_SOURCE_DIR}/logic/xgeometrytypes.hpp
     )
 
 # Database GLOB
