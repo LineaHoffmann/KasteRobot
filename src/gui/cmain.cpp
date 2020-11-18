@@ -18,7 +18,7 @@ wxBEGIN_EVENT_TABLE(cMain, wxFrame)
     EVT_TIMER(ID_TIMER_INFOTREE_UPDATE, cMain::OnTimerInfoUpdate)
 
     // When selecting an item in the database sub tab tree
-    EVT_TREELIST_SELECTION_CHANGED(ID_DATABASE_SUB_TREE_SELECTION, cMain::OnNewDatabaseTreeSelection)
+    EVT_TREELIST_SELECTION_CHANGED(ID_DATABASE_SUB_TREE, cMain::OnNewDatabaseTreeSelection)
 
     // Menu and button bindings go the same way
     EVT_MENU(wxID_ANY, cMain::OnButtonPress)
@@ -310,7 +310,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mNotebookGripper->Layout();
 
     // Database tab building - TreeList for entry view
-    mDatabaseSubTree = new wxTreeListCtrl(mNotebookDatabase, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTL_DEFAULT_STYLE);
+    mDatabaseSubTree = new wxTreeListCtrl(mNotebookDatabase, ID_DATABASE_SUB_TREE, wxDefaultPosition, wxDefaultSize, wxTL_DEFAULT_STYLE);
     mDatabaseSubTree->AppendColumn("Timestamp",
                                       wxCOL_WIDTH_DEFAULT,
                                       wxALIGN_LEFT,
@@ -325,7 +325,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mBtnDatabaseUpdate = new wxButton(mNotebookDatabase, ID_BTN_DATABASE_UPDATE, "Update Connection");
     mBtnDatabaseUpdateTree = new wxButton(mNotebookDatabase, ID_BTN_DATABASE_UPDATE_TREE, "Update List");
     // Database tab building - Text Controls
-    mTxtDatabaseItemView = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "Item View", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY);
+    mTxtDatabaseItemView = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "Item View", wxDefaultPosition, wxDefaultSize, wxHSCROLL | wxTE_MULTILINE | wxTE_READONLY);
     mTxtDatabaseIP = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "IP");
     mTxtDatabasePort = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "Port");
     mTxtDatabaseUser = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "User");
