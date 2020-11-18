@@ -114,7 +114,7 @@ private:
     // Mutex, only for calls to Status Bar
     std::mutex mMtx;
 
-    // Data entries for the tree view
+    // Data entries for the general tree view
     wxTreeListItem *mTreeRootRobot;
     wxTreeListItem *mTreeRootCamera;
     wxTreeListItem *mTreeRootGripper;
@@ -186,9 +186,14 @@ private:
     wxTextCtrl *mTxtGripperCmd;
     wxStaticBitmap *mBmpGripperStatus;
     // DATABASE SUB PANEL ENTRIES
+    wxTreeListCtrl *mDatabaseSubTree;
+    std::vector<qDatabaseEntry> mDatabaseSubTreeEntries;
+    std::vector<wxTreeListItem*> mDatabaseSubTreePtrs;
     wxButton *mBtnDatabaseConnect;
     wxButton *mBtnDatabaseDisconnect;
     wxButton *mBtnDatabaseUpdate;
+    wxButton *mBtnDatabaseUpdateTree;
+    wxTextCtrl *mTxtDatabaseItemView;
     wxTextCtrl *mTxtDatabaseIP;
     wxTextCtrl *mTxtDatabasePort;
     wxTextCtrl *mTxtDatabaseUser;

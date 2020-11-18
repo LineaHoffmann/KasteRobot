@@ -89,8 +89,12 @@ void xController::fillInfo(treeInfo &info)
     } else{
         info.robotState = ROBOT_NOT_CONNECTED;
     }
+}
 
-
+std::vector<qDatabaseEntry> xController::getDatabaseEntries() {
+    // Get the data from the database object, if any.
+    // If not, return the empty constructor
+    return std::vector<qDatabaseEntry>();
 }
 
 //template <typename T>

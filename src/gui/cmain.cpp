@@ -112,7 +112,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mTreeList->AppendColumn("Description",
                                       160,
                                       wxALIGN_LEFT,
-                                      wxCOL_RESIZABLE | wxCOL_SORTABLE);
+                                      wxCOL_RESIZABLE);
     mTreeList->AppendColumn("Data",
                                       wxCOL_WIDTH_DEFAULT,
                                       wxALIGN_RIGHT,
@@ -306,23 +306,52 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mNotebookGripper->SetSizer(mSizerNotebookGripper);
     mNotebookGripper->Layout();
 
-    // Database tab building
-    wxBoxSizer *mSizerNotebookDatabase = new wxBoxSizer(wxHORIZONTAL);
-    mNotebookDatabase->SetSizer(mSizerNotebookDatabase);
+    // Database tab building - TreeList for entry view
+    mDatabaseSubTree = new wxTreeListCtrl(mNotebookDatabase, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTL_DEFAULT_STYLE);
+    mDatabaseSubTree->AppendColumn("Timestamp",
+                                      wxCOL_WIDTH_DEFAULT,
+                                      wxALIGN_LEFT,
+                                      wxCOL_RESIZABLE);
+    mDatabaseSubTree->AppendColumn("Description",
+                                      wxCOL_WIDTH_DEFAULT,
+                                      wxALIGN_RIGHT,
+                                      wxCOL_RESIZABLE);
+    // Database tab building - Buttons
     mBtnDatabaseConnect = new wxButton(mNotebookDatabase, ID_BTN_DATABASE_CONNECT, "Connect");
     mBtnDatabaseDisconnect = new wxButton(mNotebookDatabase, ID_BTN_DATABASE_DISCONNECT, "Disconnect");
-    mSizerNotebookDatabase->Add(mBtnDatabaseConnect);
-    mSizerNotebookDatabase->Add(mBtnDatabaseDisconnect);
+    mBtnDatabaseUpdate = new wxButton(mNotebookDatabase, ID_BTN_DATABASE_UPDATE, "Update Connection");
+    mBtnDatabaseUpdateTree = new wxButton(mNotebookDatabase, ID_BTN_DATABASE_UPDATE_TREE, "Update List");
+    // Database tab building - Text Controls
+    mTxtDatabaseItemView = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "Item View", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY);
     mTxtDatabaseIP = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "IP");
     mTxtDatabasePort = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "Port");
     mTxtDatabaseUser = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "User");
     mTxtDatabaseSchema = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "Schema");
     mTxtDatabasePassword = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "Password");
-    mSizerNotebookDatabase->Add(mTxtDatabaseIP);
-    mSizerNotebookDatabase->Add(mTxtDatabasePort);
-    mSizerNotebookDatabase->Add(mTxtDatabaseUser);
-    mSizerNotebookDatabase->Add(mTxtDatabaseSchema);
-    mSizerNotebookDatabase->Add(mTxtDatabasePassword);
+    // Database tab building - GridBagSizer Setup
+    wxGridBagSizer *mSizerNotebookDatabase = new wxGridBagSizer(0,0);
+    mNotebookDatabase->SetSizer(mSizerNotebookDatabase);
+    mSizerNotebookDatabase->Add(mDatabaseSubTree, wxGBPosition(0,2), wxGBSpan(3,5), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookDatabase->Add(mBtnDatabaseConnect, wxGBPosition(0,0), wxGBSpan(1,1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookDatabase->Add(mBtnDatabaseDisconnect, wxGBPosition(0,1), wxGBSpan(1,1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookDatabase->Add(mBtnDatabaseUpdate, wxGBPosition(1,0), wxGBSpan(1,1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookDatabase->Add(mBtnDatabaseUpdateTree, wxGBPosition(1,1), wxGBSpan(1,1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookDatabase->Add(mTxtDatabaseItemView, wxGBPosition(3,2), wxGBSpan(2,5), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookDatabase->Add(mTxtDatabaseIP, wxGBPosition(2,0), wxGBSpan(1,2), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookDatabase->Add(mTxtDatabasePort, wxGBPosition(3,0), wxGBSpan(1,1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookDatabase->Add(mTxtDatabaseUser, wxGBPosition(4,0), wxGBSpan(1,1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookDatabase->Add(mTxtDatabaseSchema, wxGBPosition(3,1), wxGBSpan(1,1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookDatabase->Add(mTxtDatabasePassword, wxGBPosition(4,1), wxGBSpan(1,1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    for (int i = 0; i < mSizerNotebookDatabase->GetCols(); i++) {
+        mSizerNotebookDatabase->AddGrowableCol(i);
+    }
+    for (int i = 0; i < mSizerNotebookDatabase->GetRows(); i++) {
+        mSizerNotebookDatabase->AddGrowableRow(i);
+    }
+    mNotebookDatabase->SetSizer(mSizerNotebookDatabase);
+    mNotebookDatabase->Layout();
+    // Database tab building - Tooltips
+
 
     // Testing tab building - Buttons
     mBtnTestMathXYZtoVAA = new wxButton(mNotebookTesting, ID_BTN_TESTING_XYZ_VVA, "XYZ->VAA");
@@ -341,7 +370,6 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mSizerNotebookTesting->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     mSizerNotebookTesting->Add( mBtnTestMathXYZtoVAA, wxGBPosition( 0, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookTesting->Add( mBtnTestDectectPick, wxGBPosition( 0, 5 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-
     mSizerNotebookTesting->Add( mTxtTestMathInX, wxGBPosition( 1, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookTesting->Add( mTxtTestMathInY, wxGBPosition( 2, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookTesting->Add( mTxtTestMathInZ, wxGBPosition( 3, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
@@ -713,6 +741,25 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         break;
     case ID_BTN_DATABASE_UPDATE:
         xTry([&] {mController->guiButtonPressed(ID_BTN_DATABASE_UPDATE);});
+        break;
+    case ID_BTN_DATABASE_UPDATE_TREE:
+        // Updating the database sub panel list of entries
+    {
+        // Get the entries from database, through the controller
+        // As this must be a full copy, it's quite expensive for large blobs
+        mDatabaseSubTreeEntries = mController->getDatabaseEntries();
+
+        // Add items from database to the list. NOTE srp: At the moment not limited
+        wxTreeListItem root = mDatabaseSubTree->GetRootItem();
+        for (size_t i; i < mDatabaseSubTreeEntries.size(); ++i) {
+            std::time_t timestamp = std::chrono::system_clock::to_time_t(mDatabaseSubTreeEntries.at(i).timestamp);
+            std::tm timestamp_tm = *std::localtime(&timestamp);
+            std::string formattedTimestamp;
+            strftime(formattedTimestamp.data(), 21, "%T", &timestamp_tm);
+            mDatabaseSubTreePtrs.push_back(new wxTreeListItem(mDatabaseSubTree->AppendItem(root, formattedTimestamp.c_str())));
+            mDatabaseSubTree->SetItemText(*mDatabaseSubTreePtrs.back(), 1, mDatabaseSubTreeEntries.at(i).description.c_str());
+        }
+    }
         break;
     case ID_BTN_TESTING_XYZ_VVA:
     {

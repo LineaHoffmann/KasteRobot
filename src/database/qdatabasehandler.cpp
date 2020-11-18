@@ -45,8 +45,13 @@ Session *qDatabaseHandler::connect()
 
 void qDatabaseHandler::disconnect()
 {
-    std::cout << "qDatabaseHandler: Closing session ..." << std::endl;
-    mSession->close();
+    if (mSession != nullptr) {
+        std::cout << "qDatabaseHandler: Closing session ..." << std::endl;
+        mSession->close();
+    }
+    else {
+        std::cout << "qDatabaseHandler: No active connection ..." << std::endl;
+    }
 }
 
 void qDatabaseHandler::setDatabaseCredentials(std::tuple<std::string, std::string, std::string, std::string, uint32_t> credentialsInput)

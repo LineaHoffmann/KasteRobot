@@ -51,6 +51,7 @@ public:
     cv::Mat getImage();
     // For GUI when updating info tree
     void fillInfo(treeInfo& info);
+    std::vector<qDatabaseEntry> getDatabaseEntries(); // Must be a full actual copy
     // For GUI button calls. Don't actually do stuff here, only post the tasks!
     // The GUI thread does not like working in here
     template<typename T = bool>
