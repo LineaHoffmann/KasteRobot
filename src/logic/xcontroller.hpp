@@ -249,13 +249,11 @@ public:
         case ID_BTN_DATABASE_DISCONNECT:
             logstd("Closing DB session, bye");
             try{
-            mDatabase->disconnect();
-            return;
-        } catch(const std::exception &e)
-            {
+                if (mDatabase) mDatabase->disconnect();
+            } catch(const std::exception &e) {
                 logwar(e.what());
-                break;
             }
+            break;
         default:
             throw x_err::error(x_err::what::NO_IMPLEMENTATION);
             break;

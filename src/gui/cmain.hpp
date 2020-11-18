@@ -64,11 +64,12 @@ private:
     void OnTimerInfoUpdate(wxTimerEvent &evt);
     void OnButtonPress(wxCommandEvent &evt);
 
-    // Template function for wrapping calls in most basic x_err / std::exception handling
+    // Template function for wrapping calls to mController in most basic x_err / std::exception handling
     // Credit must go to StackExchange users Morwenn and Tim Martin
     // https://codereview.stackexchange.com/questions/2484/generic-c-exception-catch-handler-macro
     template<typename Callable>
     auto xTry(Callable&& f) -> decltype(f()) {
+        if (!mController) return;
         try {
             f();
             return;
