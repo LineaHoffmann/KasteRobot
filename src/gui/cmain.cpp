@@ -796,7 +796,8 @@ void cMain::OnNewDatabaseTreeSelection(wxTreeListEvent &evt)
     mTxtDatabaseItemView->Clear();
     for (const auto item : mDatabaseSubTreeEntries) {
         if (item.second.GetID() == evt.GetItem().GetID()) {
-            mTxtDatabaseItemView->AppendText(item.first.formattedData.c_str());
+            //mTxtDatabaseItemView->AppendText(item.first.formattedData.c_str());
+            // Detect the derived type of database entry, and list in the text item view
         }
     }
     evt.Skip();
