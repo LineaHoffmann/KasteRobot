@@ -8,7 +8,7 @@
 using namespace mysqlx;
 
 struct qDatabaseEntry {
-    std::chrono::system_clock::time_point timestamp; // Has to be system clock for formatting
+    std::string timestamp;
     std::string description;
     std::string formattedData;
 };

@@ -63,6 +63,7 @@ private:
     void OnTimerView2Update(wxTimerEvent &evt);
     void OnTimerInfoUpdate(wxTimerEvent &evt);
     void OnButtonPress(wxCommandEvent &evt);
+    void OnNewDatabaseTreeSelection(wxTreeListEvent &evt);
 
     // Template function for wrapping calls to mController in most basic x_err / std::exception handling
     // Credit must go to StackExchange users Morwenn and Tim Martin
@@ -188,8 +189,7 @@ private:
     wxStaticBitmap *mBmpGripperStatus;
     // DATABASE SUB PANEL ENTRIES
     wxTreeListCtrl *mDatabaseSubTree;
-    std::vector<qDatabaseEntry> mDatabaseSubTreeEntries;
-    std::vector<wxTreeListItem*> mDatabaseSubTreePtrs;
+    std::vector<std::pair<qDatabaseEntry, wxTreeListItem>> mDatabaseSubTreeEntries;
     wxButton *mBtnDatabaseConnect;
     wxButton *mBtnDatabaseDisconnect;
     wxButton *mBtnDatabaseUpdate;

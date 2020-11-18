@@ -17,6 +17,9 @@ wxBEGIN_EVENT_TABLE(cMain, wxFrame)
     //EVT_TIMER(ID_TIMER_VIEW2_UPDATE, cMain::OnTimerView2Update)
     EVT_TIMER(ID_TIMER_INFOTREE_UPDATE, cMain::OnTimerInfoUpdate)
 
+    // When selecting an item in the database sub tab tree
+    EVT_TREELIST_SELECTION_CHANGED(ID_DATABASE_SUB_TREE_SELECTION, cMain::OnNewDatabaseTreeSelection)
+
     // Menu and button bindings go the same way
     EVT_MENU(wxID_ANY, cMain::OnButtonPress)
     EVT_BUTTON(wxID_ANY, cMain::OnButtonPress)
@@ -747,17 +750,13 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
     {
         // Get the entries from database, through the controller
         // As this must be a full copy, it's quite expensive for large blobs
-        mDatabaseSubTreeEntries = mController->getDatabaseEntries();
+        std::vector<qDatabaseEntry> res = mController->getDatabaseEntries();
+        // Assuming qDatabaseEntry is std::string timestamp, std::string description, std::string data
 
-        // Add items from database to the list. NOTE srp: At the moment not limited
         wxTreeListItem root = mDatabaseSubTree->GetRootItem();
-        for (size_t i; i < mDatabaseSubTreeEntries.size(); ++i) {
-            std::time_t timestamp = std::chrono::system_clock::to_time_t(mDatabaseSubTreeEntries.at(i).timestamp);
-            std::tm timestamp_tm = *std::localtime(&timestamp);
-            std::string formattedTimestamp;
-            strftime(formattedTimestamp.data(), 21, "%T", &timestamp_tm);
-            mDatabaseSubTreePtrs.push_back(new wxTreeListItem(mDatabaseSubTree->AppendItem(root, formattedTimestamp.c_str())));
-            mDatabaseSubTree->SetItemText(*mDatabaseSubTreePtrs.back(), 1, mDatabaseSubTreeEntries.at(i).description.c_str());
+        for (auto item : res) {
+            wxTreeListItem p = mDatabaseSubTree->AppendItem(root, item.timestamp.c_str());
+            mDatabaseSubTreeEntries.push_back(std::pair<qDatabaseEntry, wxTreeListItem>{item, p});
         }
     }
         break;
@@ -789,4 +788,16 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
     }
     evt.Skip();
     return;
+}
+
+void cMain::OnNewDatabaseTreeSelection(wxTreeListEvent &evt)
+{
+    // Clear database item view and update with the new current selection
+    mTxtDatabaseItemView->Clear();
+    for (const auto item : mDatabaseSubTreeEntries) {
+        if (item.second.GetID() == evt.GetItem().GetID()) {
+            mTxtDatabaseItemView->AppendText(item.first.formattedData.c_str());
+        }
+    }
+    evt.Skip();
 }
