@@ -16,10 +16,11 @@ enum GRIPPER_MOVE_TYPE {
     // Something, something, same as above ..
 };
 struct qDatabaseEntry {
-    qDatabaseEntry(const std::string& t, const std::string& desc) :
-        timestamp(t), description(desc) {};
     std::string timestamp;
     std::string description;
+protected:
+    qDatabaseEntry(const std::string& t, const std::string& desc) :
+        timestamp(t), description(desc) {};
 };
 template <class T>
 struct qDatabaseMoveEntry : public qDatabaseEntry {
@@ -40,7 +41,7 @@ struct qDatabaseThrowEntry : public qDatabaseEntry {
     double releaseVelocity, deviation;
 };
 template <class T>
-struct qDatabaseGripperEntry : qDatabaseEntry {
+struct qDatabaseGripperEntry : public qDatabaseEntry {
     static_assert (std::is_floating_point_v<T>, "Must be a floating point value!");
     qDatabaseGripperEntry(const std::string& t, const std::string& d, T s, T e) :
         qDatabaseEntry(t, d), start(s), end(e) {};
@@ -48,7 +49,7 @@ struct qDatabaseGripperEntry : qDatabaseEntry {
     T start, end;
 };
 template <class T>
-struct qDatabaseBallEntry : qDatabaseEntry {
+struct qDatabaseBallEntry : public qDatabaseEntry {
     qDatabaseBallEntry(const std::string& t, const std::string& d, T di, const point2D<T>& p) :
         qDatabaseEntry(t, d), ballDiameter(di), ballPosition(p) {};
     double ballDiameter;
