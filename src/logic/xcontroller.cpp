@@ -12,8 +12,9 @@ xController::xController()
     mImagehandler = std::make_shared<ximageHandler>(cv::imread("../resources/testImg.png"));
     mImagehandler->ballColor(25, 15); //set what color ball we are looking for
     mImagehandler->setMinMaxRadius(1.7, 2.3); //i cm
+    mImagehandler->setRobotBase(42.5, 9); //i cm
     //mImagehandler->setRobotBase(42.5, 9.5); //i cm
-    mImagehandler->setRobotBase(42.5, 14.5); //i cm
+    //mImagehandler->setRobotBase(42.5, 14.5); //i cm
 
     mImagehandler->showResult = true;
 
@@ -116,8 +117,8 @@ void xController::testDetectAndPickUp(std::shared_ptr<ximageHandler> mImagehandl
 
 
     mGripper->home();
-    //std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(mCamera->getImage());
-    std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(cv::imread("../resources/ballimgs/remappedBall1.png"));
+    std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(mCamera->getImage());
+    //std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(cv::imread("../resources/ballimgs/remappedBall1.png"));
 
     if (std::get<0>(ballResult)){
         logstd("Ball found, moving robot to pre pickup position");

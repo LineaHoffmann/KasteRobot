@@ -66,7 +66,8 @@ rw::math::Rotation3D<> xMath::calculateTCPRotation(const rw::math::Vector3D<> &v
                                    0., cos(thetax), -sin(thetax),
                                    0., sin(thetax),  cos(thetax));
 
-    rw::math::Rotation3D totalRotation = rotationZ*rotationY*rotationX;
+    //rw::math::Rotation3D totalRotation = rotationZ*rotationY*rotationX;
+    rw::math::Rotation3D totalRotation = rotationX;
 
     std::cout << "radius: " << radius << " ThetaX: " << thetax << " ThetaY: " << thetay << " ThetaZ: " << thetaz << " vect: " << vect << std::endl;
 //    std::cout << totalRotation << std::endl;
@@ -86,24 +87,29 @@ std::vector<double> xMath::ball_position_to_robotframe(std::tuple<bool, cv::Mat,
                                                 -sin(baseRadian), -cos(baseRadian), 0.0,
                                                              0.0,              0.0, 1.0 );
 
-            rw::math::Vector3D<double> position(pointRobot.x,pointRobot.y,pointRobot.z);
+            rw::math::Vector3D<double> preposition(pointRobot.x,pointRobot.y,pointRobot.z);
+            preposition = rotationMatrix * (preposition/100);
+
+
+            //rw::math::Vector6D<double> position(preposition(0),preposition(1), preposition(2), 0.720, -3.062, 0.044); // celle 2
+            rw::math::Vector6D<double> position(preposition(0),preposition(1), preposition(2), 1.778, 2.577, -0.010); //celle 1-4
 
             std::cout << "pre-transform: " << position << std::endl;
 
-            rw::math::Rotation3D rotationTCP = calculateTCPRotation(position);
+            //rw::math::Rotation3D rotationTCP = calculateTCPRotation(position);
 
-            position = rotationMatrix * (position/100);
 
-            rw::math::Transform3D transform(position, rotationTCP);
 
-            rw::math::Pose6D pose(transform);
+            //rw::math::Transform3D transform(position, rotationTCP);
 
-            std::cout << transform << " | " << pose <<  std::endl;
+            //rw::math::Pose6D pose(transform);
+
+            //std::cout << transform << " | " << pose <<  std::endl;
 
             std::vector<double> pointAndRotation;
 
             for (size_t i = 0; i < 6; ++i) {
-                pointAndRotation.push_back(pose(i));
+                pointAndRotation.push_back(position(i));
             }
 
 
@@ -119,9 +125,9 @@ std::vector<double> xMath::ball_position_to_robotframe(std::tuple<bool, cv::Mat,
 //            pointAndRotation.push_back(0.720);
 //            pointAndRotation.push_back(-3.062);
 //            pointAndRotation.push_back(0.044);
-////            pointAndRotation.push_back(1.778);
-////            pointAndRotation.push_back(2.577);
-////            pointAndRotation.push_back(-0.010);
+//            pointAndRotation.push_back(1.778);
+//            pointAndRotation.push_back(2.577);
+//            pointAndRotation.push_back(-0.010);
 
 
 

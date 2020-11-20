@@ -123,7 +123,7 @@ bool ximageHandler::cutOutTable()
         //pixel to cm hackerway
         pixToCm = table.cols / tableWidth;
 
-        //if (showResult)cv::imshow("table", table);
+        if (showResult)cv::imshow("table", table);
         return 1;
     } else {
         return 0;
