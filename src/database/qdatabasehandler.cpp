@@ -100,11 +100,3 @@ std::vector<Row> *qDatabaseHandler::getDbData(std::string tableName)
     return mRes;
 }
 
-bool qDatabaseHandler::qInsert()
-{
-    // NOTE check with count, if new row added
-    mTable->insert().execute();
-
-    return true;
-
-}

@@ -63,14 +63,8 @@ public:
     ~qDatabaseHandler();
     void disconnect();
     void setDatabaseCredentials(std::tuple<std::string, std::string, std::string, std::string, uint32_t> credentialsInput);
-
-
     std::vector<Row>* showTables();
-    bool qInsert();
-
     std::vector<Row>* getDbData(std::string tableName);
-    //bool writeSql(std::vector inputList); //WARNING must add type specifier for the vector, therefor commented.
-
 
 private:
     // Member variables
