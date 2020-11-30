@@ -34,7 +34,7 @@ public:
     void release();
     void home();
     void disconnectReq();
-    void connectReq();
+    void connectReq(std::pair<std::string, int> ipPort);
     void setIpPort(std::pair<std::string, int>);
     bool isReady();
 
@@ -54,7 +54,7 @@ private:
     std::thread* mT1;
     std::mutex mMtx;
     std::atomic<bool> mTRuntime, mReady, mConnected, mGripReq, mReleaseReq, mHomeReq,
-                      mConnectReq, mDisconnectReq, mUpdateReq;
+                      mConnectReq, mDisconnectReq, mAutosend;
     std::pair<std::string, int> mIpPort;
 
     std::thread *mWorker;

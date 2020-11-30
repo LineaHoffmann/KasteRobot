@@ -196,14 +196,9 @@ public:
             break;
         case ID_BTN_GRIPPER_CONNECT:
         {
-            mGripper->connectReq();
-        }
-            break;
-        case ID_BTN_GRIPPER_UPDATE:
-        {
             if constexpr (std::is_same_v<T, std::pair<std::string, int>>) {
                 static_cast<std::pair<std::string, int>>(data);
-                mGripper->setIpPort(data);
+                mGripper->connectReq(data);
             }
         }
             break;

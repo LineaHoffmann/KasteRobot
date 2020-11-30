@@ -274,7 +274,6 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     // Gripper tab building - Buttons
     mBtnGripperConnect = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_CONNECT, "Connect");
     mBtnGripperDisconnect = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_DISCONNECT, "Disconnect");
-    mBtnGripperUpdate = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_UPDATE, "Update");
     mBtnGripperRelease = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_RELEASE, "Release");
     mBtnGripperGrip = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_GRIP, "Grip");
     mBtnGripperSendCmd = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_SEND_CMD, "Send cmd");
@@ -292,7 +291,6 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mSizerNotebookGripper->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     mSizerNotebookGripper->Add( mBtnGripperConnect, wxGBPosition( 1, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookGripper->Add( mBtnGripperDisconnect, wxGBPosition( 1, 1 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-    mSizerNotebookGripper->Add( mBtnGripperUpdate, wxGBPosition( 1, 2 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookGripper->Add( mBtnGripperRelease, wxGBPosition( 3, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookGripper->Add( mBtnGripperGrip, wxGBPosition( 3, 1 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookGripper->Add( mBtnGripperSendCmd, wxGBPosition( 4, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );    
@@ -657,21 +655,19 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         xTry([&] {mController->guiButtonPressed(ID_BTN_ROBOT_SEND_PICKUP);});
         break;
     case ID_BTN_GRIPPER_CONNECT:
-        xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_CONNECT);});
-        break;
-    case ID_BTN_GRIPPER_DISCONNECT:
-        xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_DISCONNECT);});
-        break;
-    case ID_BTN_GRIPPER_UPDATE:
     {
         long temp;
         std::string ip = mTxtGripperIP->GetValue().ToStdString();
         mTxtGripperPort->GetValue().ToLong(&temp);
         int port = temp;
         std::pair<std::string, int> data(ip, port);
-        xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_UPDATE, data);});
+        xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_CONNECT, data);});
     }
         break;
+    case ID_BTN_GRIPPER_DISCONNECT:
+        xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_DISCONNECT);});
+        break;
+
     case ID_BTN_GRIPPER_RELEASE:
         xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_RELEASE);});
         break;

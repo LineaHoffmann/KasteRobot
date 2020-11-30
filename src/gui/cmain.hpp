@@ -178,7 +178,6 @@ private:
     // GRIPPER SUB PANEL ENTRIES
     wxButton *mBtnGripperConnect;
     wxButton *mBtnGripperDisconnect;
-    wxButton *mBtnGripperUpdate;
     wxButton *mBtnGripperRelease;
     wxButton *mBtnGripperGrip;
     wxButton *mBtnGripperSendCmd;
