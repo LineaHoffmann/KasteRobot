@@ -61,9 +61,7 @@ void qDatabaseHandler::setDatabaseCredentials(std::tuple<std::string, std::strin
     mHost = std::get<2>(credentialsInput);
     mDatabase = std::get<3>(credentialsInput);
     mPort = std::get<4>(credentialsInput);
-
     connect();
-
 }
 
 /**

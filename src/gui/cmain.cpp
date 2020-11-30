@@ -751,6 +751,7 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
             wxTreeListItem p = mDatabaseSubTree->AppendItem(root, item.timestamp.c_str());
             mDatabaseSubTreeEntries.push_back(std::pair<qDatabaseEntry, wxTreeListItem>{item, p});
         }
+        xTry([&] {mController->guiButtonPressed(ID_BTN_DATABASE_UPDATE_TREE);});
     }
         break;
     case ID_BTN_TESTING_XYZ_VVA:
