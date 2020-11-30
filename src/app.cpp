@@ -1,4 +1,3 @@
-//#define __GXX_ABI_VERSION 1011
 #include "app.hpp"
 
 #include "database/qdatabasehandler.hpp" // NOTE TEST
@@ -8,9 +7,7 @@ wxIMPLEMENT_APP(app);
 // This class is the application itself
 // To edit the GUI go to cmain.cpp
 
-app::app()
-{
-}
+app::app() {}
 app::~app()
 {
     // Generally nothing GUI related should be manually destroyed
@@ -44,9 +41,8 @@ void app::threadFunc() {
     //** Dies on ~App **//
     logstd("App thread started!");
 
-    std::shared_ptr<xController> controller = std::make_shared<xController>();
-    guiMain->setLogicControllerPointer(controller);
-
+    std::unique_ptr<xController> controller = std::make_unique<xController>();
+    guiMain->setLogicControllerPointer(std::move(controller));
 
     while (!mJoinThread.load()) {
         std::this_thread::sleep_for(std::chrono::seconds(1));

@@ -54,7 +54,7 @@ public:
 
     void pushStrToStatus(std::string& msg); // Thread safe
     void popStrFromStatus(); // Thread safe
-    void setLogicControllerPointer(std::shared_ptr<xController> controller); // Thread safe
+    void setLogicControllerPointer(std::unique_ptr<xController> controller); // Thread safe
 
 private:
     // GUI event handler functions, linked in top of cMain.cpp
@@ -83,7 +83,7 @@ private:
 
 private:
     // Pointer to logic controller object
-    std::shared_ptr<xController> mController;
+    std::unique_ptr<xController> mController;
 
     // Info sharings struct
     treeInfo *info;

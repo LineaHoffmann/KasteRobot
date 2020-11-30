@@ -456,9 +456,9 @@ void cMain::popStrFromStatus()
     if (mStatusBar != NULL && mStatusBar->GetFieldsCount() == 3)
         mStatusBar->PopStatusText(2);
 }
-void cMain::setLogicControllerPointer(std::shared_ptr<xController> controller)
+void cMain::setLogicControllerPointer(std::unique_ptr<xController> controller)
 {
-    mController = controller;
+    mController = std::move(controller);
 }
 void cMain::OnTimerView1Update(wxTimerEvent &evt)
 {
@@ -745,10 +745,7 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         // Updating the database sub panel list of entries
     {
         // Get the entries from database, through the controller
-        // As this must be a full copy, it's quite expensive for large blobs
         std::vector<qDatabaseEntry> res = mController->getDatabaseEntries();
-        // Assuming qDatabaseEntry is std::string timestamp, std::string description, std::string data
-
         wxTreeListItem root = mDatabaseSubTree->GetRootItem();
         for (auto item : res) {
             wxTreeListItem p = mDatabaseSubTree->AppendItem(root, item.timestamp.c_str());
@@ -785,7 +782,6 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
     evt.Skip();
     return;
 }
-
 void cMain::OnNewDatabaseTreeSelection(wxTreeListEvent &evt)
 {
     // Clear database item view and update with the new current selection
