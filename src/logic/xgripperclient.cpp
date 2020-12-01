@@ -16,6 +16,8 @@ void xGripperClient::entryThread() {
     mHomeReq.exchange(false);
     mTRuntime.exchange(true);
     mAutosend.exchange(false);
+    mReady.exchange(false);
+    mAutosend.exchange(false);
 
 
     logstd("Gripper client thread started .. ");
@@ -59,6 +61,11 @@ void xGripperClient::entryThread() {
                 this->disconnectGripper();
                 mConnected.exchange(false);
                 mDisconnectReq.exchange(false);
+            }
+        }
+        if (mAutosend.load()) {
+            if (mConnected.load()) {
+                this->autoread();
             }
         }
 
@@ -154,21 +161,46 @@ bool xGripperClient::writeRead(std::string command) {
     read(mSock, buf, 32); //Reading response
     std::string test(buf);
     logstd(test.c_str());
-    mReady.exchange(true);
+    if (test[0] == 'F') {
+        mReady.exchange(true);
+    }
     return true;
 
 }
 
-std::string xGripperClient::getAnswer() {
-    if (!mConnected) {
-       return std::string();
+void xGripperClient::autoread() {
+    if (!mAutosend.load()) {
+        send(mSock, "AUTOSEND(POS, 10, true)",23 , 0);
+        send(mSock, "AUTOSEND(SPEED, 10, true)",25 , 0);
+        send(mSock, "AUTOSEND(FORCE, 10, true)",25 , 0);
+        send(mSock, "AUTOSEND(TEMP, 10, true)",24 , 0);
+        send(mSock, "AUTOSEND(GRIPSTATE, 10, true)",29 , 0);
+        mAutosend.exchange(true);
     }
-    std::string answer = mAnswer;
-    mAnswer = "";
-    mReady.exchange(true);
-    return answer;
-}
+    else {
+        char buf[20];
+        memset(buf, 0, 20);
+        read(mSock, buf, 20);
+        std::string answer(buf);
 
+        std::string data = answer.substr(answer.find("="), 5);
+        if (answer[1] == 'P') {
+            mPos = data;
+        }
+        if (answer[1] == 'F') {
+            mForce = data;
+        }
+        if (answer[1] == 'T') {
+            mTemp = data;
+        }
+        if (answer[1] == 'S') {
+            mSpeed = data;
+        }
+        if (answer[1] == 'G') {
+            mGripstate = data;
+        }
+    }
+}
 bool xGripperClient::isReady() {
     if (mReady.load()) {
         return true;
@@ -178,5 +210,13 @@ bool xGripperClient::isReady() {
 
 
 
+gripperData xGripperClient::getData() {
+    fullData.pos = mPos;
+    fullData.temp = mTemp;
+    fullData.force = mForce;
+    fullData.speed = mSpeed;
+    fullData.gripstate = mGripstate;
 
+    return fullData;
+}
 
