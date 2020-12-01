@@ -16,7 +16,7 @@ enum GRIPPER_MOVE_TYPE {
     // Something, something, same as above ..
 };
 struct qDatabaseEntry {
-    std::string timestamp;
+    std::string timestamp; // This is auto generated in Database.
     std::string description;
 protected:
     qDatabaseEntry(const std::string& t, const std::string& desc) :
@@ -61,21 +61,13 @@ class qDatabaseHandler
 public:
     qDatabaseHandler();
     ~qDatabaseHandler();
-
-    Session *connect(); // KIg her.
     void disconnect();
-
     void setDatabaseCredentials(std::tuple<std::string, std::string, std::string, std::string, uint32_t> credentialsInput);
-
-
     std::vector<Row>* showTables();
-    bool qInsert();
-
     std::vector<Row>* getDbData(std::string tableName);
-    //bool writeSql(std::vector inputList); //WARNING must add type specifier for the vector, therefor commented.
-
 
 private:
+    // Member variables
     std::string mUser;
     std::string mPassword;
     std::string mHost;
@@ -87,6 +79,9 @@ private:
     Schema *mSchema = nullptr;
     Table *mTable = nullptr;
     std::vector<Row> *mRes;
+
+    // Functions
+    Session *connect();
 };
 
 #endif // QDATABASEHANDLER_H

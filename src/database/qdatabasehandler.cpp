@@ -61,9 +61,7 @@ void qDatabaseHandler::setDatabaseCredentials(std::tuple<std::string, std::strin
     mHost = std::get<2>(credentialsInput);
     mDatabase = std::get<3>(credentialsInput);
     mPort = std::get<4>(credentialsInput);
-
     connect();
-
 }
 
 /**
@@ -102,11 +100,3 @@ std::vector<Row> *qDatabaseHandler::getDbData(std::string tableName)
     return mRes;
 }
 
-bool qDatabaseHandler::qInsert()
-{
-    // NOTE check with count, if new row added
-    mTable->insert().execute();
-
-    return true;
-
-}
