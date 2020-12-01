@@ -153,6 +153,37 @@ void xUrControl::setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<
     logstd("[ROBOT]: SetMove flag succesfull");
 }
 
+void xUrControl::speedJMove()
+{
+    bool completed = false;
+    // Parameters
+      double acceleration = UR_JOINT_ACCELERATION_MAX;
+      double dt = 1.0/125;
+      std::vector<double> startq{.07327, -.43385,-0.1,1.778,2.562,0.-0.01};
+      std::vector<double> joint_speed{0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+    // Move to initial joint position with a regular moveJ
+      mUrControl.moveJ(startq);
+
+    // Execute 500Hz control loop for 2 seconds, each cycle is ~2ms
+      for (unsigned int i=0; i<1000; i++)
+      {
+        auto t_start = high_resolution_clock::now();
+        mUrControl.speedJ(joint_speed, acceleration, dt);
+        joint_speed[2] += 0.005;
+        auto t_stop = high_resolution_clock::now();
+        auto t_duration = std::chrono::duration<double>(t_stop - t_start);
+
+        if (t_duration.count() < dt)
+        {
+          std::this_thread::sleep_for(std::chrono::duration<double>(dt - t_duration.count()));
+        }
+      }
+
+      rtde_control.speedStop();
+
+}
+
 
 /**
  * @brief connect tries to connect to robot meanwhile constructing the objects of ur_RTDE
@@ -299,6 +330,12 @@ void xUrControl::move()
                     case MOVE_L: //Linear tool
                         logstd("[ROBOT] MOVE_L: move commenced!");
                         if (mUrControl->moveL(mQ[0], speed, acc)){
+                            logstd("[ROBOT] MOVE_L: move completed!");
+                        }
+                        break;
+                    case SPEEDJ: //Linear tool
+                        logstd("[ROBOT] MOVE_L: move commenced!");
+                        if (speedJ){
                             logstd("[ROBOT] MOVE_L: move completed!");
                         }
                         break;
