@@ -17,8 +17,6 @@ void xGripperClient::entryThread() {
     mTRuntime.exchange(true);
     mAutosend.exchange(false);
     mReady.exchange(false);
-    mAutosend.exchange(false);
-
 
     logstd("Gripper client thread started .. ");
 

@@ -182,6 +182,7 @@ private:
     wxButton *mBtnGripperGrip;
     wxButton *mBtnGripperSendCmd;
     wxButton *mBtnGripperHome;
+    wxButton *mBtnGripperAutosend;
     wxTextCtrl *mTxtGripperIP;
     wxTextCtrl *mTxtGripperPort;
     wxTextCtrl *mTxtGripperCmd;

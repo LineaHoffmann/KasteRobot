@@ -278,6 +278,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mBtnGripperGrip = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_GRIP, "Grip");
     mBtnGripperSendCmd = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_SEND_CMD, "Send cmd");
     mBtnGripperHome = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_HOME, "Home");
+    mBtnGripperAutosend = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_AUTOSEND, "Autosend");
     // Gripper tab building - Text controls
     mTxtGripperIP = new wxTextCtrl(mNotebookGripper, wxID_ANY, "192.168.100.10");
     mTxtGripperPort = new wxTextCtrl(mNotebookGripper, wxID_ANY, "1000");
@@ -295,6 +296,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mSizerNotebookGripper->Add( mBtnGripperGrip, wxGBPosition( 3, 1 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookGripper->Add( mBtnGripperSendCmd, wxGBPosition( 4, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );    
     mSizerNotebookGripper->Add( mBtnGripperHome, wxGBPosition( 3, 2 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookGripper->Add( mBtnGripperAutosend, wxGBPosition( 1, 2 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookGripper->Add( mTxtGripperIP, wxGBPosition( 1, 3 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookGripper->Add( mTxtGripperPort, wxGBPosition( 1, 4 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookGripper->Add( mTxtGripperCmd, wxGBPosition( 4, 1 ), wxGBSpan( 1, 4 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
