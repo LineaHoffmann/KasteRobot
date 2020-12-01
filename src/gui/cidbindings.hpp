@@ -45,4 +45,5 @@ enum BINDING_ID {
 
     ID_BTN_TESTING_XYZ_VVA,      // Testing Notebook panel buttons
     ID_BTN_TESTING_DETECT_PICK
+    ID_BTN_TESTING_SPEEDJ
 };
