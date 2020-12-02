@@ -275,3 +275,9 @@ void xController::testDetectAndPickUp2(std::shared_ptr<ximageHandler> mImagehand
 
     std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 }
+
+void xController::testThrowSpeedJ()
+{
+    mRobot->setPollingRate(125);
+    mRobot->setMove()
+}

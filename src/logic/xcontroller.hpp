@@ -205,7 +205,7 @@ public:
         case ID_BTN_GRIPPER_AUTOSEND:
         {
             mGripper->autoreadReq();
-            logstd("Autoread acticated");
+            logstd("Autoread acticvated");
         }
 
     //NOTE: TESTING BTN xController
@@ -236,6 +236,7 @@ public:
         case ID_BTN_TESTING_SPEEDJ:
         {
             logstd("SPEEDJ test from controller");
+            testThrowSpeedJ();
             mRobot->setMove(ROBOT_MOVE_TYPE::SPEEDJ);
         }
 
@@ -287,6 +288,9 @@ public:
                                     std::shared_ptr<xUrControl> mRobot,
                                     std::shared_ptr<xGripperClient> mGripper,
                                     std::shared_ptr<xCollisionDetector> mCollisionDetector);
+
+    void testThrowSpeedJ();
+
 private:
 
 

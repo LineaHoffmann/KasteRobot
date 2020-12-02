@@ -110,7 +110,7 @@ private:
               std::atomic<int> mMoveMode;
               std::atomic<double> acc, speed;
 
-    std::atomic<int> mPollingRate = 20;
+    std::atomic<int> mPollingRate = 2;
     std::string mIP = "127.0.0.1";
     std::vector<double> *mJoints = nullptr; //pointer to
 

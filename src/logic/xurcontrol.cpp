@@ -411,9 +411,15 @@ void xUrControl::getData()
     //preparing timers
     // DONE: Use steady_clock instead, system_clock might not be as steady as one would think
     std::chrono::steady_clock::time_point timePoint;
-    long waitTime = 1000 / mPollingRate; //polling rate in millis
+    int prevPolling{0};
+    long waitTime; //polling rate in millis
 
     while (mContinue) {
+        if(prevPolling != mPollingRate){
+            prevPolling = mPollingRate;
+            waitTime = 1000 / mPollingRate;
+        }
+
         timePoint = std::chrono::steady_clock::now() + std::chrono::milliseconds(waitTime);
 
         //lock Scope
