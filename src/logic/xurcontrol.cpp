@@ -85,7 +85,6 @@ void xUrControl::setConnect(std::string IP)
 {
     {
     std::lock_guard<std::mutex> ipLock(mMtx);
-    logstd(mIP.c_str());
     mIP = IP;
     }
     mConnect = true;
