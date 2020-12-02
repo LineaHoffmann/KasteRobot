@@ -18,8 +18,6 @@ xController::xController()
 
     mImagehandler->showResult = true;
 
-    //robworks
-    mCollisionDetector = std::make_shared<xCollisionDetector>("../resources/XML_files/Collision v1.wc.xml");
 
 
     // Robot
@@ -35,18 +33,21 @@ xController::xController()
         logerr(s.c_str());
     }
 
-
-
     // Gripper
     mGripper = std::make_shared<xGripperClient>();
 
     // Database
     mDatabase = std::make_shared<qDatabaseHandler>();
 
+    //robworks
+    mCollisionDetector = std::make_shared<xCollisionDetector>();
+    mCollisionDetector->loadWorkcell("../resources/XML_files/CollisionV2.wc.xml");
+
+
     //starting camera
     mCamera->start();
-}
 
+}
 
 xController::~xController() {};
 bool xController::hasNewImage()
@@ -56,6 +57,16 @@ bool xController::hasNewImage()
     }
     else return false;
 }
+
+void xController::test() {
+    std::vector<double> beg = {0.763407, -0.775973, 0.490088, -1.2158, -1.37288, 0};
+    std::vector<double> end = {1.70903, -0.775973, 0.490088, -1.2158, -1.37288, 0};
+    std::vector<std::vector<double>> qlist;
+    qlist = mCollisionDetector->makePath(beg, end);
+    mCollisionDetector->checkCollision(&qlist);
+
+}
+
 cv::Mat xController::getImage()
 {
     if (mCamera) {
@@ -114,7 +125,6 @@ void xController::testDetectAndPickUp(std::shared_ptr<ximageHandler> mImagehandl
     while(mRobot->getIsBusy()){
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
-
 
     mGripper->home();
     std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(mCamera->getImage());
@@ -177,6 +187,73 @@ void xController::testDetectAndPickUp(std::shared_ptr<ximageHandler> mImagehandl
             }
         }
 
+
+        logstd("Sequenze succesfull");
+
+    }else{
+    logstd("Stopping detection and pickup sequenze");
+    }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+}
+
+
+void xController::testDetectAndPickUp2(std::shared_ptr<ximageHandler> mImagehandler,
+                                      std::shared_ptr<xBaslerCam> mCamera,
+                                      std::shared_ptr<xUrControl> mRobot,
+                                      std::shared_ptr<xGripperClient> mGripper,
+                                      std::shared_ptr<xCollisionDetector> mCollisionDetector)
+{
+    //flyt robotten til hjem position
+    try{
+    mRobot->setMove(xUrControl::moveEnum::HOME);
+    logstd("Robot Homing");
+    while(mRobot->getIsBusy()){
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    } catch (const x_err::error &e){
+        logerr("homing failed");
+    }
+
+    std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(mCamera->getImage());
+//    std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(cv::imread("../resources/ballimgs/remappedBall2.png"));
+
+    if (std::get<0>(ballResult)){
+        logstd("Ball found, moving robot to pre pickup position");
+
+        //flyt robotten til det der prepickup position
+
+
+        std::vector<double> pickupPosition = xMath::ball_position_to_robotframe(ballResult);
+
+        logstd("moving robot to pickup object");
+
+        try {
+            std::vector<std::vector<double>> q;
+            q.push_back(pickupPosition);
+            //flyt robot til positionen i variablen pickupPosition
+            mRobot->setMove(xUrControl::moveEnum::MOVE_L, q);
+            while(mRobot->getIsBusy()){
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            }
+        } catch (const x_err::error &e){
+            logerr("homing failed");
+        }
+
+        logstd("grip object...");
+        //mGripper->grip();
+
+        logstd("moving robot to throwing position");
+        //flyt robotten til hjem position eller evt en prepickup position
+        try{
+            mRobot->setMove(xUrControl::moveEnum::HOME);
+            logstd("Robot Homing");
+        while(mRobot->getIsBusy()){
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+        } catch (const x_err::error &e){
+            logerr("homing failed");
+        }
 
         logstd("Sequenze succesfull");
 

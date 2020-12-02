@@ -212,6 +212,7 @@ public:
             break;
         case ID_BTN_TESTING_XYZ_VVA:
             logstd("XYZ_VVA from xController ..");
+            test();
             try {
             if constexpr (std::is_same_v<T, std::array<double,7>>) {
                 static_cast<std::array<double,7>>(data);
@@ -264,7 +265,14 @@ public:
         return;
     }
 
+    void test();
+
     static void testDetectAndPickUp(std::shared_ptr<ximageHandler> mImagehandler,
+                                    std::shared_ptr<xBaslerCam> mCamera,
+                                    std::shared_ptr<xUrControl> mRobot,
+                                    std::shared_ptr<xGripperClient> mGripper,
+                                    std::shared_ptr<xCollisionDetector> mCollisionDetector);
+    static void testDetectAndPickUp2(std::shared_ptr<ximageHandler> mImagehandler,
                                     std::shared_ptr<xBaslerCam> mCamera,
                                     std::shared_ptr<xUrControl> mRobot,
                                     std::shared_ptr<xGripperClient> mGripper,
