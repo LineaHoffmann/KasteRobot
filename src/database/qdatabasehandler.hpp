@@ -16,11 +16,11 @@ enum GRIPPER_MOVE_TYPE {
     // Something, something, same as above ..
 };
 struct qDatabaseEntry {
-    std::string timestamp; // This is auto generated in Database.
-    std::string description;
+    std::string timestamp; // C++
+    std::string entryType; // Type of entry to DB. THROW, ?
 protected:
     qDatabaseEntry(const std::string& t, const std::string& desc) :
-        timestamp(t), description(desc) {};
+        timestamp(t), entryType(desc) {};
 };
 template <class T>
 struct qDatabaseMoveEntry : public qDatabaseEntry {
@@ -64,7 +64,7 @@ public:
     void disconnect();
     void setDatabaseCredentials(std::tuple<std::string, std::string, std::string, std::string, uint32_t> credentialsInput);
     std::vector<Row>* showTables();
-    std::vector<Row>* getDbData(std::string tableName);
+    std::vector<Row>* retriveData(); // Perhaps make private
 
 private:
     // Member variables
@@ -79,6 +79,7 @@ private:
     Schema *mSchema = nullptr;
     Table *mTable = nullptr;
     std::vector<Row> *mRes;
+
 
     // Functions
     Session *connect();

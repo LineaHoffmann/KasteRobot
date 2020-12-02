@@ -64,20 +64,14 @@ void qDatabaseHandler::setDatabaseCredentials(std::tuple<std::string, std::strin
     connect();
 }
 
-/**
- * @brief qDatabaseHandler::getDbData
- * @param tableName, the table you wish to collect data from
- * @return vector *mRes, contains data from sql query
- */
-std::vector<Row> *qDatabaseHandler::getDbData(std::string tableName)
+std::vector<Row> *qDatabaseHandler::retriveData()
 {
-    mSchema = new Schema(mSession->getSchema(mDatabase));
-    //Schema qSchema = mSession->getSchema(mDatabase);
+    // Det nyeste af alle tabeller (row).
 
+    mSchema = new Schema(mSession->getSchema(mDatabase));
     // Accessing an exsisting table
     // TODO Make table variable, so can be changed from input
-    mTable = new Table(mSchema->getTable("throw!"));
-    //Table qTable = mSchema->getTable("throw");
+    mTable = new Table(mSchema->getTable("throw"));
     if(mTable->isView())
     {
         std::cout << "qDatabasehandler: Something is wrong, isVeiw() " << std::endl;
@@ -88,6 +82,7 @@ std::vector<Row> *qDatabaseHandler::getDbData(std::string tableName)
     disconnect();
 
     mRes = new std::vector<Row>(qResult.fetchAll());
+    // Testing Purpose (Show in terminal)
     for(Row row : *mRes)
             {
                 for(uint32_t i = 0; i < row.colCount(); i++)
@@ -97,6 +92,8 @@ std::vector<Row> *qDatabaseHandler::getDbData(std::string tableName)
                 std::cout << std::endl;
             }
 
+    // Hvilket objekt vil jeg have ? -> Oprette objekt
+    // Noget med entryType...Skal gøres noget med getTable() For at hente korrekt data.
     return mRes;
 }
 
