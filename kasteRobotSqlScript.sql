@@ -1,7 +1,7 @@
 CREATE DATABASE kasteRobot;
 USE kasteRobot;
 CREATE TABLE IF NOT EXISTS position (
-position_ID CHAR(36) NOT NULL PRIMARY KEY,
+position_ID CHAR(36) PRIMARY KEY NOT NULL,
 x_pos DOUBLE,
 y_pos DOUBLE,
 z_pos DOUBLE,
@@ -9,22 +9,26 @@ x_rotation DOUBLE,
 y_rotation DOUBLE,
 z_rotation DOUBLE
 );
-CREATE TABLE IF NOT EXISTS moveEntry(
-moveEntry_ID CHAR(36) PRIMARY KEY,
-movetype VARCHAR(30),
-a_positionID CHAR(36),
-b_positionID CHAR(36),
-FOREIGN KEY (a_positionID) REFERENCES kasteRobot.position(position_ID),
-FOREIGN KEY (b_positionID) REFERENCES kasteRobot.position(position_ID)
-);
 CREATE TABLE IF NOT EXISTS log (
 log_ID CHAR(36) PRIMARY KEY,
 created_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 entryType VARCHAR(50)
 );
+CREATE TABLE IF NOT EXISTS moveEntry(
+moveEntry_ID CHAR(36) PRIMARY KEY,
+log_ID CHAR(36),
+movetype VARCHAR(30),
+a_positionID CHAR(36),
+b_positionID CHAR(36),
+FOREIGN KEY (log_ID) REFERENCES kasteRobot.log(log_ID),
+FOREIGN KEY (a_positionID) REFERENCES kasteRobot.position(position_ID),
+FOREIGN KEY (b_positionID) REFERENCES kasteRobot.position(position_ID)
+);
 CREATE TABLE IF NOT EXISTS throw (
 throw_ID CHAR(36) PRIMARY KEY,
 log_ID CHAR(36),
+position_ID CHAR(36),
+FOREIGN KEY (position_ID) REFERENCES kasteRobot.position(position_ID),
 FOREIGN KEY (log_ID) REFERENCES kasteRobot.log(log_ID),
 successful BOOLEAN,
 deviation DOUBLE,
