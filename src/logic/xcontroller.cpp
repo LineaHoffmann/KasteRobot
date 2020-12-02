@@ -276,8 +276,20 @@ void xController::testDetectAndPickUp2(std::shared_ptr<ximageHandler> mImagehand
     std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 }
 
-void xController::testThrowSpeedJ()
+void xController::testThrowSpeedJ(double angle)
 {
+    RobotData robotData(mRobot->getURStruct());
+    int prevPollingRate = mRobot->getPollingRate();
     mRobot->setPollingRate(125);
-    mRobot->setMove()
+    mRobot->setMove(ROBOT_MOVE_TYPE::SPEEDJ);
+
+    while (mRobot->getIsBusy()){
+        if (robotData.robotJointPosition[2] >= angle){
+            mGripper->release();
+        }
+    }
+
+
+    mRobot->setPollingRate(prevPollingRate);
+    logstd("Speedj test throw completed");
 }

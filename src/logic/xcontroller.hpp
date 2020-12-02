@@ -236,9 +236,10 @@ public:
         case ID_BTN_TESTING_SPEEDJ:
         {
             logstd("SPEEDJ test from controller");
-            testThrowSpeedJ();
-            mRobot->setMove(ROBOT_MOVE_TYPE::SPEEDJ);
+            testThrowSpeedJ(-1.745);
+            //mRobot->setMove(ROBOT_MOVE_TYPE::SPEEDJ);
         }
+            break;
 
     // Databse Buttuns implementation
         case ID_BTN_DATABASE_CONNECT:
@@ -269,6 +270,7 @@ public:
         } catch(const std::exception &e){
                 logwar(e.what());
             }
+        break;
         default:
             throw x_err::error(x_err::what::NO_IMPLEMENTATION);
             break;
@@ -289,7 +291,7 @@ public:
                                     std::shared_ptr<xGripperClient> mGripper,
                                     std::shared_ptr<xCollisionDetector> mCollisionDetector);
 
-    void testThrowSpeedJ();
+    void testThrowSpeedJ(double angle);
 
 private:
 
