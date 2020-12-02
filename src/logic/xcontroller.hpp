@@ -226,8 +226,13 @@ public:
                 }
             } catch ( const std::exception &e ) {
                 logwar(e.what());
-                break;
-            }
+            break;
+        }
+        case ID_BTN_TESTING_SPEEDJ:
+        {
+            logstd("SPEEDJ test from controller");
+            mRobot->setMove(xUrControl::moveEnum::SPEEDJ);
+        }
 
     // Databse Buttuns implementation
         case ID_BTN_DATABASE_CONNECT:
