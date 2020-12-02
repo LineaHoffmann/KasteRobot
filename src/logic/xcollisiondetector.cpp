@@ -99,9 +99,9 @@ std::vector<std::vector<double>> xCollisionDetector::makePath(std::vector<double
     rwlibs::pathoptimization::ClearanceOptimizer optimizer = rwlibs::pathoptimization::ClearanceOptimizer(device, state, metric, calc);
     std::cout << "3" << std::endl;
     std::cout << optimizer.getClearanceCalculator() << std::endl;
-    rw::trajectory::QPath result2;
+    rw::trajectory::QPath result2 = optimizer.optimize(result);
     std::cout << "3.5" << std::endl;
-    result2 = optimizer.optimize(result);
+    //result2 = optimizer.optimize(result);
     std::cout << "4" << std::endl;
     for (size_t i = 0; i < result.size(); i++) {
         output.push_back(result.at(i).toStdVector());

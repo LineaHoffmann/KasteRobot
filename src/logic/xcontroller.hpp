@@ -29,7 +29,7 @@
 #include "ximagehandler.hpp"
 
 #include "xmath.hpp"
-#include "xinfostruct.hpp"
+#include "globaldefs.hpp"
 
 #include "../database/qdatabasehandler.hpp"
 

@@ -275,6 +275,18 @@ install_misc() {
           apt-get install libssl-dev -y
       fi
 
+      VALGRIND_OK="$(dpkg -s valgrind | grep -c "Status: install ok installed")"
+      if [ "$VALGRIND_OK" -eq 0 ]
+        then
+          apt-get install valgrind -y
+      fi
+
+	  OPENSSH_CLIENT_OK="$(dpkg -s openssh-client | grep -c "Status: install ok installed")"
+      if [ "$OPENSSH_CLIENT_OK" -eq 0 ]
+        then
+          apt-get install openssh-client -y
+      fi
+
       # 20.04 seems to need libclang-common-8-dev for Qt5 Clang Backend, at least on Xubuntu
       if [ DISTRO == "2004" ]
         then

@@ -22,13 +22,7 @@
 #include <iostream>
 #include <atomic>
 
-struct gripperData {
-    std::string pos;
-    std::string force;
-    std::string temp;
-    std::string speed;
-    std::string gripstate;
-};
+#include "globaldefs.hpp"
 
 class xGripperClient
 {

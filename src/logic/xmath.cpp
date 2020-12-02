@@ -8,8 +8,7 @@ std::array<double, 3> xMath::distance3d_to_v0_xyAngle_czAngle(const std::array<d
                                                               double steps,
                                                               double g)
 {
-    double dxy = distanceXYZ[1] / distanceXYZ[0];
-    double theta_xy = atan(dxy);    // XY plane Throwing angle [rad]
+    double theta_xy = std::atan2(distanceXYZ[1], distanceXYZ[0]);    // XY plane Throwing angle [rad]
     double target_c = sqrt( pow(distanceXYZ[0], 2) + pow(distanceXYZ[1], 2) ); // XY plane distance to target
     // Lets try the lowest allowed angles first, and iterate
     // until an acceptable release velocity is achieved

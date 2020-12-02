@@ -107,7 +107,6 @@ void xController::fillInfo(treeInfo &info)
 
         gripperData gripper(mGripper->getData());
 
-        info.gripperSt = gripper.gripstate;
         info.gripperTemp = gripper.temp;
         info.gripperForce = gripper.force;
         info.gripperPosition = gripper.pos;

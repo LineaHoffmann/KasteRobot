@@ -1,6 +1,8 @@
 #ifndef QDATABASEHANDLER_H
 #define QDATABASEHANDLER_H
+#pragma once
 
+#include "../logic/globaldefs.hpp"
 #include "../logic/xgeometrytypes.hpp"
 #include "mysql-cppconn-8/mysqlx/xdevapi.h"
 #include <iostream>
@@ -8,13 +10,6 @@
 
 using namespace mysqlx;
 
-
-enum ROBOT_MOVE_TYPE {
-    // xUrControl has this currently, we just might need some access systemwide
-};
-enum GRIPPER_MOVE_TYPE {
-    // Something, something, same as above ..
-};
 struct qDatabaseEntry {
     std::string timestamp; // C++
     std::string entryType; // Type of entry to DB. THROW, ?

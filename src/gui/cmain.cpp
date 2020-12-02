@@ -503,15 +503,15 @@ void cMain::OnTimerInfoUpdate(wxTimerEvent &evt)
     }
     // Updating the treelist
     mController->fillInfo(*info);
-    if (info->robotState == STATE::DEFAULT) {
+    if (info->robotState == OBJSTATE::DEFAULT) {
         mTreeList->SetItemText(*mTreeRobotState, 1, "Not initialized");
-    } else if (info->robotState == STATE::ROBOT_NOT_CONNECTED) {
+    } else if (info->robotState == OBJSTATE::ROBOT_NOT_CONNECTED) {
         mBmpRobotStatus->SetBackgroundColour(wxColour(255,0,0));
         mTreeList->SetItemText(*mTreeRobotState, 1, "Not connected");
-    } else if (info->robotState == STATE::ROBOT_NOT_RUNNING) {
+    } else if (info->robotState == OBJSTATE::ROBOT_NOT_RUNNING) {
         mBmpRobotStatus->SetBackgroundColour(wxColour(255,0,0));
         mTreeList->SetItemText(*mTreeRobotState, 1, "Not running");
-    } else if (info->robotState == STATE::ROBOT_RUNNING) {
+    } else if (info->robotState == OBJSTATE::ROBOT_RUNNING) {
         mBmpRobotStatus->SetBackgroundColour(wxColour(0,255,0));
         mTreeList->SetItemText(*mTreeRobotState, 1, "Running");
     }
@@ -536,29 +536,27 @@ void cMain::OnTimerInfoUpdate(wxTimerEvent &evt)
     s.str(std::string());
     mTreeList->SetItemText(*mTreeRobotPollingRate, 1, std::to_string(info->robotPollingRate));
 
-    if (info->cameraState == STATE::DEFAULT) {
+    if (info->cameraState == OBJSTATE::DEFAULT) {
         mTreeList->SetItemText(*mTreeCameraState, 1, "Not initialized");
-    } else if (info->cameraState == STATE::CAMERA_NOT_CONNECTED) {
+    } else if (info->cameraState == OBJSTATE::CAMERA_NOT_CONNECTED) {
         mBmpCameraStatus->SetBackgroundColour(wxColour(255,0,0));
         mTreeList->SetItemText(*mTreeCameraState, 1, "Not connected");
-    } else if (info->cameraState == STATE::CAMERA_NOT_RUNNING) {
+    } else if (info->cameraState == OBJSTATE::CAMERA_NOT_RUNNING) {
         mBmpCameraStatus->SetBackgroundColour(wxColour(255,0,0));
         mTreeList->SetItemText(*mTreeCameraState, 1, "Not running");
-    } else if (info->cameraState == STATE::CAMERA_RUNNING) {
+    } else if (info->cameraState == OBJSTATE::CAMERA_RUNNING) {
         mBmpCameraStatus->SetBackgroundColour(wxColour(0,255,0));
         mTreeList->SetItemText(*mTreeCameraState, 1, "Running");
     }
     mTreeList->SetItemText(*mTreeCameraExposure, 1, std::to_string(info->cameraExposure));
     mTreeList->SetItemText(*mTreeCameraFramerate, 1, std::to_string(info->cameraFramerate));
 
-
-
-    if (info->gripperState == STATE::DEFAULT) {
+    if (info->gripperState == OBJSTATE::DEFAULT) {
         mTreeList->SetItemText(*mTreeGripperState, 1, "Not initialized");
-    } else if (info->gripperState == STATE::GRIPPER_NOT_CONNECTED) {
+    } else if (info->gripperState == OBJSTATE::GRIPPER_NOT_CONNECTED) {
         mBmpGripperStatus->SetBackgroundColour(wxColour(255,0,0));
         mTreeList->SetItemText(*mTreeGripperState, 1, "Not connected");
-    } else if (info->gripperState == STATE::GRIPPER_RUNNING) {
+    } else if (info->gripperState == OBJSTATE::GRIPPER_RUNNING) {
         mBmpGripperStatus->SetBackgroundColour(wxColour(0,255,0));
         mTreeList->SetItemText(*mTreeGripperState, 1, "Running");
     }
@@ -568,14 +566,13 @@ void cMain::OnTimerInfoUpdate(wxTimerEvent &evt)
     mTreeList->SetItemText(*mTreeGripperSpeed, 1, info->gripperSpeed);
     mTreeList->SetItemText(*mTreeGripperTemp, 1, info->gripperTemp);
     mTreeList->SetItemText(*mTreeGripperForce, 1, info->gripperForce);
-    mTreeList->SetItemText(*mTreeGripperSt, 1, info->gripperSt);
 
-    if (info->databaseState == STATE::DEFAULT) {
+    if (info->databaseState == OBJSTATE::DEFAULT) {
         mTreeList->SetItemText(*mTreeDatabaseState, 1, "Not initialized");
-    } else if (info->databaseState == STATE::DATABASE_NOT_CONNECTED) {
+    } else if (info->databaseState == OBJSTATE::DATABASE_NOT_CONNECTED) {
         //mBmpDatabaseStatus->SetBackgroundColour(wxColour(255,0,0));
         mTreeList->SetItemText(*mTreeDatabaseState, 1, "Not connected");
-    } else if (info->databaseState == STATE::DATABASE_RUNNING) {
+    } else if (info->databaseState == OBJSTATE::DATABASE_RUNNING) {
         //mBmpDatabaseStatus->SetBackgroundColour(wxColour(0,255,0));
         mTreeList->SetItemText(*mTreeDatabaseState, 1, "Running");
     }
