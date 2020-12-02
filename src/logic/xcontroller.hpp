@@ -84,7 +84,7 @@ public:
                 }
                 logstd(std::string("New TCP Position sent to robot: ").append(s).c_str());
                 if(mRobot){
-                mRobot->setMove(xUrControl::moveEnum::MOVE_L,q);
+                mRobot->setMove(ROBOT_MOVE_TYPE::MOVE_L,q);
                 }
             }
         }
@@ -98,13 +98,13 @@ public:
         case ID_BTN_ROBOT_SEND_HOME:
             logstd("Robot Moving to home from xController");
             if(mRobot){
-            mRobot->setMove(xUrControl::HOME);
+            mRobot->setMove(ROBOT_MOVE_TYPE::HOME);
             }
             break;
         case ID_BTN_ROBOT_SEND_PICKUP:
             logstd("Robot Moving to Pickup from xController");
             if(mRobot){
-            mRobot->setMove(xUrControl::PICKUP);
+            mRobot->setMove(ROBOT_MOVE_TYPE::PICKUP);
             }
             break;
 
@@ -236,7 +236,7 @@ public:
         case ID_BTN_TESTING_SPEEDJ:
         {
             logstd("SPEEDJ test from controller");
-            mRobot->setMove(xUrControl::moveEnum::SPEEDJ);
+            mRobot->setMove(ROBOT_MOVE_TYPE::SPEEDJ);
         }
 
     // Databse Buttuns implementation

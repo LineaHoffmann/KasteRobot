@@ -24,19 +24,8 @@
 #include "wx/log.h"
 
 #include "xexceptions.hpp"
+#include "globaldefs.hpp"
 #include "xcollisiondetector.hpp"
-
-//definition of data struct
-struct UR_STRUCT {
-
-    int robotState;
-    bool isConnected = false;
-    std::string IP;
-    uint16_t robotPollingRate{0};
-    std::array<float, 6> robotTcpPosition{0,0,0,0,0,0};
-    std::array<float, 6> robotJointPosition{0,0,0,0,0,0};
-
-};
 
 class xUrControl
 {
@@ -62,16 +51,12 @@ public:
     void setConnect(std::string IP);
     void setDisconnect();
 
-    //move ENUM
-    enum moveEnum {MOVE_JLIN, MOVE_JPATH, MOVE_JIK, MOVE_LFK, MOVE_L, MOVE_TLIN, SERVOJ, SPEEDJ, HOME, PICKUP}; // WARNING: Update Enums to fit code, before final export:
-
     //move function to access private move functions of UR_RTDE
-    void setMove(xUrControl::moveEnum moveMode);
-    void setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<double> > inputQ);
-    void setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<double> > inputQ, double acc, double speed);
+    void setMove(ROBOT_MOVE_TYPE moveMode);
+    void setMove(ROBOT_MOVE_TYPE moveMode, std::vector<std::vector<double> > inputQ);
+    void setMove(ROBOT_MOVE_TYPE moveMode, std::vector<std::vector<double> > inputQ, double acc, double speed);
 
     void speedJMove(double t = 0.5);
-
 
     //read current pose in rads or deg
     std::vector<double> getCurrentPose();
@@ -87,7 +72,7 @@ public:
     void setPollingRate(int pollingRate);
 
     //returning pointer to the datastruct.
-    UR_STRUCT getURStruct();
+    RobotData getURStruct();
 
     std::atomic<int> getPollingRate() const;
 
@@ -134,7 +119,7 @@ private:
 
     xCollisionDetector *mDetector;
 
-    UR_STRUCT mURStruct;
+    RobotData mURStruct;
 
     std::exception_ptr mEptr = nullptr;
 

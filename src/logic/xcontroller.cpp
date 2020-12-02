@@ -83,7 +83,7 @@ void xController::fillInfo(treeInfo &info)
     // TODO: Fill the info struct
     if(mRobot && mRobot->getIsConnected()){
         try{
-        UR_STRUCT robot(mRobot->getURStruct());
+        RobotData robot(mRobot->getURStruct());
 
         if (robot.robotState == 7){
             info.robotState = ROBOT_RUNNING;
@@ -132,7 +132,7 @@ void xController::testDetectAndPickUp(std::shared_ptr<ximageHandler> mImagehandl
                                       std::shared_ptr<xCollisionDetector> mCollisionDetector)
 {
     //flyt robotten til hjem position
-    mRobot->setMove(xUrControl::moveEnum::HOME);
+    mRobot->setMove(ROBOT_MOVE_TYPE::HOME);
     logstd("Robot Homing");
     while(mRobot->getIsBusy()){
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -146,7 +146,7 @@ void xController::testDetectAndPickUp(std::shared_ptr<ximageHandler> mImagehandl
         logstd("Ball found, moving robot to pre pickup position");
 
         //flyt robotten til det der prepickup position
-            mRobot->setMove(xUrControl::moveEnum::PICKUP);
+            mRobot->setMove(ROBOT_MOVE_TYPE::PICKUP);
             while(mRobot->getIsBusy()){
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
             }
@@ -163,13 +163,13 @@ void xController::testDetectAndPickUp(std::shared_ptr<ximageHandler> mImagehandl
 
 
             //flyt robot til positionen i variablen pickupPosition uden z højde
-            mRobot->setMove(xUrControl::moveEnum::MOVE_L, moveTo);
+            mRobot->setMove(ROBOT_MOVE_TYPE::MOVE_L, moveTo);
             while(mRobot->getIsBusy()){
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
             }
 
             //flyt robot til positionen i variablen pickupPosition
-            mRobot->setMove(xUrControl::moveEnum::MOVE_L, pickupPosition);
+            mRobot->setMove(ROBOT_MOVE_TYPE::MOVE_L, pickupPosition);
             while(mRobot->getIsBusy()){
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
             }
@@ -180,7 +180,7 @@ void xController::testDetectAndPickUp(std::shared_ptr<ximageHandler> mImagehandl
         std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 
         logstd("moving robot to throwing position");
-        mRobot->setMove(xUrControl::moveEnum::PICKUP);
+        mRobot->setMove(ROBOT_MOVE_TYPE::PICKUP);
         while(mRobot->getIsBusy()){
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
@@ -189,7 +189,7 @@ void xController::testDetectAndPickUp(std::shared_ptr<ximageHandler> mImagehandl
         kast.push_back(std::vector<double>{-1.15192, -1.39626,0.0, -1.5708,1.5708,0});
 
         //flyt robotten til hjem position eller evt en prepickup position
-            mRobot->setMove(xUrControl::moveEnum::MOVE_JLIN, kast,3,3);
+            mRobot->setMove(ROBOT_MOVE_TYPE::MOVE_JLIN, kast,3,3);
             int i = 0;
         while(mRobot->getIsBusy()){
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -218,7 +218,7 @@ void xController::testDetectAndPickUp2(std::shared_ptr<ximageHandler> mImagehand
 {
     //flyt robotten til hjem position
     try{
-    mRobot->setMove(xUrControl::moveEnum::HOME);
+    mRobot->setMove(ROBOT_MOVE_TYPE::HOME);
     logstd("Robot Homing");
     while(mRobot->getIsBusy()){
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -244,7 +244,7 @@ void xController::testDetectAndPickUp2(std::shared_ptr<ximageHandler> mImagehand
             std::vector<std::vector<double>> q;
             q.push_back(pickupPosition);
             //flyt robot til positionen i variablen pickupPosition
-            mRobot->setMove(xUrControl::moveEnum::MOVE_L, q);
+            mRobot->setMove(ROBOT_MOVE_TYPE::MOVE_L, q);
             while(mRobot->getIsBusy()){
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
             }
@@ -258,7 +258,7 @@ void xController::testDetectAndPickUp2(std::shared_ptr<ximageHandler> mImagehand
         logstd("moving robot to throwing position");
         //flyt robotten til hjem position eller evt en prepickup position
         try{
-            mRobot->setMove(xUrControl::moveEnum::HOME);
+            mRobot->setMove(ROBOT_MOVE_TYPE::HOME);
             logstd("Robot Homing");
         while(mRobot->getIsBusy()){
             std::this_thread::sleep_for(std::chrono::milliseconds(10));

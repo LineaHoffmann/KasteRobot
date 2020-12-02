@@ -98,7 +98,7 @@ void xUrControl::setDisconnect()
     logstd("[ROBOT]: SetDisconnect flag succesfull");
 }
 
-void xUrControl::setMove(xUrControl::moveEnum moveMode){
+void xUrControl::setMove(ROBOT_MOVE_TYPE moveMode){
     if (mMove){
         logerr("[ROBOT]: setMove flag already set");
         return;
@@ -112,7 +112,7 @@ void xUrControl::setMove(xUrControl::moveEnum moveMode){
 
 }
 
-void xUrControl::setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<double> > inputQ)
+void xUrControl::setMove(ROBOT_MOVE_TYPE moveMode, std::vector<std::vector<double> > inputQ)
 {
     if (mMove){
         logerr("[ROBOT]: setMove flag already set");
@@ -138,7 +138,7 @@ void xUrControl::setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<
     logstd("[ROBOT]: SetMove flag succesfull");
 }
 
-void xUrControl::setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<double> > inputQ, double acc, double speed)
+void xUrControl::setMove(ROBOT_MOVE_TYPE moveMode, std::vector<std::vector<double> > inputQ, double acc, double speed)
 {
     if (mMove){
         logerr("[ROBOT]: setMove flag already set");
@@ -479,7 +479,7 @@ void xUrControl::initRobot(std::string IP)
  * @brief UR_Control::getURStruct
  * @return pointer to the URStruct, for data exchange
  */
-UR_STRUCT xUrControl::getURStruct() {
+RobotData xUrControl::getURStruct() {
 
     if(!isConnected){
         throw x_err::error(x_err::what::ROBOT_NOT_CONNECTED);
