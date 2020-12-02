@@ -153,7 +153,7 @@ void xUrControl::setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<
     logstd("[ROBOT]: SetMove flag succesfull");
 }
 
-void xUrControl::speedJMove()
+bool xUrControl::speedJMove()
 {
     bool completed = false;
     // Parameters
@@ -163,15 +163,15 @@ void xUrControl::speedJMove()
       std::vector<double> joint_speed{0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
     // Move to initial joint position with a regular moveJ
-      mUrControl.moveJ(startq);
+      mUrControl->moveJ(startq);
 
     // Execute 500Hz control loop for 2 seconds, each cycle is ~2ms
       for (unsigned int i=0; i<1000; i++)
       {
-        auto t_start = high_resolution_clock::now();
-        mUrControl.speedJ(joint_speed, acceleration, dt);
+        auto t_start = std::chrono::steady_clock::now();
+        mUrControl->speedJ(joint_speed, acceleration, dt);
         joint_speed[2] += 0.005;
-        auto t_stop = high_resolution_clock::now();
+        auto t_stop = std::chrono::steady_clock::now();
         auto t_duration = std::chrono::duration<double>(t_stop - t_start);
 
         if (t_duration.count() < dt)
@@ -180,7 +180,7 @@ void xUrControl::speedJMove()
         }
       }
 
-      rtde_control.speedStop();
+      mUrControl->speedStop();
 
 }
 
@@ -294,6 +294,9 @@ void xUrControl::move()
                 logerr("[ROBOT] Move home bad");
                 mUrControl->reuploadScript();
             }
+        } else if (mMoveMode == SPEEDJ){
+            logstd("[ROBOT] speedJ test commenced");
+            speedJMove();
         }
         else {
         /*NOTE: if robot is connected, switch statement will choose correct movefunction to execute!
@@ -330,12 +333,6 @@ void xUrControl::move()
                     case MOVE_L: //Linear tool
                         logstd("[ROBOT] MOVE_L: move commenced!");
                         if (mUrControl->moveL(mQ[0], speed, acc)){
-                            logstd("[ROBOT] MOVE_L: move completed!");
-                        }
-                        break;
-                    case SPEEDJ: //Linear tool
-                        logstd("[ROBOT] MOVE_L: move commenced!");
-                        if (speedJ){
                             logstd("[ROBOT] MOVE_L: move completed!");
                         }
                         break;

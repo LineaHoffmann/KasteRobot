@@ -70,7 +70,7 @@ public:
     void setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<double> > inputQ);
     void setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<double> > inputQ, double acc, double speed);
 
-    void speedJMove();
+    bool speedJMove();
 
 
     //read current pose in rads or deg

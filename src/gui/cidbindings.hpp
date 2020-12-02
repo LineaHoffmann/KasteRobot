@@ -44,6 +44,6 @@ enum BINDING_ID {
     ID_DATABASE_SUB_TREE,
 
     ID_BTN_TESTING_XYZ_VVA,      // Testing Notebook panel buttons
-    ID_BTN_TESTING_DETECT_PICK
-    ID_BTN_TESTING_SPEEDJ
+    ID_BTN_TESTING_DETECT_PICK,
+    ID_BTN_TESTING_SPEEDJ        //Testing SpeedJ Function
 };
