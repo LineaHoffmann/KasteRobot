@@ -122,8 +122,13 @@ bool ximageHandler::cutOutTable()
     if (table.cols - inputImage.cols < 0){
         //pixel to cm hackerway
         pixToCm = table.cols / tableWidth;
-
-        if (showResult)cv::imshow("table", table);
+        std::string temp = "scale: " + std::to_string(pixToCm);
+        logstd(temp.c_str());
+        setRobotBase(42.5, 93.5); //i cm
+        if (showResult) {
+            cv::imwrite("table.png", table);
+            cv::imshow("table", table);
+        }
         return 1;
     } else {
         return 0;
@@ -259,7 +264,7 @@ void ximageHandler::setRobotBase(float xcm, float ycm)
 {
 
     robotBase.x = xcm * pixToCm;
-    robotBase.y = ycm * pixToCm;
+    robotBase.y = ROI.height - (ycm * pixToCm);
 }
 
 float ximageHandler::getRadiusCM() const

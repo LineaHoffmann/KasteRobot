@@ -21,6 +21,9 @@
 #include <rwlibs/proximitystrategies/ProximityStrategyFactory.hpp>
 #include <rwlibs/proximitystrategies/ProximityStrategyYaobi.hpp>
 #include <rwlibs/pathplanners/sbl/SBLPlanner.hpp>
+#include <rwlibs/pathplanners/rrt/RRTPlanner.hpp>
+
+#include<rwlibs/pathoptimization/ClearanceOptimizer.hpp>
 
 
 
@@ -31,17 +34,19 @@ public:
     xCollisionDetector(std::string filePath);
 
     void loadWorkcell(std::string filePath);
-    bool checkCollision(rw::math::Q jointConfig);
-    bool checkCollision(std::vector<std::vector<double>> jointConfigs);
+    bool checkQ(rw::math::Q jointConfig);
     bool checkCollision(std::vector<std::vector<double>> *jointConfigs);
-    bool checkCollision(std::vector<rw::math::Q> jointConfigs);
+    std::vector<std::vector<double>> makePath(std::vector<double> Qbeg, std::vector<double> Qend);
 
 private:
     std::string filepath;
     rw::models::WorkCell::Ptr workcell;
-    rw::kinematics::State state;
+    rw::kinematics::State defState;
+    rw::models::Device::Ptr device;
+    rw::proximity::CollisionStrategy::Ptr cdstrategy;
     rw::proximity::CollisionDetector::Ptr detector;
-    rw::models::SerialDevice::Ptr robot;
+    rw::pathplanning::PlannerConstraint plannerConstraint;
+    rw::pathplanning::QToQPlanner::Ptr planner;
 };
 
 #endif // XCOLLISIONDETECTOR_H

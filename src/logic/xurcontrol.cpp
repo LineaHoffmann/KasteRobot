@@ -85,7 +85,6 @@ void xUrControl::setConnect(std::string IP)
 {
     {
     std::lock_guard<std::mutex> ipLock(mMtx);
-    logstd(mIP.c_str());
     mIP = IP;
     }
     mConnect = true;
@@ -121,11 +120,15 @@ void xUrControl::setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<
     }
     {
         std::lock_guard<std::mutex> setMoveLock(mMtx);
-        mQ = inputQ;
-//        if(!mDetector->checkCollision(this->q)){    //TODO Mikkel, please make a check on the vector
-//            logerr("bad pose");
-//            return;
-//        };
+        //mQ = inputQ;
+        std::vector<std::vector<double>> mInput = inputQ;
+        std::vector<std::vector<double>> *mQPtr;
+        mQPtr = &mInput;
+        if(mDetector->checkCollision(mQPtr)){    //TODO Mikkel, please make a check on the vector
+            std::cout << "1" << std::endl;
+            logerr("bad pose");
+            return;
+        };
     }
     this->acc = ACC_DEF;
     this->speed = SPEED_DEF;
@@ -151,6 +154,37 @@ void xUrControl::setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<
 
     mMove = true;
     logstd("[ROBOT]: SetMove flag succesfull");
+}
+
+void xUrControl::speedJMove(double t)
+{
+    double sec = t;
+    // Parameters
+      double acceleration = UR_JOINT_ACCELERATION_MAX;
+      double dt = 1.0/125;
+      std::vector<double> startq{.07327, -.43385,-0.1,1.778,2.562,0.1};
+      std::vector<double> joint_speed{0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+    // Move to initial joint position with a regular moveJ
+      mUrControl->moveL(startq);
+
+    // Execute 125Hz control loop for t seconds, each cycle is 1/125ms
+      for (unsigned int i=0; i<125*sec; i++)
+      {
+        auto t_start = std::chrono::steady_clock::now();
+        mUrControl->speedJ(joint_speed, acceleration, dt);
+        joint_speed[2] += 0.5;
+        auto t_stop = std::chrono::steady_clock::now();
+        auto t_duration = std::chrono::duration<double>(t_stop - t_start);
+
+        if (t_duration.count() < dt)
+        {
+          std::this_thread::sleep_for(std::chrono::duration<double>(dt - t_duration.count()));
+        }
+      }
+
+      mUrControl->speedStop();
+
 }
 
 
@@ -209,14 +243,26 @@ void xUrControl::connect(std::string IP){
 void xUrControl::disconnect()
 {
     if(!mUrRecieve || !mUrControl){
-        throw x_err::error(x_err::what::ROBOT_NOT_CONNECTED);
+        if(!mUrRecieve && mUrControl){
+            std::cout << "mUrRecieve not existing" << std::endl;
+        }
+        if (mUrRecieve && !mUrControl) {
+            std::cout << "mUrControl not existing" << std::endl;
+        }
+        if(!mUrRecieve && !mUrControl){
+            throw x_err::error(x_err::what::ROBOT_NOT_CONNECTED);
+        }
         return;
     }
 
     std::lock_guard<std::mutex> lock(mMtx);
     if(isConnected){
-        mUrControl->disconnect();
-        mUrRecieve->disconnect();
+        if(mUrControl->isConnected()){
+            mUrControl->disconnect();
+        }
+        if(mUrRecieve->isConnected()){
+            mUrRecieve->disconnect();
+        }
         isConnected = false;
         logstd("[ROBOT] disconnect: robot disconnected!");
     } else {
@@ -263,6 +309,9 @@ void xUrControl::move()
                 logerr("[ROBOT] Move home bad");
                 mUrControl->reuploadScript();
             }
+        } else if (mMoveMode == SPEEDJ){
+            logstd("[ROBOT] speedJ test commenced");
+            speedJMove(0.5);
         }
         else {
         /*NOTE: if robot is connected, switch statement will choose correct movefunction to execute!
@@ -370,8 +419,6 @@ void xUrControl::getData()
         //lock Scope
         {
         std::lock_guard<std::mutex> dataLock(mMtx);
-        // SRP: unique_lock is good here, but should be used in a single instantiation and use lock/unlock inside the while loop
-        // See this: https://stackoverflow.com/questions/20516773/stdunique-lockstdmutex-or-stdlock-guardstdmutex
 
         //get values from RTDE
         // TODO: define the struct and get the remaining struct members

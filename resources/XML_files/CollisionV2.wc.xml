@@ -23,5 +23,6 @@
  </Frame>
 
 <Include file="wsg50/wsg50.xml"/>
+ <CollisionSetup file="SceneCollisionSetup.xml" />
 
 </WorkCell>
