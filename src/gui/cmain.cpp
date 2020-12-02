@@ -358,6 +358,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
 
     // Testing tab building - Buttons
     mBtnTestMathXYZtoVAA = new wxButton(mNotebookTesting, ID_BTN_TESTING_XYZ_VVA, "XYZ->VAA");
+    mBtnTestURControlSpeedJ = new wxButton(mNotebookTesting, ID_BTN_TESTING_SPEEDJ, "SPEEDJ");
     mBtnTestDectectPick = new wxButton(mNotebookTesting, ID_BTN_TESTING_DETECT_PICK, "Detect and pick");
     // Testing tab building - Text Controls
     mTxtTestMathInX = new wxTextCtrl(mNotebookTesting, wxID_ANY, "X");
@@ -373,6 +374,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mSizerNotebookTesting->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     mSizerNotebookTesting->Add( mBtnTestMathXYZtoVAA, wxGBPosition( 0, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookTesting->Add( mBtnTestDectectPick, wxGBPosition( 0, 5 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookTesting->Add( mBtnTestURControlSpeedJ, wxGBPosition( 1, 5 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookTesting->Add( mTxtTestMathInX, wxGBPosition( 1, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookTesting->Add( mTxtTestMathInY, wxGBPosition( 2, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookTesting->Add( mTxtTestMathInZ, wxGBPosition( 3, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
@@ -776,6 +778,11 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
     case ID_BTN_TESTING_DETECT_PICK:
     {
         xTry([&] {mController->guiButtonPressed(ID_BTN_TESTING_DETECT_PICK);});
+    }
+        break;
+    case ID_BTN_TESTING_SPEEDJ:
+    {
+        xTry([&] {mController->guiButtonPressed(ID_BTN_TESTING_SPEEDJ);});
     }
         break;
     default:

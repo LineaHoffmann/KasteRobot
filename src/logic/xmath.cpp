@@ -94,7 +94,7 @@ std::vector<double> xMath::ball_position_to_robotframe(std::tuple<bool, cv::Mat,
             //rw::math::Vector6D<double> position(preposition(0),preposition(1), preposition(2), 0.720, -3.062, 0.044); // celle 2
             rw::math::Vector6D<double> position(preposition(0),preposition(1), preposition(2), 1.778, 2.577, -0.010); //celle 1-4
 
-            std::cout << "pre-transform: " << position << std::endl;
+                std::cout << "pre-transform: " << position << std::endl;
 
             //rw::math::Rotation3D rotationTCP = calculateTCPRotation(position);
 

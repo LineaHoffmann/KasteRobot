@@ -12,7 +12,8 @@ xController::xController()
     mImagehandler = std::make_shared<ximageHandler>(cv::imread("../resources/testImg.png"));
     mImagehandler->ballColor(25, 15); //set what color ball we are looking for
     mImagehandler->setMinMaxRadius(1.7, 2.3); //i cm
-    mImagehandler->setRobotBase(42.5, 9); //i cm
+
+
     //mImagehandler->setRobotBase(42.5, 9.5); //i cm
     //mImagehandler->setRobotBase(42.5, 14.5); //i cm
 
@@ -165,7 +166,7 @@ void xController::testDetectAndPickUp(std::shared_ptr<ximageHandler> mImagehandl
 
         logstd("grip object...");
         mGripper->grip();
-        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(2500));
 
         logstd("moving robot to throwing position");
         mRobot->setMove(xUrControl::moveEnum::PICKUP);
