@@ -448,6 +448,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
 }
 cMain::~cMain()
 {
+    mTimerInfo.Stop();
     mTimerView1.Stop();
 }
 void cMain::pushStrToStatus(std::string &msg)

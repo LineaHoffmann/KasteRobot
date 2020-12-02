@@ -247,7 +247,13 @@ public:
             try{
             if constexpr (std::is_same_v<T, std::tuple<std::string, std::string, std::string, std::string, uint32_t>>){
                 static_cast<std::tuple<std::string, std::string, std::string, std::string, uint32_t>>(data);
-                mDatabase->setDatabaseCredentials(data);
+                std::string user = get<0>(data);
+                std::string password = get<1>(data);
+                std::string hostname = get<2>(data);
+                std::string schema = get<3>(data);
+                uint32_t port = get<4>(data);
+
+                mDatabase->setDatabaseCredentials(user, password, hostname, schema, port);
                 }
                 return;
             } catch(const std::exception &e){

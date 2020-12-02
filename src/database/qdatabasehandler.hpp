@@ -57,7 +57,11 @@ public:
     qDatabaseHandler();
     ~qDatabaseHandler();
     void disconnect();
-    void setDatabaseCredentials(std::tuple<std::string, std::string, std::string, std::string, uint32_t> credentialsInput);
+    void setDatabaseCredentials(const std::string& user,
+                                const std::string& password,
+                                const std::string& hostname,
+                                const std::string& schema,
+                                uint32_t port);
     std::vector<Row>* showTables();
     std::vector<Row>* retriveData(); // Perhaps make private
 

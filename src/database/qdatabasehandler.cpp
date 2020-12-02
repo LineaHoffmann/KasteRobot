@@ -54,13 +54,17 @@ void qDatabaseHandler::disconnect()
     }
 }
 
-void qDatabaseHandler::setDatabaseCredentials(std::tuple<std::string, std::string, std::string, std::string, uint32_t> credentialsInput)
+void qDatabaseHandler::setDatabaseCredentials(const std::string& user,
+                                              const std::string& password,
+                                              const std::string& hostname,
+                                              const std::string& schema,
+                                              uint32_t port)
 {
-    mUser = std::get<0>(credentialsInput);
-    mPassword = std::get<1>(credentialsInput);
-    mHost = std::get<2>(credentialsInput);
-    mDatabase = std::get<3>(credentialsInput);
-    mPort = std::get<4>(credentialsInput);
+    mUser = user;
+    mPassword = password;
+    mHost = hostname;
+    mDatabase = schema;
+    mPort = port;
     connect();
 }
 
