@@ -38,6 +38,7 @@ void xGripperClient::entryThread() {
         }
         if (mHomeReq.load()) {                      //HOME
             if (mConnected.load()) {
+                logstd("Try home");
                 this->writeRead("HOME()");
             }
                 else {logstd("Gripper not connected");}
@@ -132,6 +133,10 @@ void xGripperClient::connectReq(std::pair<std::string, int> ipPort) {
     mConnectReq.exchange(true);
 }
 
+bool xGripperClient::isConnected() {
+    return mConnected.load();
+}
+
 void xGripperClient::disconnectReq() {
     mDisconnectReq.exchange(true);
 }
@@ -158,21 +163,32 @@ bool xGripperClient::writeRead(std::string command) {
     memset(buf, 0, 32);
     read(mSock, buf, 32); //Reading response
     std::string test(buf);
-    logstd(test.c_str());
     if (test[0] == 'F') {
         mReady.exchange(true);
     }
+    logstd(test.c_str());
     return true;
 
 }
 
+void xGripperClient::autoreadReq() {
+    if (mAutosend.load()) {
+        mAutosend.exchange(false);
+        logstd("Autosend diabled");
+    }
+    else {mAutosend.exchange(true);
+        logstd("Autosend activated");
+    }
+
+}
 void xGripperClient::autoread() {
-    if (!mAutosend.load()) {
+    if (!mAutosendCmd) {
         send(mSock, "AUTOSEND(POS, 10, true)",23 , 0);
         send(mSock, "AUTOSEND(SPEED, 10, true)",25 , 0);
         send(mSock, "AUTOSEND(FORCE, 10, true)",25 , 0);
         send(mSock, "AUTOSEND(TEMP, 10, true)",24 , 0);
         send(mSock, "AUTOSEND(GRIPSTATE, 10, true)",29 , 0);
+        mAutosendCmd = true;
         mAutosend.exchange(true);
     }
     else {
@@ -209,6 +225,7 @@ bool xGripperClient::isReady() {
 
 
 gripperData xGripperClient::getData() {
+    gripperData fullData;
     fullData.pos = mPos;
     fullData.temp = mTemp;
     fullData.force = mForce;

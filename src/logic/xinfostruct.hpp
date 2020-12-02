@@ -41,7 +41,11 @@ struct treeInfo {
     STATE gripperState{DEFAULT};
     std::string gripperIP{"0.0.0.0"};
     uint16_t gripperPort{0};
-    float gripperPosition{0};
+    std::string gripperPosition{0};
+    std::string gripperTemp{0};
+    std::string gripperForce{0};
+    std::string gripperSpeed{0};
+    std::string gripperSt{0};
     // Database
     STATE databaseState{DEFAULT};
     std::string databaseHost{"0.0.0.0"};

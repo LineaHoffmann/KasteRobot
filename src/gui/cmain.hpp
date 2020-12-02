@@ -135,6 +135,10 @@ private:
     wxTreeListItem *mTreeGripperIP;
     wxTreeListItem *mTreeGripperPort;
     wxTreeListItem *mTreeGripperWidth;
+    wxTreeListItem *mTreeGripperTemp;
+    wxTreeListItem *mTreeGripperSpeed;
+    wxTreeListItem *mTreeGripperSt;
+    wxTreeListItem *mTreeGripperForce;
     wxTreeListItem *mTreeDatabaseState;
     wxTreeListItem *mTreeDatabaseHost;
     wxTreeListItem *mTreeDatabasePort;

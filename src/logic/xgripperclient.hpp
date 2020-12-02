@@ -41,11 +41,14 @@ public:
     void release();
     void home();
 
+    void autoreadReq();
     void disconnectReq();
     void connectReq(std::pair<std::string, int> ipPort);
     void setIpPort(std::pair<std::string, int>);
     bool isReady();
     gripperData getData();
+    bool isConnected();
+
 
 
 private:
@@ -69,9 +72,7 @@ private:
     std::pair<std::string, int> mIpPort;
 
     std::thread *mWorker;
-
-    struct gripperData fullData;
-
+    bool mAutosendCmd;
 };
 
 

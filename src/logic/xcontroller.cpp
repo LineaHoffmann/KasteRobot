@@ -90,6 +90,19 @@ void xController::fillInfo(treeInfo &info)
     } else{
         info.robotState = ROBOT_NOT_CONNECTED;
     }
+
+    if (mGripper && mGripper->isConnected()) {
+        info.gripperState = GRIPPER_RUNNING;
+
+        gripperData gripper(mGripper->getData());
+
+        info.gripperSt = gripper.gripstate;
+        info.gripperTemp = gripper.temp;
+        info.gripperForce = gripper.force;
+        info.gripperPosition = gripper.pos;
+        info.gripperSpeed = gripper.speed;
+    }
+    else {info.gripperState = GRIPPER_NOT_CONNECTED;}
 }
 
 std::vector<qDatabaseEntry> xController::getDatabaseEntries() {

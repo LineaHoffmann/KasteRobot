@@ -145,6 +145,10 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mTreeGripperIP = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootGripper, "IP"));
     mTreeGripperPort = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootGripper, "Port"));
     mTreeGripperWidth = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootGripper, "Width"));
+    mTreeGripperSpeed = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootGripper, "Speed"));
+    mTreeGripperTemp = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootGripper, "Temp"));
+    mTreeGripperForce = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootGripper, "Force"));
+    mTreeGripperSt = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootGripper, "Internal State"));
     //INDEX: Sub levels - Database
     mTreeDatabaseState = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootDatabase, "State"));
     mTreeDatabaseHost = new wxTreeListItem(mTreeList->AppendItem(*mTreeRootDatabase, "IP"));
@@ -545,6 +549,8 @@ void cMain::OnTimerInfoUpdate(wxTimerEvent &evt)
     mTreeList->SetItemText(*mTreeCameraExposure, 1, std::to_string(info->cameraExposure));
     mTreeList->SetItemText(*mTreeCameraFramerate, 1, std::to_string(info->cameraFramerate));
 
+
+
     if (info->gripperState == STATE::DEFAULT) {
         mTreeList->SetItemText(*mTreeGripperState, 1, "Not initialized");
     } else if (info->gripperState == STATE::GRIPPER_NOT_CONNECTED) {
@@ -556,7 +562,11 @@ void cMain::OnTimerInfoUpdate(wxTimerEvent &evt)
     }
     mTreeList->SetItemText(*mTreeGripperIP, 1, info->gripperIP);
     mTreeList->SetItemText(*mTreeGripperPort, 1, std::to_string(info->gripperPort));
-    mTreeList->SetItemText(*mTreeGripperWidth, 1, std::to_string(info->gripperPosition));
+    mTreeList->SetItemText(*mTreeGripperWidth, 1, info->gripperPosition);
+    mTreeList->SetItemText(*mTreeGripperSpeed, 1, info->gripperSpeed);
+    mTreeList->SetItemText(*mTreeGripperTemp, 1, info->gripperTemp);
+    mTreeList->SetItemText(*mTreeGripperForce, 1, info->gripperForce);
+    mTreeList->SetItemText(*mTreeGripperSt, 1, info->gripperSt);
 
     if (info->databaseState == STATE::DEFAULT) {
         mTreeList->SetItemText(*mTreeDatabaseState, 1, "Not initialized");
@@ -685,6 +695,8 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
     case ID_BTN_GRIPPER_HOME:
         xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_HOME);});
         break;
+    case ID_BTN_GRIPPER_AUTOSEND:
+        xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_AUTOSEND);});
     case ID_BTN_CAMERA_START:
     {
         double expo;
