@@ -122,7 +122,7 @@ bool ximageHandler::cutOutTable()
     if (table.cols - inputImage.cols < 0){
         //pixel to cm hackerway
         pixToCm = table.cols / tableWidth;
-
+        setRobotBase(42.5, 95); //i cm
         if (showResult)cv::imshow("table", table);
         return 1;
     } else {
@@ -259,7 +259,7 @@ void ximageHandler::setRobotBase(float xcm, float ycm)
 {
 
     robotBase.x = xcm * pixToCm;
-    robotBase.y = ycm * pixToCm;
+    robotBase.y = ROI.height - (ycm * pixToCm);
 }
 
 float ximageHandler::getRadiusCM() const
