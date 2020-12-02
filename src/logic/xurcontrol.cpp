@@ -157,10 +157,9 @@ void xUrControl::setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<
     logstd("[ROBOT]: SetMove flag succesfull");
 }
 
-bool xUrControl::speedJMove()
+void xUrControl::speedJMove(double t)
 {
-    bool completed = false;
-    double sec = 0.5;
+    double sec = t;
     // Parameters
       double acceleration = UR_JOINT_ACCELERATION_MAX;
       double dt = 1.0/125;
@@ -170,7 +169,7 @@ bool xUrControl::speedJMove()
     // Move to initial joint position with a regular moveJ
       mUrControl->moveL(startq);
 
-    // Execute 500Hz control loop for 2 seconds, each cycle is ~2ms
+    // Execute 125Hz control loop for t seconds, each cycle is 1/125ms
       for (unsigned int i=0; i<125*sec; i++)
       {
         auto t_start = std::chrono::steady_clock::now();
@@ -313,7 +312,7 @@ void xUrControl::move()
             }
         } else if (mMoveMode == SPEEDJ){
             logstd("[ROBOT] speedJ test commenced");
-            speedJMove();
+            speedJMove(0.5);
         }
         else {
         /*NOTE: if robot is connected, switch statement will choose correct movefunction to execute!
