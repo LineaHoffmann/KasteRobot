@@ -156,21 +156,22 @@ void xUrControl::setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<
 bool xUrControl::speedJMove()
 {
     bool completed = false;
+    double sec = 0.5;
     // Parameters
       double acceleration = UR_JOINT_ACCELERATION_MAX;
       double dt = 1.0/125;
-      std::vector<double> startq{.07327, -.43385,-0.1,1.778,2.562,0.-0.01};
+      std::vector<double> startq{.07327, -.43385,-0.1,1.778,2.562,0.1};
       std::vector<double> joint_speed{0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
     // Move to initial joint position with a regular moveJ
-      mUrControl->moveJ(startq);
+      mUrControl->moveL(startq);
 
     // Execute 500Hz control loop for 2 seconds, each cycle is ~2ms
-      for (unsigned int i=0; i<1000; i++)
+      for (unsigned int i=0; i<125*sec; i++)
       {
         auto t_start = std::chrono::steady_clock::now();
         mUrControl->speedJ(joint_speed, acceleration, dt);
-        joint_speed[2] += 0.005;
+        joint_speed[2] += 0.5;
         auto t_stop = std::chrono::steady_clock::now();
         auto t_duration = std::chrono::duration<double>(t_stop - t_start);
 
@@ -240,14 +241,26 @@ void xUrControl::connect(std::string IP){
 void xUrControl::disconnect()
 {
     if(!mUrRecieve || !mUrControl){
-        throw x_err::error(x_err::what::ROBOT_NOT_CONNECTED);
+        if(!mUrRecieve && mUrControl){
+            std::cout << "mUrRecieve not existing" << std::endl;
+        }
+        if (mUrRecieve && !mUrControl) {
+            std::cout << "mUrControl not existing" << std::endl;
+        }
+        if(!mUrRecieve && !mUrControl){
+            throw x_err::error(x_err::what::ROBOT_NOT_CONNECTED);
+        }
         return;
     }
 
     std::lock_guard<std::mutex> lock(mMtx);
     if(isConnected){
-        mUrControl->disconnect();
-        mUrRecieve->disconnect();
+        if(mUrControl->isConnected()){
+            mUrControl->disconnect();
+        }
+        if(mUrRecieve->isConnected()){
+            mUrRecieve->disconnect();
+        }
         isConnected = false;
         logstd("[ROBOT] disconnect: robot disconnected!");
     } else {
@@ -404,8 +417,6 @@ void xUrControl::getData()
         //lock Scope
         {
         std::lock_guard<std::mutex> dataLock(mMtx);
-        // SRP: unique_lock is good here, but should be used in a single instantiation and use lock/unlock inside the while loop
-        // See this: https://stackoverflow.com/questions/20516773/stdunique-lockstdmutex-or-stdlock-guardstdmutex
 
         //get values from RTDE
         // TODO: define the struct and get the remaining struct members

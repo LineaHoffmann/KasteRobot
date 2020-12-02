@@ -46,7 +46,7 @@ class xUrControl
 
 
 //    inline static const std::vector<double> PICKUPQ{.07327, -.43385,0.1,0.720,-3.062,0.044};
-    inline static const std::vector<double> PICKUPQ{.07327, -.43385,0.1,1.778,2.562,0.-0.01};
+    inline static const std::vector<double> PICKUPQ{.07327, -.43385,0.1,1.778,2.562,0.1};
 
 
     inline static const double SPEED_DEF{0.5};
@@ -70,7 +70,7 @@ public:
     void setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<double> > inputQ);
     void setMove(xUrControl::moveEnum moveMode, std::vector<std::vector<double> > inputQ, double acc, double speed);
 
-    bool speedJMove();
+    void speedJMove(double t = 0.5);
 
 
     //read current pose in rads or deg
