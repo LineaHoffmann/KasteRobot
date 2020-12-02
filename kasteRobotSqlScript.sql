@@ -1,8 +1,7 @@
-DROP DATABASE kasteRobot;
 CREATE DATABASE kasteRobot;
 USE kasteRobot;
 CREATE TABLE IF NOT EXISTS position (
-positionID INT AUTO_INCREMENT PRIMARY KEY,
+position_ID CHAR(36) NOT NULL PRIMARY KEY,
 x_pos DOUBLE,
 y_pos DOUBLE,
 z_pos DOUBLE,
@@ -11,21 +10,21 @@ y_rotation DOUBLE,
 z_rotation DOUBLE
 );
 CREATE TABLE IF NOT EXISTS moveEntry(
-moveEntry_ID INT AUTO_INCREMENT PRIMARY KEY,
+moveEntry_ID CHAR(36) PRIMARY KEY,
 movetype VARCHAR(30),
-a_positionID INT,
-b_positionID INT,
-FOREIGN KEY (a_positionID) REFERENCES kasteRobot.position(positionID),
-FOREIGN KEY (b_positionID) REFERENCES kasteRobot.position(positionID)
+a_positionID CHAR(36),
+b_positionID CHAR(36),
+FOREIGN KEY (a_positionID) REFERENCES kasteRobot.position(position_ID),
+FOREIGN KEY (b_positionID) REFERENCES kasteRobot.position(position_ID)
 );
 CREATE TABLE IF NOT EXISTS log (
-log_ID INT AUTO_INCREMENT PRIMARY KEY,
-created_at VARCHAR(30),
+log_ID CHAR(36) PRIMARY KEY,
+created_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 entryType VARCHAR(50)
 );
 CREATE TABLE IF NOT EXISTS throw (
-throwID INT AUTO_INCREMENT PRIMARY KEY,
-log_ID INT,
+throw_ID CHAR(36) PRIMARY KEY,
+log_ID CHAR(36),
 FOREIGN KEY (log_ID) REFERENCES kasteRobot.log(log_ID),
 successful BOOLEAN,
 deviation DOUBLE,
@@ -35,3 +34,47 @@ release_velocity DOUBLE,
 tcp_velocity_cal DOUBLE,
 tcp_velocity_act DOUBLE
 );
+# Trigger, UUID INSERT log. 
+DELIMITER ;;
+CREATE TRIGGER log_before_insert
+BEFORE INSERT ON log FOR EACH ROW 
+BEGIN
+	IF new.log_ID IS NULL THEN
+    SET new.log_ID = uuid();
+END IF;
+END;;
+DELIMITER ;
+
+# Trigger, UUID INSERT throw. 
+DELIMITER ;;
+CREATE TRIGGER throw_before_insert
+BEFORE INSERT ON throw FOR EACH ROW 
+BEGIN
+	IF new.throw_ID IS NULL THEN
+    SET new.throw_ID = uuid();
+END IF;
+END;;
+DELIMITER ;
+
+# Trigger, UUID INSERT moveEntry. 
+DELIMITER ;;
+CREATE TRIGGER moveEntry_before_insert
+BEFORE INSERT ON moveEntry FOR EACH ROW 
+BEGIN
+	IF new.moveEntry_ID IS NULL THEN
+    SET new.moveEntry_ID = uuid();
+END IF;
+END;;
+DELIMITER ;
+
+# Trigger, UUID INSERT position. 
+DELIMITER ;;
+CREATE TRIGGER positionID_before_insert
+BEFORE INSERT ON position FOR EACH ROW 
+BEGIN
+	IF new.position_ID IS NULL THEN
+    SET new.position_ID = uuid();
+END IF;
+END;;
+DELIMITER ;
+
