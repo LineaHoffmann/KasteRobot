@@ -17,6 +17,7 @@ void xGripperClient::entryThread() {
     mTRuntime.exchange(true);
     mAutosend.exchange(false);
     mReady.exchange(false);
+    mAutosendCmd = false;
 
     logstd("Gripper client thread started .. ");
 
@@ -26,14 +27,14 @@ void xGripperClient::entryThread() {
             if (mConnected.load()) {
                 this->writeRead("GRIP()");
             }
-                else {logstd("Gripper not connected");}
+            else {logstd("Gripper not connected");}
             mGripReq.exchange(false);
         }
         if (mReleaseReq.load()) {                   //RELEASE
             if (mConnected.load()) {
                 this->writeRead("RELEASE()");
             }
-                else {logstd("Gripper not connected");}
+            else {logstd("Gripper not connected");}
             mReleaseReq.exchange(false);
         }
         if (mHomeReq.load()) {                      //HOME
@@ -41,7 +42,7 @@ void xGripperClient::entryThread() {
                 logstd("Try home");
                 this->writeRead("HOME()");
             }
-                else {logstd("Gripper not connected");}
+            else {logstd("Gripper not connected");}
             mHomeReq.exchange(false);
         }
         if (mConnectReq.load()) {                   //CONNECT
@@ -72,7 +73,7 @@ void xGripperClient::entryThread() {
     }
 }
 
-
+//CONNECTION
 void xGripperClient::connectSocket() {
     mSock = socket(AF_INET, SOCK_STREAM, 0);
     mHint.sin_family = AF_INET;
@@ -80,8 +81,8 @@ void xGripperClient::connectSocket() {
     inet_pton(AF_INET, mIpAddress.c_str(), &mHint.sin_addr);
 
     if (connect(mSock, (sockaddr*)&mHint, sizeof(mHint)) == 0) {
-    logstd("Gripper client connected");
-    mConnected.exchange(true);
+        logstd("Gripper client connected");
+        mConnected.exchange(true);
     }
     else {
         logstd("Gripper connection failed");
@@ -92,8 +93,8 @@ void xGripperClient::connectSocket() {
 
 void xGripperClient::disconnectGripper() {
     if (connect(mSock, (sockaddr*)&mHint, sizeof(mHint) == 0)) {
-    send(mSock, mDisconnectCmd.c_str(), 7, 0);
-    logstd("Disconnected");
+        send(mSock, mDisconnectCmd.c_str(), 7, 0);
+        logstd("Disconnected");
     }
     else {
         logstd("No connection to disconnect");
@@ -108,6 +109,30 @@ xGripperClient::~xGripperClient() {
 
 }
 
+bool xGripperClient::isConnected() {
+    return mConnected.load();
+}
+
+void xGripperClient::setIpPort(std::pair<std::string, int> ipPort) {
+    {
+        std::lock_guard<std::mutex>ipPortLock(mMtx);
+        mIpAddress = ipPort.first;
+        mPort = ipPort.second;
+    }
+}
+
+void xGripperClient::connectReq(std::pair<std::string, int> ipPort) {
+    setIpPort(ipPort);
+    mConnectReq.exchange(true);
+}
+
+
+void xGripperClient::disconnectReq() {
+    mDisconnectReq.exchange(true);
+}
+
+
+//MOVEMENT
 void xGripperClient::grip() {
     mGripReq.exchange(true);
 }
@@ -118,27 +143,6 @@ void xGripperClient::release() {
 
 void xGripperClient::home() {
     mHomeReq.exchange(true);
-}
-
-void xGripperClient::setIpPort(std::pair<std::string, int> ipPort) {
-    {
-    std::lock_guard<std::mutex>ipPortLock(mMtx);
-    mIpAddress = ipPort.first;
-    mPort = ipPort.second;
-    }
-}
-
-void xGripperClient::connectReq(std::pair<std::string, int> ipPort) {
-    setIpPort(ipPort);
-    mConnectReq.exchange(true);
-}
-
-bool xGripperClient::isConnected() {
-    return mConnected.load();
-}
-
-void xGripperClient::disconnectReq() {
-    mDisconnectReq.exchange(true);
 }
 
 bool xGripperClient::writeRead(std::string command) {
@@ -158,8 +162,6 @@ bool xGripperClient::writeRead(std::string command) {
         mReady.exchange(true);
         return false;
     }
-
-
     memset(buf, 0, 32);
     read(mSock, buf, 32); //Reading response
     std::string test(buf);
@@ -168,9 +170,17 @@ bool xGripperClient::writeRead(std::string command) {
     }
     logstd(test.c_str());
     return true;
-
 }
 
+bool xGripperClient::isReady() {
+    if (mReady.load()) {
+        return true;
+    }
+    else {return false;}
+}
+
+
+//AUTOREAD
 void xGripperClient::autoreadReq() {
     if (mAutosend.load()) {
         mAutosend.exchange(false);
@@ -189,7 +199,6 @@ void xGripperClient::autoread() {
         send(mSock, "AUTOSEND(TEMP, 10, true)",24 , 0);
         send(mSock, "AUTOSEND(GRIPSTATE, 10, true)",29 , 0);
         mAutosendCmd = true;
-        mAutosend.exchange(true);
     }
     else {
         char buf[20];
@@ -215,14 +224,6 @@ void xGripperClient::autoread() {
         }
     }
 }
-bool xGripperClient::isReady() {
-    if (mReady.load()) {
-        return true;
-    }
-    else {return false;}
-}
-
-
 
 gripperData xGripperClient::getData() {
     gripperData fullData;
