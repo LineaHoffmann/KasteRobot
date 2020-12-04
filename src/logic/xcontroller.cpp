@@ -270,37 +270,39 @@ void xController::testDetectAndPickUp2(std::shared_ptr<ximageHandler> mImagehand
 
 void xController::testThrowSpeedJ(double angle)
 {
-    int i{0};
+    int highPoll = 125;
     RobotData robotData(mRobot->getURStruct());
     int prevPollingRate = mRobot->getPollingRate();
 
     std::vector<std::vector<double> > startq{{0, -1.39626,-2.79253,0,1.57,1.57}};
+    logstd("Moving to throwing position");
     mRobot->setMove(ROBOT_MOVE_TYPE::MOVE_JLIN,startq, 1, 1);
     while(mRobot->getIsBusy()){
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        robotData = mRobot->getURStruct();
-        std::cout << robotData.robotJointPosition[2] << " | " << angle << std::endl;
+       std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
-    mRobot->setPollingRate(125);
 
-    std::cout << " 1: " << robotData.robotJointPosition[2] << " | " << angle << std::endl;
 
+    mRobot->setPollingRate(highPoll);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    logstd("throwing...");
     mRobot->setMove(ROBOT_MOVE_TYPE::SPEEDJ);
 
+    bool released = false;
     while (mRobot->getIsBusy()){
-        ++i;
         robotData = mRobot->getURStruct();
-        std::cout << robotData.robotJointPosition[2] << " | " << angle << std::endl;
-        if (robotData.robotJointPosition[2] >= angle){
-            mGripper->release();
-            std::cout << i << std::endl;
-            break;
-        }
-    }
-    std::cout << robotData.robotJointPosition[2] << " | " << angle << std::endl;
 
+        if (!released) std::cout << robotData.robotJointPosition[2] << " | " << angle << std::endl;
+
+        if (robotData.robotJointPosition[2] >= angle && !released){
+            mGripper->release();
+            std::cout << "Gripper released" << std::endl;
+            released = true;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000/highPoll));
+    }
 
     mRobot->setPollingRate(prevPollingRate);
+
     logstd("Speedj test throw completed");
 }
 

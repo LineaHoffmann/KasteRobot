@@ -235,7 +235,7 @@ public:
         case ID_BTN_TESTING_SPEEDJ:
         {
             logstd("SPEEDJ test from controller");
-            testThrowSpeedJ(-2.26893);
+            std::thread(&xController::testThrowSpeedJ, this, -2.14893).detach();
             //mRobot->setMove(ROBOT_MOVE_TYPE::SPEEDJ);
         }
             break;
