@@ -177,28 +177,19 @@ void xController::testDetectAndPickUp(std::shared_ptr<ximageHandler> mImagehandl
 
         logstd("grip object...");
         mGripper->grip();
-        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 
-        logstd("moving robot to throwing position");
+        std::this_thread::sleep_for(std::chrono::milliseconds(2500));
+
+        //flyt robotten til prepickup position
+        try{
         mRobot->setMove(ROBOT_MOVE_TYPE::PICKUP);
+        logstd("Robot moving to pre pickup position");
         while(mRobot->getIsBusy()){
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
-
-        std::vector<std::vector<double>> kast;
-        kast.push_back(std::vector<double>{-1.15192, -1.39626,0.0, -1.5708,1.5708,0});
-
-        //flyt robotten til hjem position eller evt en prepickup position
-            mRobot->setMove(ROBOT_MOVE_TYPE::MOVE_JLIN, kast,3,3);
-            int i = 0;
-        while(mRobot->getIsBusy()){
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            i++;
-            if (i == 70){
-                mGripper->release();
-            }
+        } catch (const x_err::error &e){
+            logerr("homing failed");
         }
-
 
         logstd("Sequenze succesfull");
 
@@ -249,17 +240,18 @@ void xController::testDetectAndPickUp2(std::shared_ptr<ximageHandler> mImagehand
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
             }
         } catch (const x_err::error &e){
-            logerr("homing failed");
+            logerr("failed");
         }
 
         logstd("grip object...");
-        //mGripper->grip();
+        mGripper->grip();
 
-        logstd("moving robot to throwing position");
-        //flyt robotten til hjem position eller evt en prepickup position
+        std::this_thread::sleep_for(std::chrono::milliseconds(2500));
+
+        //flyt robotten til prepickup position
         try{
-            mRobot->setMove(ROBOT_MOVE_TYPE::HOME);
-            logstd("Robot Homing");
+        mRobot->setMove(ROBOT_MOVE_TYPE::PICKUP);
+        logstd("Robot moving to pre pickup position");
         while(mRobot->getIsBusy()){
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
@@ -282,7 +274,9 @@ void xController::testThrowSpeedJ(double angle)
     RobotData robotData(mRobot->getURStruct());
     int prevPollingRate = mRobot->getPollingRate();
 
-    std::vector<std::vector<double> > startq{{0, -1.39626,-2.79253,0,1.57,1.57}};
+    std::vector<std::vector<double> > startq{{-1.15192, -1.9198, -2.2689, -1.8325 ,1.57,1.57}};
+    //{-1.15192, -1.39626,-0.39392081, -1.5708,1.5708,1.5708};
+
     logstd("Moving to throwing position");
     mRobot->setMove(ROBOT_MOVE_TYPE::MOVE_JLIN,startq, 1, 1);
     while(mRobot->getIsBusy()){
@@ -293,13 +287,23 @@ void xController::testThrowSpeedJ(double angle)
     mRobot->setPollingRate(highPoll);
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     logstd("throwing...");
+    std::cout << "start: " << robotData.robotJointPosition[2] << " | " << angle << std::endl;
+
     mRobot->setMove(ROBOT_MOVE_TYPE::SPEEDJ);
 
     bool released = false;
     while (mRobot->getIsBusy()){
         robotData = mRobot->getURStruct();
 
-        if (!released) std::cout << robotData.robotJointPosition[2] << " | " << angle << std::endl;
+        for (double d : robotData.robotTcpSpeed){
+            std::cout << d <<", ";
+        }
+        std::cout << "\t\t|\t\t";
+        for (double d : robotData.robotJointPosition){
+            std::cout << d << ", ";
+        }
+        std::cout << std::endl;
+        //if (!released) std::cout << robotData.robotJointPosition[2] << " | " << angle << std::endl;
 
         if (robotData.robotJointPosition[2] >= angle && !released){
             mGripper->release();
@@ -308,6 +312,7 @@ void xController::testThrowSpeedJ(double angle)
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(1000/highPoll));
     }
+    std::cout << "slut: " << robotData.robotJointPosition[2] << " | " << angle << std::endl;
 
     mRobot->setPollingRate(prevPollingRate);
 
