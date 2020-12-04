@@ -430,6 +430,9 @@ void xUrControl::getData()
         for (int i{0}; i < 6; ++i){
             mURStruct.robotJointPosition[i] = mUrRecieve->getActualQ().at(i);
         }
+        for (int i{0}; i < 6; ++i){
+            mURStruct.robotTcpSpeed[i] = mUrRecieve->getActualTCPSpeed().at(i);
+        }
 
         mURStruct.robotState = mUrRecieve->getRobotMode();
 

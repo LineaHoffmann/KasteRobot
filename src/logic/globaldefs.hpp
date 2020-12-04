@@ -46,6 +46,7 @@ struct RobotData {
     uint16_t robotPollingRate{0};
     std::array<float, 6> robotTcpPosition{0,0,0,0,0,0};
     std::array<float, 6> robotJointPosition{0,0,0,0,0,0};
+    std::array<float, 6> robotTcpSpeed{0,0,0,0,0,0};
 };
 
 ////////////////////////////////////////
