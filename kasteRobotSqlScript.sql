@@ -82,3 +82,11 @@ END IF;
 END;;
 DELIMITER ;
 
+# Created a view for newest entries
+CREATE VIEW newest_entry AS
+SELECT created_at, entryType, moveType, moveEntry.log_ID, a_positionID AS A_POS, b_positionID AS B_POS
+FROM moveEntry
+INNER JOIN log
+ON log.log_ID = moveEntry.log_ID
+WHERE created_at in(SELECT MAX(created_at) FROM log);
+
