@@ -165,8 +165,8 @@ void xUrControl::speedJMove(double t)
       std::vector<double> startq{.07327, -.43385,-0.1,1.778,2.562,0.1};
       std::vector<double> joint_speed{0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
-    // Move to initial joint position with a regular moveJ
-      mUrControl->moveL(startq);
+//    // Move to initial joint position with a regular moveJ
+//      mUrControl->moveL(startq);
 
     // Execute 125Hz control loop for t seconds, each cycle is 1/125ms
       for (unsigned int i=0; i<125*sec; i++)
@@ -311,7 +311,7 @@ void xUrControl::move()
             }
         } else if (mMoveMode == SPEEDJ){
             logstd("[ROBOT] speedJ test commenced");
-            speedJMove(0.5);
+            std::thread(&xUrControl::speedJMove, this,0.5).detach();
         }
         else {
         /*NOTE: if robot is connected, switch statement will choose correct movefunction to execute!
