@@ -311,7 +311,7 @@ void xUrControl::move()
             }
         } else if (mMoveMode == SPEEDJ){
             logstd("[ROBOT] speedJ test commenced");
-            std::thread(&xUrControl::speedJMove, this,0.5).detach();
+            speedJMove(0.5);
         }
         else {
         /*NOTE: if robot is connected, switch statement will choose correct movefunction to execute!
@@ -415,9 +415,10 @@ void xUrControl::getData()
     long waitTime; //polling rate in millis
 
     while (mContinue) {
-        if(prevPolling != mPollingRate){
-            prevPolling = mPollingRate;
-            waitTime = 1000 / mPollingRate;
+        if(prevPolling != mPollingRate.load()){
+            prevPolling = mPollingRate.load();
+            waitTime = 1000 / prevPolling;
+            std::cout << "updated: " <<prevPolling << std::endl;
         }
 
         timePoint = std::chrono::steady_clock::now() + std::chrono::milliseconds(waitTime);
@@ -527,8 +528,8 @@ void xUrControl::stopPolling()
  */
 void xUrControl::setPollingRate(int pollingRate)
 {
-    if(pollingRate <= 125 && pollingRate > 0){
-        mPollingRate = pollingRate;
+    if(pollingRate <= 125 && pollingRate >= 1){
+        mPollingRate.exchange(pollingRate);
     } else {
         logerr("Input not within specified range, polling rate not changed!");
     }
