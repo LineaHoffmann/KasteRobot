@@ -262,6 +262,16 @@ void xController::testDetectAndPickUp2(std::shared_ptr<ximageHandler> mImagehand
 
 void xController::testThrowSpeedJ(double angle)
 {
+    time_t timeNow = time(0);
+    std::stringstream timestamp;
+    timestamp << std::put_time(localtime(&timeNow), "%d%m%y_%H%M%S");
+    std::string file = "../resources/logcsv/kast_" + timestamp.str() + ".csv";
+    std::ofstream log;
+    log.open(file);
+    log << "TCP speed;;;;;;Joint Angles;;;;;;\n";
+    log << "x;y;z;rx;ry;rz;q0;q1;q2;q3;q4;q5;\n";
+    log.close();
+
     int highPoll = 125;
     RobotData robotData(mRobot->getURStruct());
     int prevPollingRate = mRobot->getPollingRate();
@@ -284,17 +294,21 @@ void xController::testThrowSpeedJ(double angle)
     mRobot->setMove(ROBOT_MOVE_TYPE::SPEEDJ);
 
     bool released = false;
+    log.open(file, std::ios::app); //appends data to already created file
     while (mRobot->getIsBusy()){
         robotData = mRobot->getURStruct();
 
         for (double d : robotData.robotTcpSpeed){
-            std::cout << d <<", ";
+            std::cout << std::setw(12) << d <<", ";
+            log << d << ";";
         }
-        std::cout << "\t\t|\t\t";
+        std::cout << "\t|\t";
         for (double d : robotData.robotJointPosition){
             std::cout << d << ", ";
+            log << d << ";";
         }
         std::cout << std::endl;
+        log << "\n";
         //if (!released) std::cout << robotData.robotJointPosition[2] << " | " << angle << std::endl;
 
         if (robotData.robotJointPosition[2] >= angle && !released){
@@ -304,6 +318,7 @@ void xController::testThrowSpeedJ(double angle)
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(1000/highPoll));
     }
+    log.close();
     std::cout << "slut: " << robotData.robotJointPosition[2] << " | " << angle << std::endl;
 
     mRobot->setPollingRate(prevPollingRate);
