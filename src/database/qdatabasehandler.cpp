@@ -39,7 +39,9 @@ Session *qDatabaseHandler::connect()
         }
     } catch (const std::exception &e) {
         std::cerr << "qDatabaseHandler: Something didn't go well! " << e.what() << std::endl;
+        return nullptr;
     }
+
     return mSession;
 }
 
@@ -67,9 +69,11 @@ void qDatabaseHandler::setDatabaseCredentials(const std::string& user,
     mPort = port;
 }
 
-void qDatabaseHandler::retriveData()
+std::vector<qDatabaseEntry> qDatabaseHandler::retriveData()
 {
-    mSchema = new Schema(connect()->getSchema(mDatabase));
+    Session* session = connect();
+    if (session == nullptr) return std::vector<qDatabaseEntry>(); // Bail out on failed connection
+    mSchema = new Schema(session->getSchema(mDatabase));
     // Accessing an exsisting table
     // TODO Make table variable, so can be changed from input
     mTable = new Table(mSchema->getTable("log"));
@@ -92,7 +96,7 @@ void qDatabaseHandler::retriveData()
 
             // Posistion
             delete tempTable;
-            Table *tempTable = new Table(mSchema->getTable("position"));
+            tempTable = new Table(mSchema->getTable("position"));
             statement.clear();
             statement << "position_ID = '" << std::string(tempRow[3]) << "'";
             tempRes = tempTable->select("*").where(statement.str().c_str()).execute();
@@ -100,7 +104,7 @@ void qDatabaseHandler::retriveData()
             point6D<double> pos(tempPosRow[2], tempPosRow[3], tempPosRow[4], tempPosRow[5], tempPosRow[6], tempPosRow[7]);
 
 
-            qDatabaseThrowEntry tempEntry(std::string(row[2]),
+            qDatabaseThrowEntry tempEntry = qDatabaseThrowEntry(std::string(row[2]),
                     std::string(row[3]),
                     bool(tempRow[4]),
                     pos,
@@ -111,5 +115,6 @@ void qDatabaseHandler::retriveData()
         }
     }
     disconnect();
+    return result;
 }
 

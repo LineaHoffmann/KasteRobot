@@ -761,11 +761,11 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         // Get the entries from database, through the controller
         std::vector<qDatabaseEntry> res = mController->getDatabaseEntries();
         wxTreeListItem root = mDatabaseSubTree->GetRootItem();
+        // List the entries and save in the storage vector
         for (auto item : res) {
             wxTreeListItem p = mDatabaseSubTree->AppendItem(root, item.timestamp.c_str());
             mDatabaseSubTreeEntries.push_back(std::pair<qDatabaseEntry, wxTreeListItem>{item, p});
         }
-        xTry([&] {mController->guiButtonPressed(ID_BTN_DATABASE_UPDATE_TREE);});
     }
         break;
     case ID_BTN_TESTING_XYZ_VVA:
@@ -806,10 +806,10 @@ void cMain::OnNewDatabaseTreeSelection(wxTreeListEvent &evt)
 {
     // Clear database item view and update with the new current selection
     mTxtDatabaseItemView->Clear();
-    for (const auto item : mDatabaseSubTreeEntries) {
+    for (const auto item : mDatabaseSubTreeEntries) { // auto is std::pair<qDatabaseEntry, wxTreeListItem>
         if (item.second.GetID() == evt.GetItem().GetID()) {
-            //mTxtDatabaseItemView->AppendText(item.first.formattedData.c_str());
-            // Detect the derived type of database entry, and list in the text item view
+            std::stringstream s; s << item.first;
+            mTxtDatabaseItemView->AppendText(s.str().c_str());
         }
     }
     evt.Skip();

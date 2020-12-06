@@ -268,11 +268,6 @@ public:
                 logwar(e.what());
             }
             break;
-        case ID_BTN_DATABASE_UPDATE_TREE:
-            logstd("Fetching some data");
-                mDatabase->retriveData();
-
-        break;
         default:
             throw x_err::error(x_err::what::NO_IMPLEMENTATION);
             break;

@@ -118,7 +118,7 @@ void xController::fillInfo(treeInfo &info)
 std::vector<qDatabaseEntry> xController::getDatabaseEntries() {
     // Get the data from the database object, if any.
     // If not, return the empty constructor
-    return std::vector<qDatabaseEntry>();
+    return mDatabase->retriveData();
 }
 
 //template <typename T>

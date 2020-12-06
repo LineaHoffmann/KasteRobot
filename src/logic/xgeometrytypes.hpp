@@ -8,9 +8,9 @@
 template <class T>
 struct point6D {
     static_assert(std::is_floating_point_v<T>, "Only for floating point numbers!");
-    point6D(){};
+    point6D(){}
     point6D(T _x, T _y, T _z, T _rx, T _ry, T _rz) :
-        x(_x), y(_y), z(_z), rx(_rx), ry(_ry), rz(_rz) {};
+        x(_x), y(_y), z(_z), rx(_rx), ry(_ry), rz(_rz) {}
     T x, y, z, rx, ry, rz;
     point6D<T> operator+(const point6D<T> &p) {return point6D<T>(x + p.x, y + p.y, z + p.z, rx + p.rx, ry + p.ry, rz + p.rz);}
     point6D<T> operator-(const point6D<T> &p) {return point6D<T>(x - p.x, y - p.y, z - p.z, rx - p.rx, ry - p.ry, rz - p.rz);}
@@ -23,8 +23,8 @@ struct point6D {
 template <class T>
 struct point3D {
     static_assert(std::is_floating_point_v<T>, "Only for floating point numbers!");
-    point3D(){};
-    point3D(T _x, T _y, T _z) : x(_x), y(_y), z(_z) {};
+    point3D(){}
+    point3D(T _x, T _y, T _z) : x(_x), y(_y), z(_z) {}
     T x, y, z;
     point3D<T> operator+(const point3D<T> &p) {return point3D<T>(x + p.x, y + p.y, z + p.z);}
     point3D<T> operator-(const point3D<T> &p) {return point3D<T>(x - p.x, y - p.y, z - p.z);}
@@ -38,8 +38,8 @@ struct point3D {
 template <class T>
 struct point2D {
     static_assert(std::is_floating_point_v<T>, "Only for floating point numbers!");
-    point2D(){};
-    point2D(T _x, T _y) : x(_x), y(_y) {};
+    point2D(){}
+    point2D(T _x, T _y) : x(_x), y(_y) {}
     T x, y;
     point2D<T> operator+(const point2D<T> &p) {return point2D<T>(x + p.x, y + p.y);}
     point2D<T> operator-(const point2D<T> &p) {return point2D<T>(x - p.x, y - p.y);}
