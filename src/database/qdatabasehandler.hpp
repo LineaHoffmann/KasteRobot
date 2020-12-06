@@ -7,18 +7,21 @@
 #include "mysql-cppconn-8/mysqlx/xdevapi.h"
 #include <iostream>
 #include <vector>
+#include <sstream>
 
 using namespace mysqlx;
 
 struct qDatabaseEntry {
-    std::string timestamp; // C++
-    std::string entryType; // Type of entry to DB. THROW, ?
+    std::string timestamp;
+    std::string entryType;
 protected:
+    qDatabaseEntry(){};
     qDatabaseEntry(const std::string& t, const std::string& desc) :
         timestamp(t), entryType(desc) {};
 };
 template <class T>
 struct qDatabaseMoveEntry : public qDatabaseEntry {
+    qDatabaseMoveEntry(){};
     qDatabaseMoveEntry(const std::string& t, const std::string& d,
                        const point6D<T>& s, const point6D<T>& e, ROBOT_MOVE_TYPE m) :
         qDatabaseEntry(t, d), start(s), end(e), moveType(m) {};
@@ -27,6 +30,7 @@ struct qDatabaseMoveEntry : public qDatabaseEntry {
 };
 template <class T>
 struct qDatabaseThrowEntry : public qDatabaseEntry {
+    qDatabaseThrowEntry(){};
     qDatabaseThrowEntry(const std::string& t, const std::string& d,
                         bool s, const point6D<T>& rp, double v, double de) :
         qDatabaseEntry(t, d), successful(s), releasePoint(rp),
@@ -37,6 +41,7 @@ struct qDatabaseThrowEntry : public qDatabaseEntry {
 };
 template <class T>
 struct qDatabaseGripperEntry : public qDatabaseEntry {
+    qDatabaseGripperEntry(){};
     static_assert (std::is_floating_point_v<T>, "Must be a floating point value!");
     qDatabaseGripperEntry(const std::string& t, const std::string& d, T s, T e) :
         qDatabaseEntry(t, d), start(s), end(e) {};
@@ -45,6 +50,7 @@ struct qDatabaseGripperEntry : public qDatabaseEntry {
 };
 template <class T>
 struct qDatabaseBallEntry : public qDatabaseEntry {
+    qDatabaseBallEntry(){};
     qDatabaseBallEntry(const std::string& t, const std::string& d, T di, const point2D<T>& p) :
         qDatabaseEntry(t, d), ballDiameter(di), ballPosition(p) {};
     double ballDiameter;
@@ -63,7 +69,7 @@ public:
                                 const std::string& schema,
                                 uint32_t port);
     std::vector<Row>* showTables();
-    std::vector<Row>* retriveData(); // Perhaps make private
+    void retriveData(); // Perhaps make private
 
 private:
     // Member variables

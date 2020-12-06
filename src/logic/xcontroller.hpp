@@ -270,12 +270,8 @@ public:
             break;
         case ID_BTN_DATABASE_UPDATE_TREE:
             logstd("Fetching some data");
-            try{
+                mDatabase->retriveData();
 
-
-        } catch(const std::exception &e){
-                logwar(e.what());
-            }
         break;
         default:
             throw x_err::error(x_err::what::NO_IMPLEMENTATION);

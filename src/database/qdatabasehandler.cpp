@@ -65,39 +65,51 @@ void qDatabaseHandler::setDatabaseCredentials(const std::string& user,
     mHost = hostname;
     mDatabase = schema;
     mPort = port;
-    connect();
 }
 
-std::vector<Row> *qDatabaseHandler::retriveData()
+void qDatabaseHandler::retriveData()
 {
-    // Det nyeste af alle tabeller (row).
-
-    mSchema = new Schema(mSession->getSchema(mDatabase));
+    mSchema = new Schema(connect()->getSchema(mDatabase));
     // Accessing an exsisting table
     // TODO Make table variable, so can be changed from input
-    mTable = new Table(mSchema->getTable("throw"));
-    if(mTable->isView())
-    {
-        std::cout << "qDatabasehandler: Something is wrong, isVeiw() " << std::endl;
-    }
+    mTable = new Table(mSchema->getTable("log"));
 
     // Sql call, find rows.
     RowResult qResult = mTable->select("*").execute();
-    disconnect();
+    std::vector<qDatabaseEntry> result;
 
     mRes = new std::vector<Row>(qResult.fetchAll());
-    // Testing Purpose (Show in terminal)
     for(Row row : *mRes)
-            {
-                for(uint32_t i = 0; i < row.colCount(); i++)
-                {
-                    std::cout << row[i] << " | ";
-                }
-                std::cout << std::endl;
-            }
+    {
+        if(std::string(row[3]) == "throw")
+        {
+            Table *tempTable = new Table(mSchema->getTable("throw"));
+            std::stringstream statement;
+            statement << "log_ID = '" << std::string(row[1]) << "'";
+//            RowResult tempRes = tempTable->select(statement.str().c_str()).execute();
+            RowResult tempRes = tempTable->select("*").where(statement.str().c_str()).execute();
+            Row tempRow = tempRes.fetchOne();
 
-    // Hvilket objekt vil jeg have ? -> Oprette objekt
-    // Noget med entryType...Skal gøres noget med getTable() For at hente korrekt data.
-    return mRes;
+            // Posistion
+            delete tempTable;
+            Table *tempTable = new Table(mSchema->getTable("position"));
+            statement.clear();
+            statement << "position_ID = '" << std::string(tempRow[3]) << "'";
+            tempRes = tempTable->select("*").where(statement.str().c_str()).execute();
+            Row tempPosRow = tempRes.fetchOne();
+            point6D<double> pos(tempPosRow[2], tempPosRow[3], tempPosRow[4], tempPosRow[5], tempPosRow[6], tempPosRow[7]);
+
+
+            qDatabaseThrowEntry tempEntry(std::string(row[2]),
+                    std::string(row[3]),
+                    bool(tempRow[4]),
+                    pos,
+                    double(tempRow[8]),
+                    double(tempRow[5]));
+
+            result.push_back((qDatabaseEntry)tempEntry);
+        }
+    }
+    disconnect();
 }
 
