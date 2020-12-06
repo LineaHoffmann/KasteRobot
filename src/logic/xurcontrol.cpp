@@ -153,6 +153,7 @@ void xUrControl::speedJMove(double t)
     double sec = t;
     // Parameters
       double acceleration = UR_JOINT_ACCELERATION_MAX;
+      double speed = UR_JOINT_VELOCITY_MAX;
       double dt = 1.0/125;
       std::vector<double> startq{.07327, -.43385,-0.1,1.778,2.562,0.1};
       std::vector<double> joint_speed{0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
@@ -165,8 +166,8 @@ void xUrControl::speedJMove(double t)
       {
         auto t_start = std::chrono::steady_clock::now();
         mUrControl->speedJ(joint_speed, acceleration, dt);
-        joint_speed[2] += 0.2;
-        joint_speed[3] += 0.3;
+        joint_speed[2] += 0.31;
+        joint_speed[3] += 0.31;
         auto t_stop = std::chrono::steady_clock::now();
         auto t_duration = std::chrono::duration<double>(t_stop - t_start);
 
@@ -178,6 +179,11 @@ void xUrControl::speedJMove(double t)
 
       mUrControl->speedStop();
 
+}
+
+void xUrControl::speedJStop()
+{
+    mUrControl->speedStop();
 }
 
 
@@ -433,6 +439,9 @@ void xUrControl::getData()
         }
         for (int i{0}; i < 6; ++i){
             mURStruct.robotTcpSpeed[i] = mUrRecieve->getActualTCPSpeed().at(i);
+        }
+        for (int i{0}; i < 6; ++i){
+            mURStruct.robotJointSpeed[i] = mUrRecieve->getActualQd().at(i);
         }
 
         mURStruct.robotState = mUrRecieve->getRobotMode();

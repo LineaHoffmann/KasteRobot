@@ -268,15 +268,15 @@ void xController::testThrowSpeedJ(double angle)
     std::string file = "../resources/logcsv/kast_" + timestamp.str() + ".csv";
     std::ofstream log;
     log.open(file);
-    log << "TCP speed;;;;;;Joint Angles;;;;;;\n";
-    log << "x;y;z;rx;ry;rz;q0;q1;q2;q3;q4;q5;\n";
+    log << "TCP speed;;;;;;Joint Angles;;;;;;TCP position;;;;;;Release;\n";
+    log << "x;y;z;rx;ry;rz;q0;q1;q2;q3;q4;q5;x;y;z;rx;ry;rz;\n";
     log.close();
 
     int highPoll = 125;
     RobotData robotData(mRobot->getURStruct());
     int prevPollingRate = mRobot->getPollingRate();
 
-    std::vector<std::vector<double> > startq{{-1.15192, -1.9198, -2.2689, -1.8325 ,1.57,1.57}};
+    std::vector<std::vector<double> > startq{{-1.15192, -1.81514, -2.2689, -1.8325 ,1.57,1.57}};
     //{-1.15192, -1.39626,-0.39392081, -1.5708,1.5708,1.5708};
 
     logstd("Moving to throwing position");
@@ -302,20 +302,29 @@ void xController::testThrowSpeedJ(double angle)
             std::cout << std::setw(12) << d <<", ";
             log << d << ";";
         }
-        std::cout << "\t|\t";
+        std::cout << std::setw(5) << "|\t";
         for (double d : robotData.robotJointPosition){
-            std::cout << d << ", ";
+            std::cout << std::setw(12) << d << ", ";
+            log << d << ";";
+        }
+        std::cout << std::setw(5) << "|\t";
+        for (double d : robotData.robotTcpPosition){
+            std::cout << std::setw(12) << d << ", ";
             log << d << ";";
         }
         std::cout << std::endl;
-        log << "\n";
+
         //if (!released) std::cout << robotData.robotJointPosition[2] << " | " << angle << std::endl;
 
         if (robotData.robotJointPosition[2] >= angle && !released){
             mGripper->release();
             std::cout << "Gripper released" << std::endl;
+            log << "released;";
             released = true;
+//            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+//            mRobot->speedJStop();
         }
+        log << "\n";
         std::this_thread::sleep_for(std::chrono::milliseconds(1000/highPoll));
     }
     log.close();

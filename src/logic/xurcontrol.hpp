@@ -57,6 +57,7 @@ public:
     void setMove(ROBOT_MOVE_TYPE moveMode, std::vector<std::vector<double> > inputQ, double acc, double speed);
 
     void speedJMove(double t = 0.5);
+    void speedJStop();
 
     //read current pose in rads or deg
     std::vector<double> getCurrentPose();
