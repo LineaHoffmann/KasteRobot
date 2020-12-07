@@ -113,6 +113,49 @@ std::vector<qDatabaseEntry> qDatabaseHandler::retriveData()
 
             result.push_back((qDatabaseEntry)tempEntry);
         }
+
+        if(std::string(row[3]) == "move")
+        {
+            Table *tempTableMove = new Table(mSchema->getTable("newest_moveEntry"));
+            RowResult tempResMove = tempTableMove->select("*").execute();
+            Row tempMoveRow = tempResMove.fetchOne();
+
+            // ROBOT ENUM TYPE.
+
+            // position Start
+            delete tempTableMove;
+            tempTableMove = new Table(mSchema->getTable("position"));
+            std::stringstream statement;
+            statement << "position_ID = '" << std::string(tempMoveRow[3]) << "'";
+            tempResMove = tempTableMove->select("*").where(statement.str().c_str()).execute();
+            Row tempPosRowS = tempResMove.fetchOne();
+            point6D<double> posS(tempPosRowS[2],tempPosRowS[3], tempPosRowS[4], tempPosRowS[5], tempPosRowS[6], tempPosRowS[7]);
+
+            // position End
+            delete tempTableMove;
+            tempTableMove = new Table(mSchema->getTable("position"));
+            statement.clear();
+            statement << "position_ID = '" << std::string(tempMoveRow[4]) << "'";
+            tempResMove = tempTableMove->select("*").where(statement.str().c_str()).execute();
+            Row tempPosRowE = tempResMove.fetchOne();
+            point6D<double> posE(tempPosRowE[2],tempPosRowE[3], tempPosRowE[4], tempPosRowE[5], tempPosRowE[6], tempPosRowE[7]);
+
+//            qDatabaseMoveEntry tempMoveEntry = qDatabaseMoveEntry(std::string(row[2]),
+//                    std::string(row[3]),
+//                    posS,
+//                    posE,
+//                    std::string(tempMoveRow[2]));
+        }
+
+        if(std::string(row[3]) == "gripper")
+        {
+
+        }
+
+        if(std::string(row[3]) == "ball"){}
+
+        // Else ?? If none of the above?
+
     }
     disconnect();
     return result;
