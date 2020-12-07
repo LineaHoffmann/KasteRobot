@@ -25,7 +25,7 @@ void xGripperClient::entryThread() {
     while (mTRuntime.load()) {
         if (mGripReq.load()) {                      //GRIP
             if (mConnected.load()) {
-                this->writeRead("GRIP()");
+                this->writeRead("GRIP(10, 40)");    // 10 N gripping force, 40 mm part width
             }
             else {logstd("Gripper not connected");}
             mGripReq.exchange(false);
