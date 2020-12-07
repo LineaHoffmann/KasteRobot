@@ -40,7 +40,6 @@ void xGripperClient::entryThread() {
         }
         if (mHomeReq.load()) {                      //HOME
             if (mConnected.load()) {
-                logstd("Try home");
                 this->writeRead("HOME()");
             }
             else {logstd("Gripper not connected");}
@@ -60,6 +59,10 @@ void xGripperClient::entryThread() {
             if (mConnected.load()) {
                 this->disconnectGripper();
                 mConnected.exchange(false);
+                mDisconnectReq.exchange(false);
+            }
+            else {
+                logstd("Gripper not connected");
                 mDisconnectReq.exchange(false);
             }
         }
