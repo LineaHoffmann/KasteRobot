@@ -34,7 +34,6 @@ successful BOOLEAN,
 deviation DOUBLE,
 xy_plane_angle DOUBLE,
 cz_plane_angle DOUBLE,
-release_velocity DOUBLE,
 tcp_velocity_cal DOUBLE,
 tcp_velocity_act DOUBLE
 );
