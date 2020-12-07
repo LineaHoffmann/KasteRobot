@@ -53,8 +53,7 @@ void xGripperClient::entryThread() {
             else {
                 this->connectSocket();
                 mConnectReq.exchange(false);
-                mConnected.exchange(true);
-            }
+                }
         }
         if (mDisconnectReq.load()) {                //DISCONNECT
             if (mConnected.load()) {
