@@ -207,7 +207,7 @@ public:
             mGripper->autoreadReq();
             logstd("Autoread acticvated");
         }
-
+            break;
     //NOTE: TESTING BTN xController
         case ID_BTN_TESTING_DETECT_PICK:
         {
