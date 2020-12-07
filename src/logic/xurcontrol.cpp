@@ -166,8 +166,8 @@ void xUrControl::speedJMove(double t)
       {
         auto t_start = std::chrono::steady_clock::now();
         mUrControl->speedJ(joint_speed, acceleration, dt);
-        joint_speed[2] += 0.31;
-        joint_speed[3] += 0.31;
+        joint_speed[2] += 1*0.31;
+        joint_speed[3] += 1*0.31;
         auto t_stop = std::chrono::steady_clock::now();
         auto t_duration = std::chrono::duration<double>(t_stop - t_start);
 

@@ -187,8 +187,9 @@ public:
             break;
         case ID_BTN_GRIPPER_RELEASE:
         {
+            logstd("Gripper releasing object...");
             mGripper->release();
-            logstd("Gripper released object");
+
         }
             break;
        case ID_BTN_GRIPPER_HOME:

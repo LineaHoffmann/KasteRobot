@@ -161,7 +161,6 @@ bool xGripperClient::writeRead(std::string command) {
     mAnswer = answer;
     auto t1Stop = std::chrono::high_resolution_clock::now();
     logstd(mAnswer.c_str());
-    if (mAnswer[0] == 'E') {
         mReady.exchange(true);
         return false;
     }
@@ -171,6 +170,7 @@ bool xGripperClient::writeRead(std::string command) {
     auto t2Stop = std::chrono::high_resolution_clock::now();
     if (test[0] == 'F') {
         mReady.exchange(true);
+        ackValue = false;
     }
     logstd(test.c_str());
     std::chrono::duration<double> timerStartAck = (t1Stop - t1Start);
