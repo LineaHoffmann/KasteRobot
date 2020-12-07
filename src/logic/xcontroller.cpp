@@ -191,6 +191,8 @@ void xController::testDetectAndPickUp(std::shared_ptr<ximageHandler> mImagehandl
             logerr("homing failed");
         }
 
+
+
         logstd("Sequenze succesfull");
 
     }else{
@@ -270,6 +272,11 @@ void xController::testDetectAndPickUp2(std::shared_ptr<ximageHandler> mImagehand
 
 void xController::testThrowSpeedJ(double angle)
 {
+    logstd("Starting ball detection and pick-up sequence ..");
+    std::thread findball(testDetectAndPickUp, mImagehandler, mCamera, mRobot, mGripper, mCollisionDetector);
+    findball.join();
+
+
     time_t timeNow = time(0);
     std::stringstream timestamp;
     timestamp << std::put_time(localtime(&timeNow), "%d%m%y_%H%M%S");
@@ -283,8 +290,14 @@ void xController::testThrowSpeedJ(double angle)
     int highPoll = 125;
     RobotData robotData(mRobot->getURStruct());
     int prevPollingRate = mRobot->getPollingRate();
+    double relAngle = -2.05668	-1.62165;
 
-    std::vector<std::vector<double> > startq{{-1.15192, -1.81514, -2.2689, -1.8325 ,1.57,1.57}};
+    //start q[2] kan afgøre hvor langt der kastes ved brug af en af disse ligninger
+    //angle = -0.0106*længde + 0.2075
+    double x = 135;
+    //double jonas = -0.00006*(x*x) + 0.0071*x - 1.1886;
+    double jonas = -0.0087*x - 0.1347;
+    std::vector<std::vector<double> > startq{{-1.15192, jonas, -2.2689, -1.8325 ,1.57,1.57}};
     //{-1.15192, -1.39626,-0.39392081, -1.5708,1.5708,1.5708};
 
     logstd("Moving to throwing position");
@@ -292,6 +305,10 @@ void xController::testThrowSpeedJ(double angle)
     while(mRobot->getIsBusy()){
        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
+
+
+
+
 
 
     mRobot->setPollingRate(highPoll);
@@ -323,15 +340,18 @@ void xController::testThrowSpeedJ(double angle)
         std::cout << std::endl;
 
         //if (!released) std::cout << robotData.robotJointPosition[2] << " | " << angle << std::endl;
-
-        if (robotData.robotJointPosition[2] >= angle && !released){
+        //release vinkel = startq[2] + startq[3]
+        if (robotData.robotJointPosition[2] + robotData.robotJointPosition[3] >= relAngle && !released){
             mGripper->release();
             std::cout << "Gripper released" << std::endl;
-            log << "released;";
+            log << "release send;";
             released = true;
 //            std::this_thread::sleep_for(std::chrono::milliseconds(50));
 //            mRobot->speedJStop();
         }
+        if (mGripper->ackValue){
+            log << "ack recived;";
+            }
         log << "\n";
         std::this_thread::sleep_for(std::chrono::milliseconds(1000/highPoll));
     }

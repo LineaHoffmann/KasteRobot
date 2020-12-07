@@ -25,7 +25,8 @@ void xGripperClient::entryThread() {
     while (mTRuntime.load()) {
         if (mGripReq.load()) {                      //GRIP
             if (mConnected.load()) {
-                this->writeRead("GRIP()");
+                ackValue = false;
+                this->writeRead("GRIP(10, 40)");
             }
             else {logstd("Gripper not connected");}
             mGripReq.exchange(false);
@@ -69,7 +70,7 @@ void xGripperClient::entryThread() {
             }
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000/125));
     }
 }
 
@@ -157,8 +158,9 @@ bool xGripperClient::writeRead(std::string command) {
     read(mSock, buf, 32); //Reading response
     std::string answer(buf);
     mAnswer = answer;
-    logstd(mAnswer.c_str());
+    ackValue = true;
     if (mAnswer[0] == 'E') {
+    logstd(mAnswer.c_str());
         mReady.exchange(true);
         return false;
     }
@@ -167,6 +169,7 @@ bool xGripperClient::writeRead(std::string command) {
     std::string test(buf);
     if (test[0] == 'F') {
         mReady.exchange(true);
+        ackValue = false;
     }
     logstd(test.c_str());
     return true;

@@ -43,7 +43,7 @@ public:
     gripperData getData();
     bool isConnected();
 
-
+    bool ackValue = false;
 
 private:
     void connectSocket();
