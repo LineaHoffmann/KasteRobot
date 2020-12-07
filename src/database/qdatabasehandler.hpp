@@ -10,12 +10,14 @@
 #endif
 #include "wx/log.h"
 
-#include "../logic/globaldefs.hpp"
-#include "../logic/xgeometrytypes.hpp"
-#include "mysql-cppconn-8/mysqlx/xdevapi.h"
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include <type_traits>
+
+#include "../logic/globaldefs.hpp"
+#include "../logic/xgeometrytypes.hpp"
+#include "mysql-cppconn-8/mysqlx/xdevapi.h"
 
 using namespace mysqlx;
 
@@ -49,17 +51,18 @@ template <class T>
 struct qDatabaseThrowEntry : public qDatabaseEntry {
     qDatabaseThrowEntry(){}
     qDatabaseThrowEntry(const std::string& t, const std::string& d,
-                        bool s, const point6D<T>& rp, double v, double de) :
+                        bool s, const point6D<T>& rp, double v1, double v2, double de) :
         qDatabaseEntry(t, d), successful(s), releasePoint(rp),
-        releaseVelocity(v), deviation(de) {}
+        releaseVelocityCalced(v1), releaseVelocityActual(v2), deviation(de) {}
     bool successful;
     point6D<T> releasePoint;
-    double releaseVelocity, deviation;
+    double releaseVelocityCalced, releaseVelocityActual, deviation;
     friend std::ostream& operator<<(std::ostream&os, const qDatabaseThrowEntry &p) {
         return os << (qDatabaseEntry) p << "\n"
                   << "Succesful: " << p.successful << "\n"
                   << "Release point: " << p.releasePoint << "\n"
-                  << "Release velocity: " << p.releaseVelocity << "\n"
+                  << "Calc release velocity: " << p.releaseVelocityCalced << "\n"
+                  << "Actual release velocity: " << p.releaseVelocityActual << "\n"
                   << "~Deviation: " << p.deviation;
     }
 };
@@ -105,6 +108,33 @@ public:
                                 uint32_t port);
     std::vector<Row>* showTables();
     std::vector<qDatabaseEntry> retriveData();
+
+    template <class T>
+    bool pushLogEntry(T _t) {
+        // Detect sub-type
+        // Build SQL statements and execute them
+        // Read the just added data from the database to check succes
+        if constexpr (std::is_same_v<T, qDatabaseBallEntry>) {
+            static_cast<qDatabaseBallEntry<double>>(_t);
+            std::stringstream s;
+
+        } else if constexpr (std::is_same_v<T, qDatabaseMoveEntry>) {
+            static_cast<qDatabaseMoveEntry<double>>(_t);
+            std::stringstream s;
+
+        } else if constexpr (std::is_same_v<T, qDatabaseThrowEntry>) {
+            static_cast<qDatabaseThrowEntry<double>>(_t);
+            std::stringstream s;
+
+        } else if constexpr (std::is_same_v<T, qDatabaseGripperEntry>) {
+            static_cast<qDatabaseGripperEntry<double>>(_t);
+            std::stringstream s;
+
+        } else {
+            logerr("Cannot push this type of data to the database!");
+            return false;
+        }
+    }
 
 private:
     // Member variables
