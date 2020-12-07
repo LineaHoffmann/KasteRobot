@@ -62,14 +62,7 @@ void xGripperClient::entryThread() {
                 mDisconnectReq.exchange(false);
             }
         }
-        if (mAutosend.load()) {
-            if (mConnected.load()) {
-                this->autoread();
-            }
-            else {
-                mAutosend.exchange(false);
-            }
-        }
+
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }
@@ -189,11 +182,12 @@ void xGripperClient::autoreadReq() {
     }
     else {mAutosend.exchange(true);
         logstd("Autosend activated");
+        mTData = new std::thread(&xGripperClient::autoread, this);
     }
 
 }
 void xGripperClient::autoread() {
-    if (!mAutosendCmd) {
+    if (!mAutosendCmd && isConnected()) {
         send(mSock, "AUTOSEND(POS, 10, true)",23 , 0);
         send(mSock, "AUTOSEND(SPEED, 10, true)",25 , 0);
         send(mSock, "AUTOSEND(FORCE, 10, true)",25 , 0);
@@ -201,7 +195,8 @@ void xGripperClient::autoread() {
         send(mSock, "AUTOSEND(GRIPSTATE, 10, true)",29 , 0);
         mAutosendCmd = true;
     }
-    else {
+
+    while (mAutosend.load() && isConnected()) {
         char buf[20];
         memset(buf, 0, 20);
         read(mSock, buf, 20);
@@ -223,9 +218,9 @@ void xGripperClient::autoread() {
         if (answer[1] == 'G') {
             mGripstate = data;
         }
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }
-
 gripperData xGripperClient::getData() {
     gripperData fullData;
     fullData.pos = mPos;

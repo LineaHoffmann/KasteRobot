@@ -59,13 +59,14 @@ private:
     std::string mIpAddress, mCommand, mUserInput, mAnswer, mPos, mForce, mTemp, mSpeed, mGripstate;
     std::string mDisconnectCmd = "BYE()\n";
     sockaddr_in mHint;
-    std::thread* mT1;
     std::mutex mMtx;
     std::atomic<bool> mTRuntime, mReady, mConnected, mGripReq, mReleaseReq, mHomeReq,
                       mConnectReq, mDisconnectReq, mAutosend;
     std::pair<std::string, int> mIpPort;
 
-    std::thread *mWorker;
+    std::thread *mTData;
+    std::thread* mT1;
+
     bool mAutosendCmd;
 };
 

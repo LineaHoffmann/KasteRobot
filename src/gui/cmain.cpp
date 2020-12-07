@@ -284,7 +284,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mBtnGripperHome = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_HOME, "Home");
     mBtnGripperAutosend = new wxButton(mNotebookGripper, ID_BTN_GRIPPER_AUTOSEND, "Autosend");
     // Gripper tab building - Text controls
-    mTxtGripperIP = new wxTextCtrl(mNotebookGripper, wxID_ANY, "192.168.100.10");
+    mTxtGripperIP = new wxTextCtrl(mNotebookGripper, wxID_ANY, "192.168.100.20");
     mTxtGripperPort = new wxTextCtrl(mNotebookGripper, wxID_ANY, "1000");
     mTxtGripperCmd = new wxTextCtrl(mNotebookGripper, wxID_ANY, "Command");
     // Gripper tab building - Static bitmap
