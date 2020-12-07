@@ -61,7 +61,7 @@ private:
     sockaddr_in mHint;
     std::mutex mMtx;
     std::atomic<bool> mTRuntime, mReady, mConnected, mGripReq, mReleaseReq, mHomeReq,
-                      mConnectReq, mDisconnectReq, mAutosend;
+                      mConnectReq, mDisconnectReq, mAutosend, mGetDataReady;
     std::pair<std::string, int> mIpPort;
 
     std::thread *mTData;

@@ -17,6 +17,7 @@ void xGripperClient::entryThread() {
     mTRuntime.exchange(true);
     mAutosend.exchange(false);
     mReady.exchange(false);
+    mGetDataReady.exchange(false);
     mAutosendCmd = false;
 
     logstd("Gripper client thread started .. ");
@@ -53,7 +54,7 @@ void xGripperClient::entryThread() {
             else {
                 this->connectSocket();
                 mConnectReq.exchange(false);
-                }
+            }
         }
         if (mDisconnectReq.load()) {                //DISCONNECT
             if (mConnected.load()) {
@@ -179,6 +180,14 @@ void xGripperClient::autoreadReq() {
     if (mAutosend.load()) {
         mAutosend.exchange(false);
         logstd("Autosend diabled");
+        mTData->join();
+        delete mTData;
+        send(mSock, "AUTOSEND(POS, 0, true)",23 , 0);
+        send(mSock, "AUTOSEND(SPEED, 0, true)",25 , 0);
+        send(mSock, "AUTOSEND(FORCE, 0, true)",25 , 0);
+        send(mSock, "AUTOSEND(TEMP, 0, true)",24 , 0);
+        send(mSock, "AUTOSEND(GRIPSTATE, 0, true)",29 , 0);
+        mAutosendCmd = false;
     }
     else {mAutosend.exchange(true);
         logstd("Autosend activated");
@@ -205,18 +214,23 @@ void xGripperClient::autoread() {
 
         std::string data = answer.substr(answer.find("="), 5);
         if (answer[1] == 'P') {
+            std::lock_guard<std::mutex> dataLock(mMtx);
             mPos = data;
         }
-        if (answer[1] == 'F') {
+        else if (answer[1] == 'F') {
+            std::lock_guard<std::mutex> dataLock(mMtx);
             mForce = data;
         }
-        if (answer[1] == 'T') {
+        else if (answer[1] == 'T') {
+            std::lock_guard<std::mutex> dataLock(mMtx);
             mTemp = data;
         }
-        if (answer[1] == 'S') {
+        else if (answer[1] == 'S') {
+            std::lock_guard<std::mutex> dataLock(mMtx);
             mSpeed = data;
         }
-        if (answer[1] == 'G') {
+        else if (answer[1] == 'G') {
+            std::lock_guard<std::mutex> dataLock(mMtx);
             mGripstate = data;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -224,6 +238,7 @@ void xGripperClient::autoread() {
 }
 gripperData xGripperClient::getData() {
     gripperData fullData;
+    std::lock_guard<std::mutex> dataLock(mMtx);
     fullData.pos = mPos;
     fullData.temp = mTemp;
     fullData.force = mForce;
@@ -231,5 +246,6 @@ gripperData xGripperClient::getData() {
     fullData.gripstate = mGripstate;
 
     return fullData;
+
 }
 
