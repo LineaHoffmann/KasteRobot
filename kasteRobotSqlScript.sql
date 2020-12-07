@@ -77,13 +77,13 @@ END IF;
 END;;
 DELIMITER ;
 
-# Trigger, UUID INSERT moveEntry. 
+# Trigger, UUID INSERT move. 
 DELIMITER ;;
-CREATE TRIGGER moveEntry_before_insert
+CREATE TRIGGER move_before_insert
 BEFORE INSERT ON moveEntry FOR EACH ROW 
 BEGIN
-	IF new.moveEntry_ID IS NULL THEN
-    SET new.moveEntry_ID = uuid();
+	IF new.move_ID IS NULL THEN
+    SET new.move_ID = uuid();
 END IF;
 END;;
 DELIMITER ;
