@@ -13,10 +13,17 @@ xController::xController()
     mImagehandler->ballColor(25, 15); //set what color ball we are looking for
     mImagehandler->setMinMaxRadius(1.7, 2.3); //i cm
     mImagehandler->setRobotBase(42.5, 9); //i cm
+    mImagehandler->showResult = true;
+    //mImagehandler->loadImage(cv::imread("../resources/testImg.png"));
+    //mImagehandler->cutOutTable();
+
+
+
+
     //mImagehandler->setRobotBase(42.5, 9.5); //i cm
     //mImagehandler->setRobotBase(42.5, 14.5); //i cm
 
-    mImagehandler->showResult = true;
+
 
 
 
@@ -294,10 +301,11 @@ void xController::testThrowSpeedJ(double angle)
 
     //start q[2] kan afgøre hvor langt der kastes ved brug af en af disse ligninger
     //angle = -0.0106*længde + 0.2075
-    double x = 135;
+    double x = 160;
     //double jonas = -0.00006*(x*x) + 0.0071*x - 1.1886;
     double jonas = -0.0087*x - 0.1347;
-    std::vector<std::vector<double> > startq{{-1.15192, jonas, -2.2689, -1.8325 ,1.57,1.57}};
+    double baseAngle = -1.047197;
+    std::vector<std::vector<double> > startq{{baseAngle, jonas, -2.2689, -1.8325 ,1.57,1.57}};
     //{-1.15192, -1.39626,-0.39392081, -1.5708,1.5708,1.5708};
 
     logstd("Moving to throwing position");

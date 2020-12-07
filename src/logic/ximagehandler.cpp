@@ -71,15 +71,17 @@ bool ximageHandler::cutOutTable()
     int thisCount;
     int delta = 3;
     int offset = 400;
+    int alpha = 200;
     cv::Point topLeftCorner, topRightCorner, botLeftCorner, botRightCorner;
 
     for (int i = 0; i < grey.cols; i++){
         thisCount = 0;
         topLeftCorner = cv::Point(i,0);
 
-        for (int j = 0; j < grey.rows; j++){
-            if (grey.at<uchar>(j,i) >= 120) {
+        for (int j = 0; j < grey.rows - 50; j++){
+            if (grey.at<uchar>(j,i) >= alpha) {
                 thisCount++;
+                //std::cout << "pixelvalue: " << grey.at<uchar>(j,i) << std::endl;
                 botLeftCorner = cv::Point(i,j);
             }
 
@@ -93,8 +95,8 @@ bool ximageHandler::cutOutTable()
         thisCount = 0;
         topRightCorner = cv::Point(i,0);
 
-        for (int j = 0; j < grey.rows; j++){
-            if (grey.at<uchar>(j,i) >= 120) {
+        for (int j = 0; j < grey.rows - 50; j++){
+            if (grey.at<uchar>(j,i) >= alpha) {
                 thisCount++;
                 botRightCorner = cv::Point(i,j);
             }
@@ -109,8 +111,7 @@ bool ximageHandler::cutOutTable()
     cv::line(drawing, topLeftCorner, botLeftCorner, cv::Scalar(0, 255, 0), 1, cv::LINE_AA);
     cv::line(drawing, topRightCorner, botRightCorner, cv::Scalar(0, 255, 0), 1, cv::LINE_AA);
 
-    //if (debug)
-    //cv::imshow("where it found table egdes", drawing);
+    //if (true) cv::imshow("where it found table egdes", drawing);
 
 
 
@@ -126,8 +127,9 @@ bool ximageHandler::cutOutTable()
         logstd(temp.c_str());
         setRobotBase(42.5, 93.5); //i cm
         if (showResult) {
-            cv::imwrite("table.png", table);
+            //cv::imwrite("table.png", table);
             cv::imshow("table", table);
+            //cv::imwrite("testimg.png", inputImage);
         }
         return 1;
     } else {
