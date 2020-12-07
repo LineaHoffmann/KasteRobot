@@ -324,10 +324,8 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
                                       wxALIGN_RIGHT,
                                       wxCOL_RESIZABLE);
     // Database tab building - Buttons
-    mBtnDatabaseConnect = new wxButton(mNotebookDatabase, ID_BTN_DATABASE_CONNECT, "Connect");
-    mBtnDatabaseDisconnect = new wxButton(mNotebookDatabase, ID_BTN_DATABASE_DISCONNECT, "Disconnect");
-    mBtnDatabaseUpdate = new wxButton(mNotebookDatabase, ID_BTN_DATABASE_UPDATE, "Update Connection");
-    mBtnDatabaseUpdateTree = new wxButton(mNotebookDatabase, ID_BTN_DATABASE_UPDATE_TREE, "Update List");
+    mBtnDatabaseTryConnection = new wxButton(mNotebookDatabase, ID_BTN_DATABASE_TRY_CONNECTION, "Try Connection");
+    mBtnDatabaseUpdateTree = new wxButton(mNotebookDatabase, ID_BTN_DATABASE_UPDATE_TREE, "Update Log");
     // Database tab building - Text Controls
     mTxtDatabaseItemView = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "Item View", wxDefaultPosition, wxDefaultSize, wxHSCROLL | wxTE_MULTILINE | wxTE_READONLY);
     mTxtDatabaseIP = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "IP");
@@ -335,13 +333,14 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mTxtDatabaseUser = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "User");
     mTxtDatabaseSchema = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "Schema");
     mTxtDatabasePassword = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "Password");
+    // Database tab building - Static bitmap
+    mBmpDatabaseStatus = new wxStaticBitmap(mNotebookDatabase, wxID_ANY, GetIcon());
+    mBmpDatabaseStatus->SetBackgroundColour(wxColor(255,0,0));
     // Database tab building - GridBagSizer Setup
     wxGridBagSizer *mSizerNotebookDatabase = new wxGridBagSizer(0,0);
     mNotebookDatabase->SetSizer(mSizerNotebookDatabase);
     mSizerNotebookDatabase->Add(mDatabaseSubTree, wxGBPosition(0,2), wxGBSpan(3,5), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
-    mSizerNotebookDatabase->Add(mBtnDatabaseConnect, wxGBPosition(0,0), wxGBSpan(1,1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
-    mSizerNotebookDatabase->Add(mBtnDatabaseDisconnect, wxGBPosition(0,1), wxGBSpan(1,1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
-    mSizerNotebookDatabase->Add(mBtnDatabaseUpdate, wxGBPosition(1,0), wxGBSpan(1,1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookDatabase->Add(mBtnDatabaseTryConnection, wxGBPosition(0,0), wxGBSpan(1,1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
     mSizerNotebookDatabase->Add(mBtnDatabaseUpdateTree, wxGBPosition(1,1), wxGBSpan(1,1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
     mSizerNotebookDatabase->Add(mTxtDatabaseItemView, wxGBPosition(3,2), wxGBSpan(2,5), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
     mSizerNotebookDatabase->Add(mTxtDatabaseIP, wxGBPosition(2,0), wxGBSpan(1,2), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
@@ -349,6 +348,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mSizerNotebookDatabase->Add(mTxtDatabaseUser, wxGBPosition(4,0), wxGBSpan(1,1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
     mSizerNotebookDatabase->Add(mTxtDatabaseSchema, wxGBPosition(3,1), wxGBSpan(1,1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
     mSizerNotebookDatabase->Add(mTxtDatabasePassword, wxGBPosition(4,1), wxGBSpan(1,1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
+    mSizerNotebookDatabase->Add(mBmpDatabaseStatus, wxGBPosition(0,1), wxGBSpan(1,1), wxALL|wxALIGN_CENTER|wxEXPAND, 5);
     for (int i = 0; i < mSizerNotebookDatabase->GetCols(); i++) {
         mSizerNotebookDatabase->AddGrowableCol(i);
     }
@@ -697,6 +697,7 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         break;
     case ID_BTN_GRIPPER_AUTOSEND:
         xTry([&] {mController->guiButtonPressed(ID_BTN_GRIPPER_AUTOSEND);});
+        break;
     case ID_BTN_CAMERA_START:
     {
         double expo;
@@ -721,7 +722,6 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
     }
         break;
     case ID_BTN_CAMERA_CUT_TABLE:
-
         xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_CUT_TABLE);});
         break;
     case ID_BTN_CAMERA_LOAD_DETECTOR_SETTINGS:
@@ -736,7 +736,7 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         xTry([&] {mController->guiButtonPressed(ID_BTN_CAMERA_LOAD_DETECTOR_SETTINGS, data);});
     }
         break;
-    case ID_BTN_DATABASE_CONNECT:
+    case ID_BTN_DATABASE_TRY_CONNECTION:
     {
         std::string user, password, host, database;
         long port;
@@ -746,14 +746,8 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         database = mTxtDatabaseSchema->GetValue().ToStdString();
         mTxtDatabasePort->GetValue().ToLong(&port);
         std::tuple<std::string, std::string, std::string, std::string, uint32_t> inputData(user,password,host,database,(uint32_t) port);
-        xTry([&] {mController->guiButtonPressed(ID_BTN_DATABASE_CONNECT, inputData);});
+        xTry([&] {mController->guiButtonPressed(ID_BTN_DATABASE_TRY_CONNECTION, inputData);});
     }
-        break;
-    case ID_BTN_DATABASE_DISCONNECT:
-        xTry([&] {mController->guiButtonPressed(ID_BTN_DATABASE_DISCONNECT);});
-        break;
-    case ID_BTN_DATABASE_UPDATE:
-        xTry([&] {mController->guiButtonPressed(ID_BTN_DATABASE_UPDATE);});
         break;
     case ID_BTN_DATABASE_UPDATE_TREE:
         // Updating the database sub panel list of entries

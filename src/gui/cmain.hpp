@@ -194,9 +194,7 @@ private:
     // DATABASE SUB PANEL ENTRIES
     wxTreeListCtrl *mDatabaseSubTree;
     std::vector<std::pair<qDatabaseEntry, wxTreeListItem>> mDatabaseSubTreeEntries;
-    wxButton *mBtnDatabaseConnect;
-    wxButton *mBtnDatabaseDisconnect;
-    wxButton *mBtnDatabaseUpdate;
+    wxButton *mBtnDatabaseTryConnection;
     wxButton *mBtnDatabaseUpdateTree;
     wxTextCtrl *mTxtDatabaseItemView;
     wxTextCtrl *mTxtDatabaseIP;

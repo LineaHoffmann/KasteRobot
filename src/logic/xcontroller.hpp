@@ -242,7 +242,7 @@ public:
             break;
 
     // Databse Buttuns implementation
-        case ID_BTN_DATABASE_CONNECT:
+        case ID_BTN_DATABASE_TRY_CONNECTION:
             logstd("Connecting to database");
             try{
             if constexpr (std::is_same_v<T, std::tuple<std::string, std::string, std::string, std::string, uint32_t>>){
@@ -260,14 +260,6 @@ public:
                 logwar(e.what());
                 break;
             }
-        case ID_BTN_DATABASE_DISCONNECT:
-            logstd("Closing DB session, bye");
-            try{
-                if (mDatabase) mDatabase->disconnect();
-            } catch(const std::exception &e) {
-                logwar(e.what());
-            }
-            break;
         default:
             throw x_err::error(x_err::what::NO_IMPLEMENTATION);
             break;
