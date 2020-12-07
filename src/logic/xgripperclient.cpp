@@ -67,8 +67,10 @@ void xGripperClient::entryThread() {
             if (mConnected.load()) {
                 this->autoread();
             }
+            else {
+                mAutosend.exchange(false);
+            }
         }
-
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }
