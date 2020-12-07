@@ -196,9 +196,10 @@ void xGripperClient::autoread() {
         mAutosendCmd = true;
     }
 
+    char buf[20];
+    memset(buf, 0, 20);
+
     while (mAutosend.load() && isConnected()) {
-        char buf[20];
-        memset(buf, 0, 20);
         read(mSock, buf, 20);
         std::string answer(buf);
 
