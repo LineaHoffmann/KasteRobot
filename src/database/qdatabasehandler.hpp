@@ -145,9 +145,9 @@ private:
     uint32_t mPort;
     SSLMode mSsl_mode = SSLMode::DISABLED;
 
-    Session *mSession = nullptr;
-    Schema *mSchema = nullptr;
-    Table *mTable = nullptr;
+    Session *mSession;
+    Schema *mSchema;
+    Table *mTable;
     std::vector<Row> *mRes;
 
 
