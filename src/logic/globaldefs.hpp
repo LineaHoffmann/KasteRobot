@@ -33,7 +33,8 @@ enum ROBOT_MOVE_TYPE {
     SERVOJ,
     SPEEDJ,
     HOME,
-    PICKUP
+    PICKUP,
+    MOVE_DEFAULT
 };
 ////////////////////////////////////////
 // ROBOT DATA SHARING STRUCT
