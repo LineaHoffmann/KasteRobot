@@ -33,7 +33,7 @@ void xGripperClient::entryThread() {
         }
         if (mReleaseReq.load()) {                   //RELEASE
             if (mConnected.load()) {
-                this->writeRead("RELEASE()");
+                this->writeRead("RELEASE(0.5)");
             }
             else {logstd("Gripper not connected");}
             mReleaseReq.exchange(false);
@@ -146,15 +146,15 @@ void xGripperClient::home() {
 bool xGripperClient::writeRead(std::string command) {
     mReady.exchange(false);
     mCommand = command + "\n";
-    std::cout << mCommand << std::endl;
+    auto t1Start = std::chrono::high_resolution_clock::now();
     char buf[32];
     send(mSock, mCommand.c_str(), mCommand.size(), 0); // Sending command
-
 
     memset(buf, 0, 32);
     read(mSock, buf, 32); //Reading response
     std::string answer(buf);
     mAnswer = answer;
+    auto t1Stop = std::chrono::high_resolution_clock::now();
     logstd(mAnswer.c_str());
     if (mAnswer[0] == 'E') {
         mReady.exchange(true);
@@ -163,10 +163,17 @@ bool xGripperClient::writeRead(std::string command) {
     memset(buf, 0, 32);
     read(mSock, buf, 32); //Reading response
     std::string test(buf);
+    auto t2Stop = std::chrono::high_resolution_clock::now();
     if (test[0] == 'F') {
         mReady.exchange(true);
     }
     logstd(test.c_str());
+    std::chrono::duration<double> timerStartAck = (t1Stop - t1Start);
+    std::chrono::duration<double> timerStartFin = (t2Stop - t1Start);
+    if (mCommand[0] == 'R') {
+        std::cout << "Timer start to ACK: " << timerStartAck.count()*1000 << " ms" << std::endl;
+        std::cout << "Timer start to FIN: " << timerStartFin.count()*1000 << " ms" << std::endl;
+    }
     return true;
 }
 
