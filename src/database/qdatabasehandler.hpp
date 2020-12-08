@@ -152,7 +152,8 @@ private:
 
 
     // Functions
-    Session *connect();
+    Session* connect();
+
 };
 
 #endif // QDATABASEHANDLER_H

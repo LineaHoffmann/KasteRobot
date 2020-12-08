@@ -9,25 +9,24 @@ qDatabaseHandler::~qDatabaseHandler()
 {
 }
 
-Session *qDatabaseHandler::connect()
+Session* qDatabaseHandler::connect()
 {
-    try {
-        // Testing purpose.
-        std::cout << "Connecting to MySQL server with:" << std::endl;
-        std::cout << mUser << ":" << mPassword << "@" << mHost << ":" << mPort << std::endl;;
-        std::cout << "on database: " << mDatabase << std::endl;
+    // Testing purpose.
+    std::cout << "Connecting to MySQL server with:" << std::endl;
+    std::cout << mUser << ":" << mPassword << "@" << mHost << ":" << mPort << std::endl;;
+    std::cout << "on database: " << mDatabase << std::endl;
 
-        if (mSsl_mode == SSLMode::DISABLED) std::cout << "SSL is disabled." << std::endl;
-        mSession = new Session(
+    if (mSsl_mode == SSLMode::DISABLED) std::cout << "SSL is disabled." << std::endl;
+    try {
+            Session session(
                     SessionOption::USER, mUser,
                     SessionOption::PWD, mPassword,
                     SessionOption::HOST, mHost,
                     SessionOption::PORT, mPort,
                     SessionOption::DB, mDatabase,
                     SessionOption::SSL_MODE, mSsl_mode
-                    );
+                        );
         std::cout << "qDatabaseHandler: Session accepted ..." << std::endl;
-
         //NOTE Lad det blive i kode, da tjek for xDevAPI
         RowResult res = mSession->sql("show variables like 'version'").execute();
         std::stringstream version;
@@ -41,7 +40,6 @@ Session *qDatabaseHandler::connect()
         std::cerr << "qDatabaseHandler: Something didn't go well! " << e.what() << std::endl;
         return nullptr;
     }
-
     return mSession;
 }
 
@@ -74,12 +72,12 @@ std::vector<qDatabaseEntry> qDatabaseHandler::retriveData()
     Session* session = connect();
     if (session == nullptr) return std::vector<qDatabaseEntry>(); // Bail out on failed connection
     mSchema = new Schema(session->getSchema(mDatabase));
-    mTable = new Table(mSchema->getTable("log"));// Accessing an exsisting table
+    mTable = new Table(mSchema->getTable("kasteRobot.log"));// Accessing an exsisting table
 
     // Sql call, find newest row;
     std::stringstream statement;
     statement << "created_at IN(SELECT MAX(created_at) FROM log)";
-    RowResult qResult = mTable->select("*").where(statement.str().c_str()).execute();
+    RowResult qResult = mTable->select("log_ID").execute();
     std::vector<qDatabaseEntry> result;    
     mRes = new std::vector<Row>(qResult.fetchAll());// saves the data in mRes, from log table
 
@@ -102,7 +100,7 @@ std::vector<qDatabaseEntry> qDatabaseHandler::retriveData()
             Row tempPosRow = tempResThrow.fetchOne();
             point6D<double> pos(tempPosRow[1], tempPosRow[2], tempPosRow[3], tempPosRow[4], tempPosRow[5], tempPosRow[6]);
 
-            qDatabaseThrowEntry tempEntry = qDatabaseThrowEntry(std::string(row[1]),
+            qDatabaseThrowEntry tempThrowEntry = qDatabaseThrowEntry(std::string(row[1]),
                     std::string(row[2]), //time
                     bool(tempThrowRow[3]), // desc
                     pos,
@@ -110,7 +108,7 @@ std::vector<qDatabaseEntry> qDatabaseHandler::retriveData()
                     double(tempThrowRow[6]), // v2 act
                     double(tempThrowRow[4])); // deviation
 
-            result.push_back((qDatabaseEntry)tempEntry);
+            result.push_back((qDatabaseEntry)tempThrowEntry);
         }
 
         if(std::string(row[3]) == "move")
@@ -177,17 +175,66 @@ std::vector<qDatabaseEntry> qDatabaseHandler::retriveData()
                     posS,
                     posE,
                     moveType);
+
+            result.push_back((qDatabaseEntry)tempMoveEntry);
         }
 
         if(std::string(row[3]) == "gripper")
         {
+            Table *tempTableGripper = new Table(mSchema->getTable("log_gripper"));
+            RowResult tempResGripper;
+            if(tempTableGripper->count() <= 1)
+            {
+                tempResGripper = tempTableGripper->select("*").execute();
+            }
+            else{
+                std::stringstream statement;
+                statement << "created_at DESC";
+                tempResGripper = tempTableGripper->select("*").orderBy(statement.str().c_str()).execute();
+            }
+            Row tempGripperRow = tempResGripper.fetchOne();
 
+            qDatabaseGripperEntry tempGripperEntry = qDatabaseGripperEntry(std::string(row[2]),
+                    std::string(row[3]),
+                    double(tempGripperRow[4]), // start_width
+                    double(tempGripperRow[5])); // end_width
+
+            result.push_back((qDatabaseEntry)tempGripperEntry);
         }
 
-        if(std::string(row[3]) == "ball"){}
+        if(std::string(row[3]) == "ball"){
 
-        // Else ?? If none of the above?
+            Table *tempTableBall = new Table(mSchema->getTable("log_gripper"));
+            RowResult tempResBall;
+            if(tempTableBall->count() <= 1)
+            {
+                tempResBall = tempTableBall->select("*").execute();
+            }
+            else{
+                std::stringstream statement;
+                statement << "created_at DESC";
+                tempResBall = tempTableBall->select("*").orderBy(statement.str().c_str()).execute();
+            }
+            Row tempGripperRow = tempResBall.fetchOne();
 
+            // Ball position
+            delete tempTableBall;
+            tempTableBall = new Table(mSchema->getTable("position"));
+            std::stringstream statement;
+            statement << "position_ID = '" << std::string(tempGripperRow[5]) << "'";
+            tempResBall = tempTableBall->select("*").where(statement.str().c_str()).execute();
+            Row tempPosRowB = tempResBall.fetchOne();
+            point2D<double> posB(tempPosRowB[1],tempPosRowB[2]);
+
+            qDatabaseBallEntry tempBallEntry = qDatabaseBallEntry(std::string(row[2]),
+                    std::string(row[3]),
+                    double(tempGripperRow[3]), // diameter
+                    posB); // ballPosition
+
+            result.push_back((qDatabaseEntry)tempBallEntry);
+        } else {
+            logstd("No matching description found");
+        }
     }
     disconnect();
     return result;
