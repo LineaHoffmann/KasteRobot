@@ -130,7 +130,7 @@ ON log.log_ID = move.log_ID ORDER BY created_at DESC;
 
 #list all in log, and gripper tables.
 CREATE VIEW log_gripper AS
-SELECT log.log_ID, created_at, descriptor, gripper_ID, start_width, end_width
+SELECT log.log_ID, created_at, descriptor, successful ,gripper_ID, start_width, end_width
 FROM log
 INNER JOIN gripper
 ON gripper.log_ID = log.log_ID ORDER BY created_at DESC;
