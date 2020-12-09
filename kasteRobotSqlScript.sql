@@ -1,6 +1,6 @@
 CREATE DATABASE kasteRobot;
 USE kasteRobot;
-CREATE TABLE IF NOT EXISTS position (
+CREATE TABLE IF NOT EXISTS kasteRobot.position (
 position_ID CHAR(36) PRIMARY KEY NOT NULL,
 x_pos DOUBLE,
 y_pos DOUBLE,
@@ -9,12 +9,12 @@ x_rotation DOUBLE,
 y_rotation DOUBLE,
 z_rotation DOUBLE
 );
-CREATE TABLE IF NOT EXISTS log (
+CREATE TABLE IF NOT EXISTS kasteRobot.log (
 log_ID CHAR(36) PRIMARY KEY,
 created_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 descriptor VARCHAR(50)
 );
-CREATE TABLE IF NOT EXISTS move(
+CREATE TABLE IF NOT EXISTS kasteRobot.move(
 move_ID CHAR(36) PRIMARY KEY,
 log_ID CHAR(36),
 moveType VARCHAR(30),
@@ -24,7 +24,7 @@ FOREIGN KEY (log_ID) REFERENCES kasteRobot.log(log_ID),
 FOREIGN KEY (start_positionID) REFERENCES kasteRobot.position(position_ID),
 FOREIGN KEY (end_positionID) REFERENCES kasteRobot.position(position_ID)
 );
-CREATE TABLE IF NOT EXISTS throw (
+CREATE TABLE IF NOT EXISTS kasteRobot.throw (
 throw_ID CHAR(36) PRIMARY KEY,
 log_ID CHAR(36),
 position_ID CHAR(36),
@@ -36,7 +36,7 @@ tcp_velocity_cal DOUBLE,
 tcp_velocity_act DOUBLE
 );
 
-CREATE TABLE IF NOT EXISTS ball(
+CREATE TABLE IF NOT EXISTS kasteRobot.ball(
 ball_ID CHAR(36) PRIMARY KEY NOT NULL,
 log_ID CHAR(36),
 FOREIGN KEY (log_ID) REFERENCES kasteRobot.log(log_ID),
@@ -45,7 +45,7 @@ ball_position CHAR(36),
 FOREIGN KEY (ball_position) REFERENCES kasteRobot.position(position_ID)
 );
 
-CREATE TABLE IF NOT EXISTS gripper(
+CREATE TABLE IF NOT EXISTS kasteRobot.gripper(
 gripper_ID CHAR(36) PRIMARY KEY NOT NULL,
 log_ID CHAR(36),
 FOREIGN KEY(log_ID) REFERENCES log(log_ID),
@@ -57,7 +57,7 @@ successful BOOLEAN
 
 # Trigger, UUID INSERT log. 
 DELIMITER ;;
-CREATE TRIGGER log_before_insert
+CREATE TRIGGER logID_before_insert
 BEFORE INSERT ON log FOR EACH ROW 
 BEGIN
 	IF new.log_ID IS NULL THEN
@@ -68,7 +68,7 @@ DELIMITER ;
 
 # Trigger, UUID INSERT throw. 
 DELIMITER ;;
-CREATE TRIGGER throw_before_insert
+CREATE TRIGGER throwID_before_insert
 BEFORE INSERT ON throw FOR EACH ROW 
 BEGIN
 	IF new.throw_ID IS NULL THEN
@@ -80,7 +80,7 @@ DELIMITER ;
 # Trigger, UUID INSERT move. 
 DELIMITER ;;
 CREATE TRIGGER move_before_insert
-BEFORE INSERT ON moveEntry FOR EACH ROW 
+BEFORE INSERT ON move FOR EACH ROW 
 BEGIN
 	IF new.move_ID IS NULL THEN
     SET new.move_ID = uuid();
@@ -116,7 +116,7 @@ CREATE TRIGGER gripperID_before_insert
 BEFORE INSERT ON gripper FOR EACH ROW 
 BEGIN
 	IF new.gripper_ID IS NULL THEN
-    SET new.gipper_ID = uuid();
+    SET new.gripper_ID = uuid();
 END IF;
 END;;
 DELIMITER ;
@@ -126,30 +126,25 @@ CREATE VIEW log_move AS
 SELECT log.log_ID, created_at, descriptor, move_ID, moveType, start_positionID, end_positionID
 FROM log
 RIGHT JOIN move
-ON log.log_ID = move.log_ID;
+ON log.log_ID = move.log_ID ORDER BY created_at DESC;
 
-# This requires more than one entry
-CREATE VIEW newest_move AS
-SELECT log.log_ID, created_at, descriptor, move_ID, moveType, start_positionID, end_positionID
-FROM log
-RIGHT JOIN move
-ON log.log_ID = move.log_ID
-WHERE created_at in(SELECT MAX(created_at) FROM log);
-
+#list all in log, and gripper tables.
 CREATE VIEW log_gripper AS
 SELECT log.log_ID, created_at, descriptor, gripper_ID, start_width, end_width
 FROM log
 INNER JOIN gripper
-ON gripper.log_ID = log.log_ID;
+ON gripper.log_ID = log.log_ID ORDER BY created_at DESC;
 
+#list all in log, and throw tables.
 CREATE VIEW log_throw AS
 SELECT log.log_ID, created_at, descriptor, throw_ID,position_ID,successful,deviation,tcp_velocity_cal,tcp_velocity_act
 FROM log
 INNER JOIN throw
-ON throw.log_ID = log.log_ID;
+ON throw.log_ID = log.log_ID ORDER BY created_at DESC;
 
+#list all in log, and ball tables.
 CREATE VIEW log_ball AS
 SELECT log.log_ID, created_at, descriptor, ball_ID, diameter, ball_position
 FROM log
 INNER JOIN ball
-ON ball.log_ID = log.log_ID;
+ON ball.log_ID = log.log_ID ORDER BY created_at DESC;
