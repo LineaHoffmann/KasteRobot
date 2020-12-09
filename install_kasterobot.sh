@@ -355,7 +355,7 @@ install_pylon         # Pylon
 install_sdurobotics   # Robwork and RTDE
 install_wxwidgets     # wxWidgets
 
-apt-get autoremove
+apt-get autoremove -y
 
   # Cleaning up after any downloads
   echo "Cleaning temporary directory .."
