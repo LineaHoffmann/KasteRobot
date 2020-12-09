@@ -306,7 +306,7 @@ install_misc() {
       if [ DISTRO == "2004" ]
         then
           CLANG_8_DEV_OK="$(dpkg -s libclang-8-common-dev | grep -c "Status: install ok installed")"
-          if [  ]
+          if [ "$CLANG_8_DEV_OK" -eq 0 ]
             then
               apt-get install libclang-8-common-dev -y
           fi
