@@ -239,9 +239,14 @@ install_wxwidgets() {
 }
 
 install_misc() {
-  # Check for boost, ssl, cmake, qt, ssh, clang, gitkraken, git
+  # Check for boost, ssl, cmake, qt, ssh, clang, gitkraken, git, opengl
   if [ "$AS_DEV" -eq 1 ]
     then
+      OPENGL_OK="$(dpkg -s libopengl-dev | grep -c "Status: install ok installed")"
+      if [ "$OPENGL_OK" -eq 0 ]
+        then
+          apt-get install libopengl-dev -y
+      fi
       GIT_OK="$(dpkg -s git | grep -c "Status: install ok installed")"
       if [ "$GIT_OK" -eq 0 ]
         then
