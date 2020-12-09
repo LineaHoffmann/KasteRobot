@@ -185,10 +185,10 @@ install_sdurobotics() {
   # Development specific installs
   if [ "$AS_DEV" -eq 1 ]
     then
-      RTDE_DEV_OK="$(dpkg -s librtde | grep -c "Status: install ok installed")"
+      RTDE_DEV_OK="$(dpkg -s librtde-dev | grep -c "Status: install ok installed")"
       if [ "$RTDE_DEV_OK" -eq 0 ]
         then
-          apt-get install librtde-dev
+          apt-get install librtde-dev -y
       fi
 
       ROBWORK_S_ALL_OK="$(dpkg -s libsdurws-all-dev | grep -c "Status: install ok installed")"
@@ -212,36 +212,46 @@ install_sdurobotics() {
 
 install_wxwidgets() {
   # wxWidgets
-  WX_BASE_OK="$(dpkg -s libwxbase3.0-0v5 | grep -c "Status: install ok installed")"
+  WX_BASE_OK="$(dpkg -s libwxbase3.0-dev | grep -c "Status: install ok installed")"
   if [ "$WX_BASE_OK" -eq 0 ]
     then 
       echo "wxWidgets Base not installed, getting from Universe .."
-      apt-get install libwxbase3.0-0v5 -y
+      apt-get install libwxbase3.0-dev -y
     else
       echo "wxWidgets Base found!"
   fi
-  WX_MEDIA_OK="$(dpkg -s libwxgtk-media3.0-gtk3-0v5 | grep -c "Status: install ok installed")"
+  WX_MEDIA_OK="$(dpkg -s libwxgtk-media3.0-gtk3-dev | grep -c "Status: install ok installed")"
   if [ "$WX_MEDIA_OK" -eq 0 ]
     then 
       echo "wxWidgets Media not installed, getting from Universe .."
-      apt-get install libwxgtk-media3.0-gtk3-0v5 -y
+      apt-get install libwxgtk-media3.0-gtk3-dev -y
     else
       echo "wxWidgets Media found!"
   fi
-  WX_GTK3_OK="$(dpkg -s libwxgtk3.0-gtk3-0v5 | grep -c "Status: install ok installed")"
+  WX_GTK3_OK="$(dpkg -s libwxgtk3.0-gtk3-dev | grep -c "Status: install ok installed")"
   if [ "$WX_GTK3_OK" -eq 0 ]
     then 
       echo "wxWidgets GTK3 not installed, getting from Universe .."
-      apt-get install libwxgtk3.0-gtk3-0v5 -y
+      apt-get install libwxgtk3.0-gtk3-dev -y
     else
       echo "wxWidgets GTK3 found!"
   fi
 }
 
 install_misc() {
-  # Check for boost, ssl
+  # Check for boost, ssl, cmake, qt, ssh, clang, gitkraken, git
   if [ "$AS_DEV" -eq 1 ]
     then
+      GIT_OK="$(dpkg -s git | grep -c "Status: install ok installed")"
+      if [ "$GIT_OK" -eq 0 ]
+        then
+          apt-get install git -y
+      fi
+      GITKRAKEN_OK="$(snap info gitkraken | grep -c "installed:")"
+      if [ "$GITKRAKEN_OK" -eq 0 ]
+        then
+          snap install gitkraken --classic
+      fi
       BOOST_OK="$(dpkg -s libboost-all-dev | grep -c "Status: install ok installed")"
       if [ "$BOOST_OK" -eq 0 ]
         then
@@ -339,6 +349,9 @@ It will also get the current update / upgrade through apt."
     then echo "Aborting .."
     exit
   fi
+
+gitkraken
+git
 
 apt-get update 
 apt-get upgrade --with-new-pkgs -y
