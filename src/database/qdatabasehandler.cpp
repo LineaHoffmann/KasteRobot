@@ -211,16 +211,16 @@ std::vector<qDatabaseEntry> qDatabaseHandler::retriveData()
 
         if(std::string(row[2]) == "gripper")
         {
-            Table *tempTableGripper = new Table(mSchema->getTable("log_gripperTest"));
+            Table *tempTableGripper = new Table(mSchema->getTable("log_gripper"));
             RowResult tempResGripper = tempTableGripper->select("*").execute();
             Row tempGripperRow = tempResGripper.fetchOne();
 
             // Testing Purpose (Show in terminal)
-//            std::cout << " gripper SQL: " << std::endl;
-//            for(uint i = 0; i < tempGripperRow.colCount(); i++)
-//            {
-//                std::cout << tempGripperRow[i] << " | " << std::endl;
-//            }
+            std::cout << " gripper SQL: " << std::endl;
+            for(uint i = 0; i < tempGripperRow.colCount(); i++)
+            {
+                std::cout << tempGripperRow[i] << " | " << std::endl;
+            }
 
             qDatabaseGripperEntry tempGripperEntry = qDatabaseGripperEntry(std::string(row[2]),
                     std::string(row[2]),
