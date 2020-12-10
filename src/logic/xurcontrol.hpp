@@ -118,8 +118,6 @@ private:
     ur_rtde::RTDEControlInterface *mUrControl = nullptr;
     ur_rtde::RTDEReceiveInterface *mUrRecieve = nullptr;
 
-    xCollisionDetector *mDetector;
-
     RobotData mURStruct;
 
     std::exception_ptr mEptr = nullptr;

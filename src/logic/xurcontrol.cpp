@@ -73,7 +73,6 @@ xUrControl::~xUrControl()
     try {disconnect();} catch (...) {}
 
     //check if pointer types exists and delete if they exists.
-    delete mDetector;
     //if (mURStruct)              {delete mURStruct;}
     if (mJoints)                {delete mJoints;}
     if (mThreadData)            {delete mThreadData;}
@@ -467,7 +466,6 @@ void xUrControl::init()
 {
     //datasharing struct
     isConnected = false;
-    mDetector = new xCollisionDetector;
 
 }
 
