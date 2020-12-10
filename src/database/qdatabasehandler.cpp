@@ -69,10 +69,11 @@ void qDatabaseHandler::setDatabaseCredentials(const std::string& user,
     mPort = port;
 }
 
-std::vector<qDatabaseEntry> qDatabaseHandler::retriveData()
+std::vector<qDatabaseEntry*> qDatabaseHandler::retriveData()
 {
     Session* session = connect();
-    if (session == nullptr) return std::vector<qDatabaseEntry>(); // Bail out on failed connection
+    std::vector<qDatabaseEntry*> result;
+    if (session == nullptr) return result; // Bail out on failed connection
     mSchema = new Schema(session->getSchema(mDatabase)); // selects database to work with
 
     // Sql call, findest newest log_ID based on created_at timestamp.
@@ -80,7 +81,7 @@ std::vector<qDatabaseEntry> qDatabaseHandler::retriveData()
     RowResult qResult = session->sql("SELECT * "
                                      "FROM kasteRobot.log "
                                      "WHERE created_at IN(SELECT MAX(created_at)FROM kasteRobot.log)").execute();
-    std::vector<qDatabaseEntry> result;
+
     mRes = new std::vector<Row>(qResult.fetchAll());// saves the data in mRes, from log table
 
     // Testing Purpose (Show in terminal)
@@ -135,14 +136,14 @@ std::vector<qDatabaseEntry> qDatabaseHandler::retriveData()
 
             point6D<double> pos(tempPosRow[1], tempPosRow[2], tempPosRow[3], tempPosRow[4], tempPosRow[5], tempPosRow[6]);
 
-            qDatabaseThrowEntry tempThrowEntry = qDatabaseThrowEntry(std::string(row[1]),
+            qDatabaseThrowEntry<double> *tempThrowEntry = new qDatabaseThrowEntry<double>(std::string(row[1]),
                     std::string(row[2]), //time
                     bool(tempThrowRow[3]), // desc
                     pos,
                     double(tempThrowRow[5]), //v1 cal
                     double(tempThrowRow[6]), // v2 act
                     double(tempThrowRow[4])); // deviation
-            result.push_back((qDatabaseEntry)tempThrowEntry);
+            result.push_back((qDatabaseEntry*) tempThrowEntry);
         }
 
         if(std::string(row[2]) == "move")
@@ -200,13 +201,13 @@ std::vector<qDatabaseEntry> qDatabaseHandler::retriveData()
             Row tempPosRowE = tempResMove.fetchOne();
             point6D<double> posE(tempPosRowE[1],tempPosRowE[2], tempPosRowE[3], tempPosRowE[4], tempPosRowE[5], tempPosRowE[6]);
 
-            qDatabaseMoveEntry tempMoveEntry = qDatabaseMoveEntry(std::string(row[1]),
+            qDatabaseMoveEntry<double> *tempMoveEntry = new qDatabaseMoveEntry<double>(std::string(row[1]),
                     std::string(row[2]),
                     posS,
                     posE,
                     moveType);
 
-            result.push_back((qDatabaseEntry)tempMoveEntry);
+            result.push_back((qDatabaseEntry*) tempMoveEntry);
         }
 
         if(std::string(row[2]) == "gripper")
@@ -222,12 +223,14 @@ std::vector<qDatabaseEntry> qDatabaseHandler::retriveData()
                 std::cout << tempGripperRow[i] << " | " << std::endl;
             }
 
-            qDatabaseGripperEntry tempGripperEntry = qDatabaseGripperEntry(std::string(row[2]),
-                    std::string(row[2]),
-                    double(tempGripperRow[4]), // start_width
-                    double(tempGripperRow[5])); // end_width
+            qDatabaseGripperEntry<double> *tempGripperEntry = new qDatabaseGripperEntry<double>
+                    (std::string(row[2]),
+                    std::string(row[1]),
+                    double(tempGripperRow[3]),
+                    double(tempGripperRow[5]), // start_width
+                    double(tempGripperRow[6])); // end_width
 
-            result.push_back((qDatabaseEntry)tempGripperEntry);
+            result.push_back((qDatabaseEntry*) tempGripperEntry);
         }
 
         if(std::string(row[2]) == "ball"){
@@ -260,12 +263,12 @@ std::vector<qDatabaseEntry> qDatabaseHandler::retriveData()
 
             point2D<double> posB(tempPosRowB[1],tempPosRowB[2]);
 
-            qDatabaseBallEntry tempBallEntry = qDatabaseBallEntry(std::string(row[2]),
+            qDatabaseBallEntry<double> *tempBallEntry = new qDatabaseBallEntry<double>(std::string(row[2]),
                     std::string(row[3]),
                     double(tempBallRow[3]), // diameter
                     posB);; // ballPosition
 
-            result.push_back((qDatabaseEntry)tempBallEntry);
+            result.push_back((qDatabaseEntry*) tempBallEntry);
 
         } else {
             logstd("No matching description found");

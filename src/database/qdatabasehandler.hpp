@@ -24,6 +24,7 @@ using namespace mysqlx;
 struct qDatabaseEntry {
     std::string timestamp;
     std::string entryType;
+    virtual ~qDatabaseEntry() = default; // Virtual to make dynamic_cast possible
 protected:
     qDatabaseEntry(){}
     qDatabaseEntry(const std::string& t, const std::string& desc) :
@@ -33,7 +34,7 @@ protected:
                   << "Timestamp: " << p.timestamp;
     }
 };
-template <class T>
+template <typename T>
 struct qDatabaseMoveEntry : public qDatabaseEntry {
     qDatabaseMoveEntry(){}
     qDatabaseMoveEntry(const std::string& t, const std::string& d,
@@ -47,16 +48,16 @@ struct qDatabaseMoveEntry : public qDatabaseEntry {
                   << "Move type: " << p.moveType;
     }
 };
-template <class T>
+template <typename T>
 struct qDatabaseThrowEntry : public qDatabaseEntry {
     qDatabaseThrowEntry(){}
     qDatabaseThrowEntry(const std::string& t, const std::string& d,
-                        bool s, const point6D<T>& rp, double v1, double v2, double de) :
+                        bool s, const point6D<T>& rp, T v1, T v2, T de) :
         qDatabaseEntry(t, d), successful(s), releasePoint(rp),
         releaseVelocityCalced(v1), releaseVelocityActual(v2), deviation(de) {}
     bool successful;
     point6D<T> releasePoint;
-    double releaseVelocityCalced, releaseVelocityActual, deviation;
+    T releaseVelocityCalced, releaseVelocityActual, deviation;
     friend std::ostream& operator<<(std::ostream&os, const qDatabaseThrowEntry &p) {
         return os << (qDatabaseEntry) p << "\n"
                   << "Succesful: " << p.successful << "\n"
@@ -66,12 +67,12 @@ struct qDatabaseThrowEntry : public qDatabaseEntry {
                   << "~Deviation: " << p.deviation;
     }
 };
-template <class T>
+template <typename T>
 struct qDatabaseGripperEntry : public qDatabaseEntry {
     qDatabaseGripperEntry(){}
     static_assert (std::is_floating_point_v<T>, "Must be a floating point value!");
-    qDatabaseGripperEntry(const std::string& t, const std::string& d, T s, T e) :
-        qDatabaseEntry(t, d), start(s), end(e) {}
+    qDatabaseGripperEntry(const std::string& t, const std::string& d, bool suc, T s, T e) :
+        qDatabaseEntry(t, d), successful(suc), start(s), end(e) {}
     bool successful;
     T start, end;
     friend std::ostream& operator<<(std::ostream&os, const qDatabaseGripperEntry &p) {
@@ -81,7 +82,7 @@ struct qDatabaseGripperEntry : public qDatabaseEntry {
                   << "Succesful: " << p.successful;
     }
 };
-template <class T>
+template <typename T>
 struct qDatabaseBallEntry : public qDatabaseEntry {
     qDatabaseBallEntry(){}
     qDatabaseBallEntry(const std::string& t, const std::string& d, T di, const point2D<T>& p) :
@@ -91,7 +92,7 @@ struct qDatabaseBallEntry : public qDatabaseEntry {
     friend std::ostream& operator<<(std::ostream&os, const qDatabaseBallEntry &p) {
         return os << (qDatabaseEntry) p << "\n"
                   << "Position: " << p.ballPosition << "\n"
-                  << "Size: " << p.ballSize;
+                  << "Size: " << p.ballDiameter;
     }
 };
 
@@ -107,7 +108,7 @@ public:
                                 const std::string& schema,
                                 uint32_t port);
     std::vector<Row>* showTables();
-    std::vector<qDatabaseEntry> retriveData();
+    std::vector<qDatabaseEntry*> retriveData();
 
     template <class T>
     bool pushLogEntry(T _t) {

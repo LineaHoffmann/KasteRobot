@@ -328,11 +328,11 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mBtnDatabaseUpdateTree = new wxButton(mNotebookDatabase, ID_BTN_DATABASE_UPDATE_TREE, "Update Log");
     // Database tab building - Text Controls
     mTxtDatabaseItemView = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "Item View", wxDefaultPosition, wxDefaultSize, wxHSCROLL | wxTE_MULTILINE | wxTE_READONLY);
-    mTxtDatabaseIP = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "IP");
-    mTxtDatabasePort = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "Port");
-    mTxtDatabaseUser = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "User");
-    mTxtDatabaseSchema = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "Schema");
-    mTxtDatabasePassword = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "Password");
+    mTxtDatabaseIP = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "HOSTNAME");
+    mTxtDatabasePort = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "33060");
+    mTxtDatabaseUser = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "default");
+    mTxtDatabaseSchema = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "kasteRobot");
+    mTxtDatabasePassword = new wxTextCtrl(mNotebookDatabase, wxID_ANY, "default");
     // Database tab building - Static bitmap
     mBmpDatabaseStatus = new wxStaticBitmap(mNotebookDatabase, wxID_ANY, GetIcon());
     mBmpDatabaseStatus->SetBackgroundColour(wxColor(255,0,0));
@@ -753,12 +753,12 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         // Updating the database sub panel list of entries
     {
         // Get the entries from database, through the controller
-        std::vector<qDatabaseEntry> res = mController->getDatabaseEntries();
+        std::vector<qDatabaseEntry*> res = mController->getDatabaseEntries();
         wxTreeListItem root = mDatabaseSubTree->GetRootItem();
         // List the entries and save in the storage vector
         for (auto item : res) {
-            wxTreeListItem p = mDatabaseSubTree->AppendItem(root, item.timestamp.c_str());
-            mDatabaseSubTreeEntries.push_back(std::pair<qDatabaseEntry, wxTreeListItem>{item, p});
+            wxTreeListItem *p = new wxTreeListItem(mDatabaseSubTree->AppendItem(root, item->timestamp.c_str()));
+            mDatabaseSubTreeEntries.push_back(std::pair<qDatabaseEntry*, wxTreeListItem*>{item, p});
         }
     }
         break;
@@ -800,10 +800,20 @@ void cMain::OnNewDatabaseTreeSelection(wxTreeListEvent &evt)
 {
     // Clear database item view and update with the new current selection
     mTxtDatabaseItemView->Clear();
-    for (const auto item : mDatabaseSubTreeEntries) { // auto is std::pair<qDatabaseEntry, wxTreeListItem>
-        if (item.second.GetID() == evt.GetItem().GetID()) {
-            std::stringstream s; s << item.first;
-            mTxtDatabaseItemView->AppendText(s.str().c_str());
+    for (const auto item : mDatabaseSubTreeEntries) { // auto is std::pair<qDatabaseEntry*, wxTreeListItem*>
+        if (item.second->GetID() == evt.GetItem().GetID()) {
+            // Convert qDatabaseEntry to the derived class ?
+            // Sepperate casts for derived type templates? Seems bad, but I can't avoid it for now
+            if (auto *e = dynamic_cast<qDatabaseGripperEntry<double>*>(item.first)) {
+                std::stringstream s; s << *e << std::endl;
+                logstd(std::string("Gripper string: \n").append(s.str()).c_str());
+                mTxtDatabaseItemView->AppendText(s.str().c_str());
+            }
+            if (auto *e = dynamic_cast<qDatabaseThrowEntry<double>*>(item.first)) {
+                std::stringstream s; s << *e;
+                logstd(std::string("Throw string: \n").append(s.str()).c_str());
+                mTxtDatabaseItemView->AppendText(s.str().c_str());
+            }
         }
     }
     evt.Skip();
