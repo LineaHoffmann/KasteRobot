@@ -115,10 +115,10 @@ void xController::fillInfo(treeInfo &info)
     else {info.gripperState = GRIPPER_NOT_CONNECTED;}
 }
 
-std::vector<qDatabaseEntry> xController::getDatabaseEntries() {
+std::vector<qDatabaseEntry*> xController::getDatabaseEntries() {
     // Get the data from the database object, if any.
     // If not, return the empty constructor
-    return mDatabase ? mDatabase->retriveData() : std::vector<qDatabaseEntry>();
+    return mDatabase ? mDatabase->retriveData() : std::vector<qDatabaseEntry*>();
 }
 
 //template <typename T>

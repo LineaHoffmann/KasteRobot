@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 # Script for installing dependencies for running KasteRobot
 # Written by Søren Pedersen
 
