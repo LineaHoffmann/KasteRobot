@@ -44,7 +44,7 @@ public:
     gripperData getData();
     bool isConnected();
 
-
+    void setGripperPolling(int polling);
 
 private:
     void connectSocket();
@@ -63,6 +63,7 @@ private:
     std::mutex mMtx;
     std::atomic<bool> mTRuntime, mReady, mConnected, mGripReq, mReleaseReq, mHomeReq,
                       mConnectReq, mDisconnectReq, mAutosend, mGetDataReady;
+    std::atomic<int> mGripperPolling;
     std::pair<std::string, int> mIpPort;
 
     std::thread *mTData;

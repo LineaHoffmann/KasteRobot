@@ -18,6 +18,7 @@ void xGripperClient::entryThread() {
     mAutosend.exchange(false);
     mReady.exchange(false);
     mGetDataReady.exchange(false);
+    mGripperPolling.exchange(2);
     mAutosendCmd = false;
 
     logstd("Gripper client thread started .. ");
@@ -67,7 +68,7 @@ void xGripperClient::entryThread() {
             }
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(std::chrono::milliseconds(mGripperPolling.load()));
     }
 }
 
@@ -130,6 +131,10 @@ void xGripperClient::disconnectReq() {
 }
 
 
+void xGripperClient::setGripperPolling(int polling) {
+
+    mGripperPolling.exchange(polling);
+}
 //MOVEMENT
 void xGripperClient::grip() {
     mGripReq.exchange(true);
