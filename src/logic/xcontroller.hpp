@@ -83,9 +83,9 @@ public:
                     s.append(std::to_string(q[0].at(i)) + " | ");
                 }
                 logstd(std::string("New TCP Position sent to robot: ").append(s).c_str());
-                if(mRobot){
-                mRobot->setMove(ROBOT_MOVE_TYPE::MOVE_L,q);
-                }
+
+                std::thread(&xController::testPathCreation, this, q).detach();
+
             }
         }
             break;
@@ -217,7 +217,6 @@ public:
             break;
         case ID_BTN_TESTING_XYZ_VVA:
             logstd("XYZ_VVA from xController ..");
-            test();
             try {
             if constexpr (std::is_same_v<T, std::array<double,7>>) {
                 static_cast<std::array<double,7>>(data);
@@ -267,8 +266,6 @@ public:
         return;
     }
 
-    void test();
-
     static void testDetectAndPickUp(std::shared_ptr<ximageHandler> mImagehandler,
                                     std::shared_ptr<xBaslerCam> mCamera,
                                     std::shared_ptr<xUrControl> mRobot,
@@ -281,6 +278,7 @@ public:
                                     std::shared_ptr<xCollisionDetector> mCollisionDetector);
 
     void testThrowSpeedJ(double angle);
+    void testPathCreation(std::vector<std::vector<double>> q);
 
 private:
 

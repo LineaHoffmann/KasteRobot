@@ -121,14 +121,17 @@ void xUrControl::setMove(ROBOT_MOVE_TYPE moveMode, std::vector<std::vector<doubl
     {
         std::lock_guard<std::mutex> setMoveLock(mMtx);
         //mQ = inputQ;
-        std::vector<std::vector<double>> mInput = inputQ;
-        std::vector<std::vector<double>> *mQPtr;
-        mQPtr = &mInput;
-        if(mDetector->checkCollision(mQPtr)){    //TODO Mikkel, please make a check on the vector
-            std::cout << "1" << std::endl;
-            logerr("bad pose");
-            return;
-        };
+//        std::vector<std::vector<double>> mInput = inputQ;
+//        std::vector<std::vector<double>> *mQPtr;
+//        mQPtr = &mInput;
+
+
+        //Q[6]{0.1098, -0.33075, 0.89921, 3.14149, 0.000383972, -2.07111} ca. startpos.
+//        if(mDetector->checkCollision(mQPtr)){    //TODO Mikkel, please make a check on the vector
+//            std::cout << "1" << std::endl;
+//            logerr("bad pose");
+//            return;
+//        };
     }
     this->acc = ACC_DEF;
     this->speed = SPEED_DEF;
