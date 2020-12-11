@@ -347,9 +347,6 @@ void xController::testThrowSpeedJ(double angle)
 //            std::this_thread::sleep_for(std::chrono::milliseconds(50));
 //            mRobot->speedJStop();
         }
-        if (mGripper->ackValue){
-            log << "ack recived;";
-            }
         log << "\n";
         std::this_thread::sleep_for(std::chrono::milliseconds(1000/highPoll));
     }
