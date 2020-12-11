@@ -148,7 +148,7 @@ std::vector<qDatabaseEntry*> qDatabaseHandler::retriveData()
 
         if(std::string(row[2]) == "move")
         {
-            Table *tempTableMove = new Table(mSchema->getTable("log_moveTest"));
+            Table *tempTableMove = new Table(mSchema->getTable("log_move"));
             RowResult tempResMove = tempTableMove->select("*").execute();
             Row tempMoveRow = tempResMove.fetchOne();
             // Testing Purpose (Show in terminal)
@@ -192,14 +192,14 @@ std::vector<qDatabaseEntry*> qDatabaseHandler::retriveData()
             std::cout << statement.str() << std::endl;
             tempResMove = tempTableMove->select("*").where(statement.str().c_str()).execute();
             Row tempPosRowS = tempResMove.fetchOne();
-            point6D<double> posS(tempPosRowS[1],tempPosRowS[2], tempPosRowS[3], tempPosRowS[4], tempPosRowS[5], tempPosRowS[6]);
+            point6D<double> posS(tempPosRowS[2],tempPosRowS[3], tempPosRowS[4], tempPosRowS[5], tempPosRowS[6], tempPosRowS[7]);
 
             // position End
             statement.str(" ");
             statement << "position_ID = '" << std::string(tempMoveRow[6]) << "'";
             tempResMove = tempTableMove->select("*").where(statement.str().c_str()).execute();
             Row tempPosRowE = tempResMove.fetchOne();
-            point6D<double> posE(tempPosRowE[1],tempPosRowE[2], tempPosRowE[3], tempPosRowE[4], tempPosRowE[5], tempPosRowE[6]);
+            point6D<double> posE(tempPosRowE[2],tempPosRowE[3], tempPosRowE[4], tempPosRowE[5], tempPosRowE[6], tempPosRowE[7]);
 
             qDatabaseMoveEntry<double> *tempMoveEntry = new qDatabaseMoveEntry<double>(std::string(row[1]),
                     std::string(row[2]),
