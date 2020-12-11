@@ -324,17 +324,15 @@ void xController::testThrowSpeedJ(double angle)
         robotData = mRobot->getURStruct();
 
         for (double d : robotData.robotTcpSpeed){
-            std::cout << std::setw(12) << d <<", ";
             log << d << ";";
         }
-        std::cout << std::setw(5) << "|\t";
         for (double d : robotData.robotJointPosition){
-            std::cout << std::setw(12) << d << ", ";
             log << d << ";";
         }
-        std::cout << std::setw(5) << "|\t";
         for (double d : robotData.robotTcpPosition){
-            std::cout << std::setw(12) << d << ", ";
+            log << d << ";";
+        }
+        for (double d : robotData.robotJointSpeed){
             log << d << ";";
         }
         std::cout << std::endl;
