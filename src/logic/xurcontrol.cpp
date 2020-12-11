@@ -118,10 +118,9 @@ void xUrControl::setMove(ROBOT_MOVE_TYPE moveMode, std::vector<std::vector<doubl
         logerr("[ROBOT]: setMove flag already set");
         return;
     }
-    {
-        std::lock_guard<std::mutex> setMoveLock(mMtx);
-        mQ = inputQ;
-    }
+    std::lock_guard<std::mutex> setMoveLock(mMtx);
+    mQ = inputQ;
+
     this->acc = ACC_DEF;
     this->speed = SPEED_DEF;
     this->mMoveMode = moveMode;
@@ -327,6 +326,11 @@ void xUrControl::move()
                         break;
                     case MOVE_JPATH :
                         logstd("[ROBOT] MOVE_JPATH: move commenced!");
+                        for (size_t i = 0; i < mQ.size(); ++i) {
+                            mQ[i].push_back(ACC_DEF);
+                            mQ[i].push_back(SPEED_DEF);
+                            mQ[i].push_back(0.01);
+                        }
                         if (mUrControl->moveJ(mQ)){
                             logstd("[ROBOT] MOVE_JPATH: move completed!");
                         }
