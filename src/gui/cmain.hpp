@@ -98,6 +98,12 @@ private:
 
     // PanelNotebook
     wxNotebook *mNotebook;
+    wxPanel *mNotebookGeneral;
+    wxPanel *mNotebookRobot;
+    wxPanel *mNotebookGripper;
+    wxPanel *mNotebookCamera;
+    wxPanel *mNotebookDatabase;
+    wxPanel *mNotebookTesting;
     wxTreeListCtrl *mTreeList;
 
     // About box

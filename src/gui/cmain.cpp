@@ -62,37 +62,37 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     gridSizer->Add( mPanelView2, 1, wxEXPAND | wxALL, 0 );
 
     // Notebook contents
-    wxPanel *mNotebookGeneral = new wxPanel(mNotebook,
+    mNotebookGeneral = new wxPanel(mNotebook,
                                             wxID_ANY,
                                             wxDefaultPosition,
                                             wxDefaultSize,
                                             wxTAB_TRAVERSAL | wxNO_BORDER,
                                             "General panel");
-    wxPanel *mNotebookRobot = new wxPanel(mNotebook,
+    mNotebookRobot = new wxPanel(mNotebook,
                                           wxID_ANY,
                                           wxDefaultPosition,
                                           wxDefaultSize,
                                           wxTAB_TRAVERSAL | wxNO_BORDER,
                                           "Robot panel");
-    wxPanel *mNotebookGripper = new wxPanel(mNotebook,
+    mNotebookGripper = new wxPanel(mNotebook,
                                             wxID_ANY,
                                             wxDefaultPosition,
                                             wxDefaultSize,
                                             wxTAB_TRAVERSAL | wxNO_BORDER,
                                             "Gripper panel");
-    wxPanel *mNotebookCamera = new wxPanel(mNotebook,
+    mNotebookCamera = new wxPanel(mNotebook,
                                            wxID_ANY,
                                            wxDefaultPosition,
                                            wxDefaultSize,
                                            wxTAB_TRAVERSAL | wxNO_BORDER,
                                            "Camera panel");
-    wxPanel *mNotebookDatabase = new wxPanel(mNotebook,
+    mNotebookDatabase = new wxPanel(mNotebook,
                                              wxID_ANY,
                                              wxDefaultPosition,
                                              wxDefaultSize,
                                              wxTAB_TRAVERSAL | wxNO_BORDER,
                                              "Database panel");
-    wxPanel *mNotebookTesting = new wxPanel(mNotebook,
+    mNotebookTesting = new wxPanel(mNotebook,
                                              wxID_ANY,
                                              wxDefaultPosition,
                                              wxDefaultSize,
@@ -588,10 +588,17 @@ void cMain::OnTimerInfoUpdate(wxTimerEvent &evt)
     mTreeList->SetItemText(*mTreeDatabaseName, 1, info->databaseUser);
     mTreeList->SetItemText(*mTreeDatabaseSchema, 1, info->databaseSchema);
 
-    //disable features
+    // For when mController would like to disable some gui interfaces
     if(!info->isAvailable){
-        mNotebook
-
+        mNotebookRobot->Disable();
+        mNotebookGripper->Disable();
+        mNotebookTesting->Disable();
+        mNotebookCamera->Disable();
+    } else {
+        mNotebookRobot->Enable();
+        mNotebookGripper->Enable();
+        mNotebookTesting->Enable();
+        mNotebookCamera->Enable();
     }
 
     // POSIX resource use
