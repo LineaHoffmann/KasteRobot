@@ -75,204 +75,108 @@ std::vector<qDatabaseEntry*> qDatabaseHandler::retriveData()
     std::vector<qDatabaseEntry*> result;
     if (session == nullptr) return result; // Bail out on failed connection
     mSchema = new Schema(session->getSchema(mDatabase)); // selects database to work with
-
-    // Sql call, findest newest log_ID based on created_at timestamp.
-    // TODO IF NO ENTRIES, handle that ?
-    RowResult qResult = session->sql("SELECT * "
-                                     "FROM kasteRobot.log "
-                                     "WHERE created_at IN(SELECT MAX(created_at)FROM kasteRobot.log)").execute();
-
-    mRes = new std::vector<Row>(qResult.fetchAll());// saves the data in mRes, from log table
-
-    // Testing Purpose (Show in terminal)
-//    for(Row row : *mRes)
-//    {
-//        std::cout << "SELECT * FROM log" << std::endl;
-//        for(uint32_t i = 0; i < row.colCount(); i++)
-//        {
-//            std::cout << row[i] << " | ";
-//        }
-//        std::cout << std::endl;
-//    }
+    Table* table = new Table(mSchema->getTable("log"));
+    RowResult logRes = table->select("*").orderBy("created_at desc").limit(100).execute();
+    mRes = new std::vector<Row>(logRes.fetchAll());// saves the data in mRes, from log table
 
     for(Row row : *mRes)
     {
-        if(std::string(row[2]) == "throw")
-        {
+        // Timestamp - common for all types
+        Row tempDateRow = session->sql("SELECT date_format(created_at, '%T - %d/%m/%Y') "
+                                        "FROM kasteRobot.log "
+                                        "WHERE log_ID = ?").bind(row[0]).execute().fetchOne();
+
+        if(std::string(row[2]) == "throw") {
             Table *tempTableThrow = new Table(mSchema->getTable("log_throw"));
-            std::stringstream statement;
-            statement << "log_ID = '" << std::string(row[0]) << "'";
-            RowResult tempResThrow = tempTableThrow->select("*").where(statement.str().c_str()).execute();
-            Row tempThrowRow = tempResThrow.fetchOne();
+            Row tempThrowRow = tempTableThrow->select("*").where("log_ID = :param").bind("param", row[0]).execute().fetchOne();
 
-            // Testing Purpose
-            std::cout << "Throw SQL: " << std::endl;
-            for(uint i = 0; i < tempThrowRow.colCount(); i++)
-            {
-                std::cout << tempThrowRow[i] << " | " << std::endl;
-            }
-
-            // Testing purpose
-//            statement.str(" ");
-//            std::cout << "statement: " <<statement.str() << std::endl;
-
-            // Posistion
-            delete tempTableThrow;
+            // Position
             tempTableThrow = new Table(mSchema->getTable("position"));
-
-            // Testing purpose
-            std::cout << "index 0: " << std::string(tempThrowRow[4]) << std::endl;
-            statement.str(" ");
-            statement << "position_ID = '" << std::string(tempThrowRow[4]) << "'";
-            tempResThrow = tempTableThrow->select("*").where(statement.str().c_str()).execute();
-            Row tempPosRow = tempResThrow.fetchOne();
-
-            // Testing Purpose
-//            std::cout << "Throw: Position: SQL: " << std::endl;
-//            for(uint i = 0; i < tempPosRow.colCount(); i++)
-//            {
-//                std::cout << tempPosRow[i] << " | " << std::endl;
-//            }
-
+            Row tempPosRow = tempTableThrow->select("*").where("position_ID = :param").bind("param", tempThrowRow[4]).execute().fetchOne();
             point6D<double> pos(tempPosRow[2], tempPosRow[3], tempPosRow[4], tempPosRow[5], tempPosRow[6], tempPosRow[7]);
 
-            qDatabaseThrowEntry<double> *tempThrowEntry = new qDatabaseThrowEntry<double>(std::string(row[1]),
-                    std::string(row[2]), //time
-                    bool(tempThrowRow[3]), // desc
-                    pos,
-                    double(tempThrowRow[5]), //v1 cal
-                    double(tempThrowRow[6]), // v2 act
-                    double(tempThrowRow[4])); // deviation
+            qDatabaseThrowEntry<double> *tempThrowEntry = new qDatabaseThrowEntry<double>
+                    (std::string(tempDateRow[0]),   // Timestamp
+                    std::string(row[2]),            // Desc
+                    bool(tempThrowRow[5]),          // Successful
+                    pos,                            // Position
+                    double(tempThrowRow[7]),        // release_vel_calc
+                    double(tempThrowRow[8]),        // release_vel_act
+                    double(tempThrowRow[6]));       // deviation
             result.push_back((qDatabaseEntry*) tempThrowEntry);
-        }
-
-        if(std::string(row[2]) == "move")
-        {
+        } else if (std::string(row[2]) == "move") {
             Table *tempTableMove = new Table(mSchema->getTable("log_move"));
-            RowResult tempResMove = tempTableMove->select("*").execute();
-            Row tempMoveRow = tempResMove.fetchOne();
-            // Testing Purpose (Show in terminal)
-            std::cout << "MOVE SQL: " << std::endl;
-            for(uint i = 0; i < tempMoveRow.colCount(); i++)
-            {
-                std::cout << tempMoveRow[i] << " | ";
-            }
-            std::cout << std::endl;
+            Row tempMoveRow = tempTableMove->select("*").where("log_ID = :param").bind("param", row[0]).execute().fetchOne();
 
             // ROBOT ENUM TYPE.
-            ROBOT_MOVE_TYPE moveType;
-            if(std::string(tempMoveRow[4]) == "JLIN"){
+            ROBOT_MOVE_TYPE moveType = MOVE_DEFAULT;
+            if (std::string(tempMoveRow[4]) == "JLIN") {
                 moveType = ROBOT_MOVE_TYPE::MOVE_JLIN;
-            }else if(std::string(tempMoveRow[4]) == "JPATH"){
+            } else if (std::string(tempMoveRow[4]) == "JPATH") {
                 moveType = ROBOT_MOVE_TYPE::MOVE_JPATH;
-            }else if(std::string(tempMoveRow[4]) == "JIK"){
+            } else if (std::string(tempMoveRow[4]) == "JIK") {
                 moveType = ROBOT_MOVE_TYPE::MOVE_JIK;
-            }else if(std::string(tempMoveRow[4]) == "LFK"){
+            } else if (std::string(tempMoveRow[4]) == "LFK") {
                 moveType = ROBOT_MOVE_TYPE::MOVE_LFK;
-            }else if(std::string(tempMoveRow[4]) == "L"){
+            } else if (std::string(tempMoveRow[4]) == "L") {
                 moveType = ROBOT_MOVE_TYPE::MOVE_L;
-            }else if(std::string(tempMoveRow[4])== "TLIN"){
+            } else if (std::string(tempMoveRow[4])== "TLIN") {
                 moveType = ROBOT_MOVE_TYPE::MOVE_TLIN;
-            }else if(std::string(tempMoveRow[4]) == "SERVOJ"){
+            } else if (std::string(tempMoveRow[4]) == "SERVOJ") {
                 moveType = ROBOT_MOVE_TYPE::SERVOJ;
-            }else if(std::string(tempMoveRow[4]) == "HOME"){
+            } else if (std::string(tempMoveRow[4]) == "HOME") {
                 moveType = ROBOT_MOVE_TYPE::HOME;
-            }else if(std::string(tempMoveRow[4]) == "PICKUP"){
+            } else if (std::string(tempMoveRow[4]) == "PICKUP") {
                 moveType = ROBOT_MOVE_TYPE::PICKUP;
-            }else{
-                logstd("No macthing moveType in move tabel");
-                moveType = ROBOT_MOVE_TYPE::MOVE_DEFAULT;
-            };
+            }
 
             // position Start
-            delete tempTableMove;
             tempTableMove = new Table(mSchema->getTable("position"));
-            std::stringstream statement;
-            statement << "position_ID = '" << std::string(tempMoveRow[5]) << "'";
-            std::cout << statement.str() << std::endl;
-            tempResMove = tempTableMove->select("*").where(statement.str().c_str()).execute();
-            Row tempPosRowS = tempResMove.fetchOne();
-            point6D<double> posS(tempPosRowS[2],tempPosRowS[3], tempPosRowS[4], tempPosRowS[5], tempPosRowS[6], tempPosRowS[7]);
+            Row tempPosRowStart = tempTableMove->select("*").where("position_ID = :param").bind("param", tempMoveRow[5]).execute().fetchOne();
+            point6D<double> posS(tempPosRowStart[2], tempPosRowStart[3], tempPosRowStart[4], tempPosRowStart[5], tempPosRowStart[6], tempPosRowStart[7]);
 
             // position End
-            statement.str(" ");
-            statement << "position_ID = '" << std::string(tempMoveRow[6]) << "'";
-            tempResMove = tempTableMove->select("*").where(statement.str().c_str()).execute();
-            Row tempPosRowE = tempResMove.fetchOne();
-            point6D<double> posE(tempPosRowE[2],tempPosRowE[3], tempPosRowE[4], tempPosRowE[5], tempPosRowE[6], tempPosRowE[7]);
+            Row tempPosRowEnd = tempTableMove->select("*").where("position_ID = :param").bind("param", tempMoveRow[6]).execute().fetchOne();
+            point6D<double> posE(tempPosRowEnd[2], tempPosRowEnd[3], tempPosRowEnd[4], tempPosRowEnd[5], tempPosRowEnd[6], tempPosRowEnd[7]);
 
-            qDatabaseMoveEntry<double> *tempMoveEntry = new qDatabaseMoveEntry<double>(std::string(row[1]),
-                    std::string(row[2]),
+            qDatabaseMoveEntry<double> *tempMoveEntry = new qDatabaseMoveEntry<double>
+                    (std::string(tempDateRow[0]),
+                    std::string(tempMoveRow[2]),
                     posS,
                     posE,
                     moveType);
-
             result.push_back((qDatabaseEntry*) tempMoveEntry);
-        }
-
-        if(std::string(row[2]) == "gripper")
-        {
+        } else if (std::string(row[2]) == "gripper") {
             Table *tempTableGripper = new Table(mSchema->getTable("log_gripper"));
-            RowResult tempResGripper = tempTableGripper->select("*").execute();
-            Row tempGripperRow = tempResGripper.fetchOne();
-
-            // NOTE srp: Hack to get a formatted date from the server
-            // Sadly it seems it'll have to be a sepperate call on the log_ID
-            // Formatting directly in the server query is preferable
-            Row tempDateRow = session->sql("SELECT date_format(created_at, '%T - %d/%m/%Y') "
-                                            "FROM kasteRobot.log "
-                                            "WHERE log_ID = ?").bind(tempGripperRow[0]).execute().fetchOne();
+            Row tempResGripper = tempTableGripper->select("*").where("log_ID = :param").bind("param", row[0]).execute().fetchOne();
 
             try {
                 // TODO [srp]: The indexing isn't guaranteed yet
                 qDatabaseGripperEntry<double> *tempGripperEntry = new qDatabaseGripperEntry<double>
                         (std::string(tempDateRow[0]),                   // Timestamp
-                        std::string(tempGripperRow[2]),                 // Description
-                        false,       // Succesful
-                        double(tempGripperRow[5]),                      // start_width
-                        double(tempGripperRow[6]));                     // end_width
+                        std::string(tempResGripper[2]),                 // Description
+                        double(tempResGripper[3]) ? true : false,       // Succesful
+                        double(tempResGripper[5]),                      // start_width
+                        double(tempResGripper[6]));                     // end_width
                 result.push_back((qDatabaseEntry*) tempGripperEntry);
             } catch (...) {
                 logerr("Error while allocating Gripper Entry object for Database!");
             }
 
-        }
-
-        if(std::string(row[2]) == "ball"){
-
-            Table *tempTableBall = new Table(mSchema->getTable("log_gripperTest"));
-            RowResult tempResBall = tempTableBall->select("*").execute();
-            Row tempBallRow = tempResBall.fetchOne();
-
-//          Testing Purpose
-            std::cout << "Ball: SQL: " << std::endl;
-            for(uint i = 0; i < tempBallRow.colCount(); i++)
-            {
-                std::cout << tempBallRow[i] << " | " << std::endl;
-            }
+        } else if (std::string(row[2]) == "ball") {
+            Table *tempTableBall = new Table(mSchema->getTable("log_ball"));
+            Row tempBallRow = tempTableBall->select("*").where("log_ID = :param").bind("param", row[0]).execute().fetchOne();
 
             // Ball position
-            delete tempTableBall;
             tempTableBall = new Table(mSchema->getTable("position"));
-            std::stringstream statement;
-            statement << "position_ID = '" << std::string(tempBallRow[5]) << "'";
-            tempResBall = tempTableBall->select("*").where(statement.str().c_str()).execute();
-            Row tempPosRowB = tempResBall.fetchOne();
+            Row tempResBall = tempTableBall->select("*").where("position_ID = :param").bind("param", tempBallRow[5]).execute().fetchOne();
+            point2D<double> posB(tempResBall[2],tempResBall[3]);
 
-            // Testing Purpose
-            std::cout << "Ball: SQL: " << std::endl;
-            for(uint i = 0; i < tempPosRowB.colCount(); i++)
-            {
-                std::cout << tempPosRowB[i] << " | " << std::endl;
-            }
-
-            point2D<double> posB(tempPosRowB[2],tempPosRowB[3]);
-
-            qDatabaseBallEntry<double> *tempBallEntry = new qDatabaseBallEntry<double>(std::string(row[2]),
-                    std::string(row[3]),
-                    double(tempBallRow[3]), // diameter
-                    posB);; // ballPosition
-
+            qDatabaseBallEntry<double> *tempBallEntry = new qDatabaseBallEntry<double>
+                    (std::string(tempDateRow[0]),   // timestamp
+                    std::string(row[2]),    // descriptor
+                    double(tempBallRow[4]), // ball diameter
+                    posB);                  // ball position
             result.push_back((qDatabaseEntry*) tempBallEntry);
 
         } else {

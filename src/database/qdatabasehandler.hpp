@@ -36,6 +36,7 @@ protected:
 };
 template <typename T>
 struct qDatabaseMoveEntry : public qDatabaseEntry {
+    static_assert (std::is_floating_point_v<T>, "Must be a floating point value!");
     qDatabaseMoveEntry(){}
     qDatabaseMoveEntry(const std::string& t, const std::string& d,
                        const point6D<T>& s, const point6D<T>& e, ROBOT_MOVE_TYPE m) :
@@ -50,6 +51,7 @@ struct qDatabaseMoveEntry : public qDatabaseEntry {
 };
 template <typename T>
 struct qDatabaseThrowEntry : public qDatabaseEntry {
+    static_assert (std::is_floating_point_v<T>, "Must be a floating point value!");
     qDatabaseThrowEntry(){}
     qDatabaseThrowEntry(const std::string& t, const std::string& d,
                         bool s, const point6D<T>& rp, T v1, T v2, T de) :
@@ -69,8 +71,8 @@ struct qDatabaseThrowEntry : public qDatabaseEntry {
 };
 template <typename T>
 struct qDatabaseGripperEntry : public qDatabaseEntry {
-    qDatabaseGripperEntry(){}
     static_assert (std::is_floating_point_v<T>, "Must be a floating point value!");
+    qDatabaseGripperEntry(){}
     qDatabaseGripperEntry(const std::string& t, const std::string& d, bool suc, T s, T e) :
         qDatabaseEntry(t, d), successful(suc), start(s), end(e) {}
     bool successful;
@@ -84,10 +86,11 @@ struct qDatabaseGripperEntry : public qDatabaseEntry {
 };
 template <typename T>
 struct qDatabaseBallEntry : public qDatabaseEntry {
+    static_assert (std::is_floating_point_v<T>, "Must be a floating point value!");
     qDatabaseBallEntry(){}
     qDatabaseBallEntry(const std::string& t, const std::string& d, T di, const point2D<T>& p) :
         qDatabaseEntry(t, d), ballDiameter(di), ballPosition(p) {}
-    double ballDiameter;
+    T ballDiameter;
     point2D<T> ballPosition;
     friend std::ostream& operator<<(std::ostream&os, const qDatabaseBallEntry &p) {
         return os << (qDatabaseEntry) p << "\n"
@@ -112,29 +115,46 @@ public:
 
     template <class T>
     bool pushLogEntry(T _t) {
+
+        // Create a new session and get the main log table
+        Session *session = connect();
+        Schema schema = session->getSchema("kasteRobot");
+        Table table_log = schema.getTable("log");
+
         // Detect sub-type
-        // Build SQL statements and execute them
-        // Read the just added data from the database to check succes
+        //  Build SQL statements and execute them
+        //  Read the just added data from the database to check success
         if constexpr (std::is_same_v<T, qDatabaseBallEntry>) {
             static_cast<qDatabaseBallEntry<double>>(_t);
-            std::stringstream s;
+            table_log.insert("descriptor").values("ball").execute();
 
+            std::stringstream s;
         } else if constexpr (std::is_same_v<T, qDatabaseMoveEntry>) {
             static_cast<qDatabaseMoveEntry<double>>(_t);
+            table_log.insert("descriptor").values("move").execute();
             std::stringstream s;
-
         } else if constexpr (std::is_same_v<T, qDatabaseThrowEntry>) {
             static_cast<qDatabaseThrowEntry<double>>(_t);
+            table_log.insert("descriptor").values("throw").execute();
             std::stringstream s;
-
         } else if constexpr (std::is_same_v<T, qDatabaseGripperEntry>) {
             static_cast<qDatabaseGripperEntry<double>>(_t);
-            std::stringstream s;
-
+            table_log.insert("descriptor").values("gripper").execute();
+            Row tempNewRow = table_log.select("log_ID").orderBy("created_at", "desc").execute().fetchOne();
+            Table table_gripper = schema.getTable("gripper");
+            std::string t_values =
+                    std::string(tempNewRow[0]) + "," +
+                    _t.start + "," +
+                    _t.end + "," +
+                    _t.successful;
+            table_gripper.insert("log_ID, start_width, end_width, successful").values(t_values).execute();
         } else {
             logerr("Cannot push this type of data to the database!");
+            disconnect();
             return false;
         }
+        disconnect();
+        return true;
     }
 
 private:
@@ -150,7 +170,6 @@ private:
     Schema *mSchema;
     Table *mTable;
     std::vector<Row> *mRes;
-
 
     // Functions
     Session* connect();

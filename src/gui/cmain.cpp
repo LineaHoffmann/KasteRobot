@@ -598,7 +598,7 @@ void cMain::OnTimerInfoUpdate(wxTimerEvent &evt)
     struct rusage use;
     if (getrusage(RUSAGE_SELF, &use) == 0) {
         std::string s = "Current Resource Use [MB]: ";
-        s.append(std::to_string(use.ru_maxrss / 1048576.0f));
+        s.append(std::to_string(use.ru_maxrss / 1024.0f));
         pushStrToStatus(s);
     }
     evt.Skip();
@@ -767,6 +767,12 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         // Get the entries from database, through the controller
         std::vector<qDatabaseEntry*> res = mController->getDatabaseEntries();
         wxTreeListItem root = mDatabaseSubTree->GetRootItem();
+        // Clear the current entries in the list
+        mDatabaseSubTree->DeleteAllItems();
+        for (auto entry : mDatabaseSubTreeEntries) {
+            entry.first->~qDatabaseEntry(); // Call the proper delete, they are new allocated in qDatabaseHandler
+        }
+        mDatabaseSubTreeEntries.clear(); // If the qDatabaseEntry* gets changed to stack malloc, clear is plenty
         // List the entries and save in the storage vector
         for (qDatabaseEntry *item : res) {
             wxTreeListItem p = mDatabaseSubTree->AppendItem(root, item->timestamp);
@@ -826,16 +832,27 @@ void cMain::OnNewDatabaseTreeSelection(wxTreeListEvent &evt)
         if (item.second.GetID() == evt.GetItem().GetID()) {
             // Convert qDatabaseEntry to the derived class ?
             // Sepperate casts for derived type templates? Seems bad, but I can't avoid it for now
+            // Template type deduction is also not working too great here
+            // Luck has it we're only using the double type, but it's a bad thing
+            std::stringstream s;
             if (auto *e = dynamic_cast<qDatabaseGripperEntry<double>*>(item.first)) {
-                std::stringstream s; s << *e << std::endl;
-                logstd(std::string("Gripper string: \n").append(s.str()).c_str());
-                mTxtDatabaseItemView->AppendText(s.str().c_str());
+                s << *e;
             }
-            if (auto *e = dynamic_cast<qDatabaseThrowEntry<double>*>(item.first)) {
-                std::stringstream s; s << *e;
-                logstd(std::string("Throw string: \n").append(s.str()).c_str());
-                mTxtDatabaseItemView->AppendText(s.str().c_str());
+            else if (auto *e = dynamic_cast<qDatabaseThrowEntry<double>*>(item.first)) {
+                s << *e;
             }
+            else if (auto *e = dynamic_cast<qDatabaseMoveEntry<double>*>(item.first)) {
+                s << *e;
+            }
+            else if (auto *e = dynamic_cast<qDatabaseBallEntry<double>*>(item.first)) {
+                s << *e;
+            }
+            else {
+                logerr("The selected database entry didn't catch in the handling for the item view ..");
+                evt.Skip();
+                return;
+            }
+            mTxtDatabaseItemView->AppendText(s.str().c_str());
         }
     }
     evt.Skip();
