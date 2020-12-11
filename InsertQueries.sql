@@ -31,13 +31,13 @@ INSERT INTO kasteRobot.position(x_pos,y_pos) VALUES ();
 	INSERT INTO kasteRobot.move(log_ID,moveType,start_positionID,end_positionID) VALUES();
 
 # 3.B THROW: 
-	SELECT * FROM log.log_ID ORDER BY created_at DESC; # GET THE log_ID
+	SELECT log_ID FROM log ORDER BY created_at DESC; # GET THE log_ID
 	#EXTRACT IN C++
-	SELECT * FROM position ORDER BY created_at_position DESC;
+	SELECT position_ID FROM position ORDER BY created_at_position DESC; # GET THE position_ID
 	#EXTRACT IN C++
 
 	#INSERT INTO TABLE
-	INSERT INTO kasteRobot.throw(throw_ID,log_ID,position_ID,
+	INSERT INTO kasteRobot.throw(log_ID,position_ID,
 		successful,deviation,tcp_velocity_cal,tcp_velocity_act) VALUES ();
 
 
@@ -48,7 +48,7 @@ INSERT INTO kasteRobot.position(x_pos,y_pos) VALUES ();
 	# EXRACT IN C++
 
 	#INSERT INTO TABLE
-	INSERT INTO kasteRobot.ball(ball_ID,log_ID,diameter,ball_position) VALUES ();
+	INSERT INTO kasteRobot.ball(log_ID,diameter,ball_position) VALUES ();
 
 # 3.D Gripper
 	SELECT * FROM log.log_ID ORDER BY created_at DESC;
