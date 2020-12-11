@@ -238,7 +238,7 @@ void xController::testDetectAndPickUp2()
 //            mRobot->setMove(ROBOT_MOVE_TYPE::MOVE_L, q);
             std::vector<std::vector<double>> pickupXYZ;
             //pickupXYZ.push_back(pickupPosition);
-            testPathCreation(pickupPosition);
+            createPath(pickupPosition);
             while(mRobot->getIsBusy()){
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
             }
@@ -308,11 +308,6 @@ void xController::testThrowSpeedJ(double angle)
        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
-
-
-
-
-
     mRobot->setPollingRate(highPoll);
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     logstd("throwing...");
@@ -360,7 +355,7 @@ void xController::testThrowSpeedJ(double angle)
     logstd("Speedj test throw completed");
 }
 
-void xController::testPathCreation(std::vector<std::vector<double>> q){
+void xController::createPath(std::vector<std::vector<double>> q){
     std::array<float, 6> currentPoseArr;
     currentPoseArr = mRobot->getURStruct().robotJointPosition;
     std::vector<double> currentPose;

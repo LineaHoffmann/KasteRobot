@@ -88,7 +88,7 @@ public:
                 }
                 logstd(std::string("New TCP Position sent to robot: ").append(s).c_str());
 
-                std::thread(&xController::testPathCreation, this, q).detach();
+                std::thread(&xController::createPath, this, q).detach();
 
             }
         }
@@ -277,10 +277,11 @@ public:
                                     std::shared_ptr<xUrControl> mRobot,
                                     std::shared_ptr<xGripperClient> mGripper,
                                     std::shared_ptr<xCollisionDetector> mCollisionDetector);
+    void createPath(std::vector<std::vector<double>> q);
+
     void testDetectAndPickUp2();
 
     void testThrowSpeedJ(double angle);
-    void testPathCreation(std::vector<std::vector<double>> q);
 
 private:
 
