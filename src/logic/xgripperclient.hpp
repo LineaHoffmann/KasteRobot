@@ -46,6 +46,8 @@ public:
 
     void setGripperPolling(int polling);
 
+    double getPos();
+
 private:
     void connectSocket();
     void disconnectGripper();

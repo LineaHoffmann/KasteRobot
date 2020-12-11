@@ -364,7 +364,10 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mBtnTestMathXYZtoVAA = new wxButton(mNotebookTesting, ID_BTN_TESTING_XYZ_VVA, "XYZ->VAA");
     mBtnTestURControlSpeedJ = new wxButton(mNotebookTesting, ID_BTN_TESTING_SPEEDJ, "SPEEDJ");
     mBtnTestDectectPick = new wxButton(mNotebookTesting, ID_BTN_TESTING_DETECT_PICK, "Detect and pick");
+    mBtnTestThrowSeq = new wxButton(mNotebookTesting, ID_BTN_TESTING_THROW, "Throw");
     // Testing tab building - Text Controls
+    mTxtTestThrowX = new wxTextCtrl(mNotebookTesting, wxID_ANY, "X");
+    mTxtTestThrowY = new wxTextCtrl(mNotebookTesting, wxID_ANY, "Y");
     mTxtTestMathInX = new wxTextCtrl(mNotebookTesting, wxID_ANY, "X");
     mTxtTestMathInY = new wxTextCtrl(mNotebookTesting, wxID_ANY, "Y");
     mTxtTestMathInZ = new wxTextCtrl(mNotebookTesting, wxID_ANY, "Z");
@@ -376,16 +379,19 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     wxGridBagSizer *mSizerNotebookTesting = new wxGridBagSizer(0, 0);
     mSizerNotebookTesting->SetFlexibleDirection( wxBOTH );
     mSizerNotebookTesting->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    mSizerNotebookTesting->Add( mBtnTestMathXYZtoVAA, wxGBPosition( 0, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-    mSizerNotebookTesting->Add( mBtnTestDectectPick, wxGBPosition( 0, 5 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-    mSizerNotebookTesting->Add( mBtnTestURControlSpeedJ, wxGBPosition( 1, 5 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-    mSizerNotebookTesting->Add( mTxtTestMathInX, wxGBPosition( 1, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-    mSizerNotebookTesting->Add( mTxtTestMathInY, wxGBPosition( 2, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-    mSizerNotebookTesting->Add( mTxtTestMathInZ, wxGBPosition( 3, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-    mSizerNotebookTesting->Add( mTxtTestMathInAngleLowLim, wxGBPosition( 1, 2 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-    mSizerNotebookTesting->Add( mTxtTestMathInAngleHighLim, wxGBPosition( 2, 2 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-    mSizerNotebookTesting->Add( mTxtTestMathInVelocityLowLim, wxGBPosition( 1, 3 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
-    mSizerNotebookTesting->Add( mTxtTestMathInVelocityHighLim, wxGBPosition( 2, 3 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookTesting->Add( mBtnTestMathXYZtoVAA,           wxGBPosition( 0, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookTesting->Add( mBtnTestDectectPick,            wxGBPosition( 0, 5 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookTesting->Add( mBtnTestURControlSpeedJ,        wxGBPosition( 1, 5 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookTesting->Add( mTxtTestMathInX,                wxGBPosition( 1, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookTesting->Add( mTxtTestMathInY,                wxGBPosition( 2, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookTesting->Add( mBtnTestThrowSeq,               wxGBPosition( 2, 5 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookTesting->Add( mTxtTestThrowX,                 wxGBPosition( 2, 6 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookTesting->Add( mTxtTestThrowY,                 wxGBPosition( 2, 7 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookTesting->Add( mTxtTestMathInZ,                wxGBPosition( 3, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookTesting->Add( mTxtTestMathInAngleLowLim,      wxGBPosition( 1, 2 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookTesting->Add( mTxtTestMathInAngleHighLim,     wxGBPosition( 2, 2 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookTesting->Add( mTxtTestMathInVelocityLowLim,   wxGBPosition( 1, 3 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookTesting->Add( mTxtTestMathInVelocityHighLim,  wxGBPosition( 2, 3 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mNotebookTesting->SetSizer(mSizerNotebookTesting);
     mNotebookTesting->Layout();
     // Testing tab building - Tooltips
@@ -581,6 +587,12 @@ void cMain::OnTimerInfoUpdate(wxTimerEvent &evt)
     mTreeList->SetItemText(*mTreeDatabasePort, 1, std::to_string(info->databasePort));
     mTreeList->SetItemText(*mTreeDatabaseName, 1, info->databaseUser);
     mTreeList->SetItemText(*mTreeDatabaseSchema, 1, info->databaseSchema);
+
+    //disable features
+    if(!info->isAvailable){
+        mNotebook
+
+    }
 
     // POSIX resource use
     struct rusage use;
@@ -788,6 +800,15 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
     case ID_BTN_TESTING_SPEEDJ:
     {
         xTry([&] {mController->guiButtonPressed(ID_BTN_TESTING_SPEEDJ);});
+    }
+        break;
+
+    case ID_BTN_TESTING_THROW:
+    {
+        std::array<double, 2> data;
+        mTxtTestThrowX->GetValue().ToDouble(&data[0]);
+        mTxtTestThrowY->GetValue().ToDouble(&data[1]);
+        xTry([&] {mController->guiButtonPressed(ID_BTN_TESTING_THROW, data);});
     }
         break;
     default:

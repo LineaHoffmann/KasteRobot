@@ -368,3 +368,137 @@ void xController::createPath(std::vector<std::vector<double>> q){
     mRobot->setMove(ROBOT_MOVE_TYPE::MOVE_JPATH,path);
     }
 }
+
+void xController::throwBall(double x, double y)
+{
+    //local scope fuction variables
+    std::vector<std::vector<double>> q;
+
+    try{
+    mRobot->setMove(ROBOT_MOVE_TYPE::HOME);
+    logstd("Robot Homing");
+    while(mRobot->getIsBusy()){
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    } catch (const x_err::error &e){
+        logerr("homing failed");
+        //TODO: failed movement
+        return;
+    }
+
+    std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(mCamera->getImage());
+    if (!std::get<0>(ballResult)){
+        logstd("Ball not found, moving robot to pre pickup position, aborting");
+        //TODO: abort log to database implementation, no ball
+        return;
+    }
+
+    std::vector<double> pickupPosition = xMath::ball_position_to_robotframe(ballResult);
+
+    logstd("moving robot to pickup object");
+
+    try {
+        q.push_back(pickupPosition);
+        mRobot->setMove(ROBOT_MOVE_TYPE::MOVE_L, q);
+        while(mRobot->getIsBusy()){
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+    } catch (const x_err::error &e){
+        logerr("failed");
+        //TODO: failed movement
+        return;
+    }
+
+    double radius = std::get<3>(ballResult);
+    q.clear();
+    q.push_back(pickupPosition);
+    q[0][2] += (double) radius * 3;
+
+
+        //flyt robot til positionen i variablen pickupPosition uden z højde
+        mRobot->setMove(ROBOT_MOVE_TYPE::MOVE_L, q);
+        while(mRobot->getIsBusy()){
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+
+    q.clear();
+    q.push_back(pickupPosition);
+
+        //flyt robot til positionen i variablen pickupPosition
+        mRobot->setMove(ROBOT_MOVE_TYPE::MOVE_L, q);
+        while(mRobot->getIsBusy()){
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+
+    q.clear();
+
+    mGripper->grip();
+    while (mGripper->isReady()){
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+
+    //check if ball of right diameter is gripped
+    if (mGripper->getPos() < (radius * 2)-2 || mGripper->getPos() > (radius * 2)+2 ){
+        logerr("ball not detected in gripper, Aborting");
+        //TODO: ABORTING throw
+        return;
+    }
+    //moving to pre-pickup position
+    try{
+        mRobot->setMove(ROBOT_MOVE_TYPE::PICKUP);
+        logstd("Robot moving to pre pickup position");
+        while(mRobot->getIsBusy()){
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+    } catch (const x_err::error &e){
+        logerr("homing failed");
+        //TODO: ABORTING throw move bad
+        return;
+    }
+
+    //preparing throw
+    int highPoll = 125;
+    RobotData robotData(mRobot->getURStruct());
+    int prevPollingRate = mRobot->getPollingRate();
+    double relAngle = -2.05668	-1.62165;
+    q.push_back(std::vector<double>{-1.15192, -1.57, -2.2689, -1.8325 ,1.57,1.57});
+
+    xMath::calcThrow(q[0],x,y);
+
+    logstd("Moving to throwing position");
+    try{
+        mRobot->setMove(ROBOT_MOVE_TYPE::MOVE_JLIN,q,2,2);
+        logstd("Robot moving to pre pickup position");
+        while(mRobot->getIsBusy()){
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+    } catch (const x_err::error &e){
+        logerr("homing failed");
+        //TODO: ABORTING throw move bad
+        return;
+    }
+
+    mRobot->setPollingRate(highPoll);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    logstd("throwing...");
+    mRobot->setMove(ROBOT_MOVE_TYPE::SPEEDJ);
+
+    bool released = false;
+    while (mRobot->getIsBusy()){
+        robotData = mRobot->getURStruct();
+
+        if (robotData.robotJointPosition[2] + robotData.robotJointPosition[3] >= relAngle && !released){
+            mGripper->release();
+            std::cout << "Gripper released" << std::endl;
+            released = true;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000/(highPoll*2)));
+    }
+
+
+    mRobot->setPollingRate(prevPollingRate);
+
+    logstd("[THROW] throw completed");
+
+    //TODO: Write Database log for completed throw
+}

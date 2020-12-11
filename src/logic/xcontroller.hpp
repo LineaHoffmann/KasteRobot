@@ -245,8 +245,19 @@ public:
             //mRobot->setMove(ROBOT_MOVE_TYPE::SPEEDJ);
         }
             break;
+        case ID_BTN_TESTING_THROW:
+        {
+            logstd("THROW test from controller");
+            if constexpr (std::is_same_v<T,std::array<double,2>>){
+                static_cast<std::array<double,2>>(data);
+                double x{data[0]}, y{data[1]};
 
-    // Databse Buttuns implementation
+
+            }
+        }
+            break;
+
+    // Databse BTN implementation
         case ID_BTN_DATABASE_TRY_CONNECTION:
             logstd("Connecting to database");
             try{
@@ -282,6 +293,8 @@ public:
     void testDetectAndPickUp2();
 
     void testThrowSpeedJ(double angle);
+
+    void throwBall(double x, double y);
 
 private:
 

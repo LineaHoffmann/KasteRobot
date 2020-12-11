@@ -207,7 +207,10 @@ private:
     wxButton *mBtnTestMathXYZtoVAA;
     wxButton *mBtnTestURControlSpeedJ;
     wxButton *mBtnTestDectectPick;
+    wxButton *mBtnTestThrowSeq;
     wxTextCtrl *mTxtTestMathInX;
+    wxTextCtrl *mTxtTestThrowX;
+    wxTextCtrl *mTxtTestThrowY;
     wxTextCtrl *mTxtTestMathInY;
     wxTextCtrl *mTxtTestMathInZ;
     wxTextCtrl *mTxtTestMathInAngleLowLim;

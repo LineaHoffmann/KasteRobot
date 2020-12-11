@@ -251,6 +251,18 @@ void xGripperClient::autoread() {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }
+
+double xGripperClient::getPos()
+{
+    std::lock_guard<std::mutex> dataLock(mMtx);
+    double pos{0};
+    try {
+        pos = std::stod(mPos);
+    } catch (...) {
+
+    }
+    return pos;
+}
 gripperData xGripperClient::getData() {
     gripperData fullData;
     std::lock_guard<std::mutex> dataLock(mMtx);

@@ -118,6 +118,7 @@ struct treeInfo {
     std::string databasePassword{"-"};
     std::string databaseSchema{"-"};
     // General?
+    bool isAvailable{true};
 };
 
 #endif // GLOBALDEFS_H

@@ -37,7 +37,7 @@ public:
 
     static rw::math::Rotation3D<> calculateTCPRotation(const rw::math::Vector3D<> &vect);
 
-    void calcThrow(std::vector<double> &q, double x, double y);
+    static void calcThrow(std::vector<double> &q, double x, double y);
 
 
     //takes balloutput from findball and converts it into a 3d point in the frame of det robotbase
