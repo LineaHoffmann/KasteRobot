@@ -134,7 +134,7 @@ std::vector<qDatabaseEntry*> qDatabaseHandler::retriveData()
 //                std::cout << tempPosRow[i] << " | " << std::endl;
 //            }
 
-            point6D<double> pos(tempPosRow[1], tempPosRow[2], tempPosRow[3], tempPosRow[4], tempPosRow[5], tempPosRow[6]);
+            point6D<double> pos(tempPosRow[2], tempPosRow[3], tempPosRow[4], tempPosRow[5], tempPosRow[6], tempPosRow[7]);
 
             qDatabaseThrowEntry<double> *tempThrowEntry = new qDatabaseThrowEntry<double>(std::string(row[1]),
                     std::string(row[2]), //time
@@ -261,7 +261,7 @@ std::vector<qDatabaseEntry*> qDatabaseHandler::retriveData()
                 std::cout << tempPosRowB[i] << " | " << std::endl;
             }
 
-            point2D<double> posB(tempPosRowB[1],tempPosRowB[2]);
+            point2D<double> posB(tempPosRowB[2],tempPosRowB[3]);
 
             qDatabaseBallEntry<double> *tempBallEntry = new qDatabaseBallEntry<double>(std::string(row[2]),
                     std::string(row[3]),
