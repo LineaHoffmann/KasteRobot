@@ -96,7 +96,7 @@ std::vector<std::vector<double>> xCollisionDetector::makePath(std::vector<double
     std::cout << "MP3" << std::endl;
     std::cout << planner->getProperties().empty() << "planner i makepath2" << std::endl;
     rw::trajectory::QPath result;
-    if (planner->query (Qbeg, Qend, result) {
+    if (planner->query (Qbeg, Qend, result)) {
         std::cout << "Planned path with " << result.size ();
         std::cout << " configuration steps" << std::endl;
     } else {

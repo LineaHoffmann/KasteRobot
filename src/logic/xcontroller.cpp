@@ -42,8 +42,8 @@ xController::xController()
     //robworks
     mCollisionDetector = std::make_shared<xCollisionDetector>();
     mCollisionDetector->loadWorkcell("../resources/XML_files/CollisionV2.wc.xml");
-    std::vector<double> currentPose {0.1098, -0.33075, 0.89921, 3.14149, 0.000383972, -2.07111};
-    mCollisionDetector->checkQ(currentPose);
+//    std::vector<double> currentPose {0.1098, -0.33075, 0.89921, 3.14149, 0.000383972, -2.07111};
+//    mCollisionDetector->checkQ(currentPose);
 
 
     //starting camera
@@ -287,8 +287,7 @@ void xController::testThrowSpeedJ(double angle)
 }
 
 void xController::testPathCreation(std::vector<std::vector<double>> q){
-    //std::cout << mCollisionDetector->planner->getProperties().empty() << "planner i testpathcreation" << std::endl; Eneste sted den ikke tilgår hvis planner er private
-    std::vector<double> currentPose {1.553, -1.697, 0.467, -0.34, -1.57, -0.017}; //Joint configs
+    std::vector<double> currentPose {3, -0.723, 0.283, -1.062, -1.188, -1.527}; //Joint configs
     std::vector<std::vector<double>> path;
     std::cout << "1 i test" << std::endl;
     path = mCollisionDetector->moveFromTo(currentPose, q[0]);
