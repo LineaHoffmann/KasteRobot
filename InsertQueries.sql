@@ -3,7 +3,7 @@
 # For each insert query, we need to split into two calls.
 
 # 1. Insert into log, create a entry in the log. 
-INSERT INTO kasteRobot.log(log_ID,descriptor) VALUES();
+INSERT INTO kasteRobot.log(descriptor) VALUES();
 
 # Insert into position, because we need the postion_ID in other tables, unless its gripper. 
 
