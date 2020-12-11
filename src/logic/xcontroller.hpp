@@ -17,6 +17,7 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+#include <vector>
 
 #include "opencv2/core.hpp"
 #include "opencv2/opencv.hpp"
@@ -216,7 +217,8 @@ public:
         case ID_BTN_TESTING_DETECT_PICK:
         {
             logstd("Starting ball detection and pick-up sequence ..");
-            std::thread(testDetectAndPickUp, mImagehandler, mCamera, mRobot, mGripper, mCollisionDetector).detach();
+            //std::thread(testDetectAndPickUp, mImagehandler, mCamera, mRobot, mGripper, mCollisionDetector).detach();
+            std::thread(&xController::testDetectAndPickUp2,this).detach();
         }
             break;
         case ID_BTN_TESTING_XYZ_VVA:
@@ -275,11 +277,7 @@ public:
                                     std::shared_ptr<xUrControl> mRobot,
                                     std::shared_ptr<xGripperClient> mGripper,
                                     std::shared_ptr<xCollisionDetector> mCollisionDetector);
-    static void testDetectAndPickUp2(std::shared_ptr<ximageHandler> mImagehandler,
-                                    std::shared_ptr<xBaslerCam> mCamera,
-                                    std::shared_ptr<xUrControl> mRobot,
-                                    std::shared_ptr<xGripperClient> mGripper,
-                                    std::shared_ptr<xCollisionDetector> mCollisionDetector);
+    void testDetectAndPickUp2();
 
     void testThrowSpeedJ(double angle);
     void testPathCreation(std::vector<std::vector<double>> q);

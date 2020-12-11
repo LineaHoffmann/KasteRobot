@@ -202,11 +202,7 @@ void xController::testDetectAndPickUp(std::shared_ptr<ximageHandler> mImagehandl
 }
 
 
-void xController::testDetectAndPickUp2(std::shared_ptr<ximageHandler> mImagehandler,
-                                      std::shared_ptr<xBaslerCam> mCamera,
-                                      std::shared_ptr<xUrControl> mRobot,
-                                      std::shared_ptr<xGripperClient> mGripper,
-                                      std::shared_ptr<xCollisionDetector> mCollisionDetector)
+void xController::testDetectAndPickUp2()
 {
     //flyt robotten til hjem position
     try{
@@ -219,24 +215,30 @@ void xController::testDetectAndPickUp2(std::shared_ptr<ximageHandler> mImagehand
         logerr("homing failed");
     }
 
-    std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(mCamera->getImage());
-//    std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(cv::imread("../resources/ballimgs/remappedBall2.png"));
+    //std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(mCamera->getImage());
+    std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(cv::imread("../resources/ballimgs/remappedBall3.png"));
 
     if (std::get<0>(ballResult)){
         logstd("Ball found, moving robot to pre pickup position");
 
         //flyt robotten til det der prepickup position
 
-
-        std::vector<double> pickupPosition = xMath::ball_position_to_robotframe(ballResult);
+//        std::vector<double> pickupPosition; //= {std::get<2>(ballResult).x/100, -(std::get<2>(ballResult).y/100), -0.025, 1.778, 2.577, -0.1};
+//        pickupPosition.push_back(xMath::ball_position_to_robotframe(ballResult));
+        std::cout << std::get<2>(ballResult).x/100 << -(std::get<2>(ballResult).y/100) << std::endl;
+        std::vector<std::vector<double>> pickupPosition;
+        pickupPosition.push_back(xMath::ball_position_to_robotframe(ballResult));
 
         logstd("moving robot to pickup object");
 
         try {
-            std::vector<std::vector<double>> q;
-            q.push_back(pickupPosition);
-            //flyt robot til positionen i variablen pickupPosition
-            mRobot->setMove(ROBOT_MOVE_TYPE::MOVE_L, q);
+//            std::vector<std::vector<double>> q;
+//            q.push_back(pickupPosition);
+//            //flyt robot til positionen i variablen pickupPosition
+//            mRobot->setMove(ROBOT_MOVE_TYPE::MOVE_L, q);
+            std::vector<std::vector<double>> pickupXYZ;
+            //pickupXYZ.push_back(pickupPosition);
+            testPathCreation(pickupPosition);
             while(mRobot->getIsBusy()){
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
             }
@@ -359,11 +361,14 @@ void xController::testThrowSpeedJ(double angle)
 }
 
 void xController::testPathCreation(std::vector<std::vector<double>> q){
-    std::vector<double> currentPose {3, -0.723, 0.283, -1.062, -1.188, -1.527}; //Joint configs
+    std::array<float, 6> currentPoseArr;
+    currentPoseArr = mRobot->getURStruct().robotJointPosition;
+    std::vector<double> currentPose;
+    for (size_t i = 0; i < currentPoseArr.size(); ++i) {
+        currentPose.push_back(currentPoseArr[i]);
+    }
     std::vector<std::vector<double>> path;
-    std::cout << "1 i test" << std::endl;
     path = mCollisionDetector->moveFromTo(currentPose, q[0]);
-    std::cout << "2 i test" << std::endl;
     if(mRobot){
     mRobot->setMove(ROBOT_MOVE_TYPE::MOVE_JPATH,path);
     }
