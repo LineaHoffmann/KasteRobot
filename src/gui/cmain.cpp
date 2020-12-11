@@ -756,9 +756,10 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         std::vector<qDatabaseEntry*> res = mController->getDatabaseEntries();
         wxTreeListItem root = mDatabaseSubTree->GetRootItem();
         // List the entries and save in the storage vector
-        for (auto item : res) {
-            wxTreeListItem *p = new wxTreeListItem(mDatabaseSubTree->AppendItem(root, item->timestamp.c_str()));
-            mDatabaseSubTreeEntries.push_back(std::pair<qDatabaseEntry*, wxTreeListItem*>{item, p});
+        for (qDatabaseEntry *item : res) {
+            wxTreeListItem p = mDatabaseSubTree->AppendItem(root, item->timestamp);
+            mDatabaseSubTree->SetItemText(p, 1, item->entryType);
+            mDatabaseSubTreeEntries.push_back(std::pair<qDatabaseEntry*, wxTreeListItem>{item, p});
         }
     }
         break;
@@ -801,7 +802,7 @@ void cMain::OnNewDatabaseTreeSelection(wxTreeListEvent &evt)
     // Clear database item view and update with the new current selection
     mTxtDatabaseItemView->Clear();
     for (const auto item : mDatabaseSubTreeEntries) { // auto is std::pair<qDatabaseEntry*, wxTreeListItem*>
-        if (item.second->GetID() == evt.GetItem().GetID()) {
+        if (item.second.GetID() == evt.GetItem().GetID()) {
             // Convert qDatabaseEntry to the derived class ?
             // Sepperate casts for derived type templates? Seems bad, but I can't avoid it for now
             if (auto *e = dynamic_cast<qDatabaseGripperEntry<double>*>(item.first)) {

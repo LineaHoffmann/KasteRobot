@@ -216,21 +216,26 @@ std::vector<qDatabaseEntry*> qDatabaseHandler::retriveData()
             RowResult tempResGripper = tempTableGripper->select("*").execute();
             Row tempGripperRow = tempResGripper.fetchOne();
 
-            // Testing Purpose (Show in terminal)
-            std::cout << " gripper SQL: " << std::endl;
-            for(uint i = 0; i < tempGripperRow.colCount(); i++)
-            {
-                std::cout << tempGripperRow[i] << " | " << std::endl;
+            // NOTE srp: Hack to get a formatted date from the server
+            // Sadly it seems it'll have to be a sepperate call on the log_ID
+            // Formatting directly in the server query is preferable
+            Row tempDateRow = session->sql("SELECT date_format(created_at, '%T - %d/%m/%Y') "
+                                            "FROM kasteRobot.log "
+                                            "WHERE log_ID = ?").bind(tempGripperRow[0]).execute().fetchOne();
+
+            try {
+                // TODO [srp]: The indexing isn't guaranteed yet
+                qDatabaseGripperEntry<double> *tempGripperEntry = new qDatabaseGripperEntry<double>
+                        (std::string(tempDateRow[0]),                   // Timestamp
+                        std::string(tempGripperRow[2]),                 // Description
+                        false,       // Succesful
+                        double(tempGripperRow[5]),                      // start_width
+                        double(tempGripperRow[6]));                     // end_width
+                result.push_back((qDatabaseEntry*) tempGripperEntry);
+            } catch (...) {
+                logerr("Error while allocating Gripper Entry object for Database!");
             }
 
-            qDatabaseGripperEntry<double> *tempGripperEntry = new qDatabaseGripperEntry<double>
-                    (std::string(row[2]),
-                    std::string(row[1]),
-                    double(tempGripperRow[3]),
-                    double(tempGripperRow[5]), // start_width
-                    double(tempGripperRow[6])); // end_width
-
-            result.push_back((qDatabaseEntry*) tempGripperEntry);
         }
 
         if(std::string(row[2]) == "ball"){

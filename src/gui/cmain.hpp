@@ -193,7 +193,7 @@ private:
     wxStaticBitmap *mBmpGripperStatus;
     // DATABASE SUB PANEL ENTRIES
     wxTreeListCtrl *mDatabaseSubTree;
-    std::vector<std::pair<qDatabaseEntry*, wxTreeListItem*>> mDatabaseSubTreeEntries;
+    std::vector<std::pair<qDatabaseEntry*, wxTreeListItem>> mDatabaseSubTreeEntries;
     wxButton *mBtnDatabaseTryConnection;
     wxButton *mBtnDatabaseUpdateTree;
     wxTextCtrl *mTxtDatabaseItemView;
