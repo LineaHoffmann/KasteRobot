@@ -52,21 +52,72 @@ struct RobotData {
 ////////////////////////////////////////
 // ROBOT ENUM STRING CONVERSIONS
 ////////////////////////////////////////
-std::string getRobotMoveTypeAsString(const ROBOT_MOVE_TYPE type) {
+static inline std::string getRobotMoveTypeAsString(const ROBOT_MOVE_TYPE type) {
     std::string s;
     switch (type) {
-    case MOVE_JLIN:
+    case ROBOT_MOVE_TYPE::MOVE_JLIN:
+        s = "JLIN";
         break;
-    case MOVE_JPATH:
+    case ROBOT_MOVE_TYPE::MOVE_JPATH:
+        s = "JPATH";
+        break;
+    case ROBOT_MOVE_TYPE::MOVE_JIK:
+        s = "JIK";
+        break;
+    case ROBOT_MOVE_TYPE::MOVE_LFK:
+        s = "LFK";
+        break;
+    case ROBOT_MOVE_TYPE::MOVE_L:
+        s = "L";
+        break;
+    case ROBOT_MOVE_TYPE::MOVE_TLIN:
+        s = "TLIN";
+        break;
+    case ROBOT_MOVE_TYPE::SERVOJ:
+        s = "SERVOJ";
+        break;
+    case ROBOT_MOVE_TYPE::SPEEDJ:
+        s = "SPEEDJ";
+        break;
+    case ROBOT_MOVE_TYPE::HOME:
+        s = "HOME";
+        break;
+    case ROBOT_MOVE_TYPE::PICKUP:
+        s = "PICKUP";
+        break;
+    case ROBOT_MOVE_TYPE::MOVE_DEFAULT:
+        s = "MOVE_DEFAULT";
         break;
     }
-
     return s;
 }
-ROBOT_MOVE_TYPE getRobotMoveTypeFromString(const std::string& s) {
-    return ROBOT_MOVE_TYPE::HOME;
+static inline ROBOT_MOVE_TYPE getRobotMoveTypeFromString(const std::string& s) {
+    ROBOT_MOVE_TYPE type;
+    if (s == "JLIN") {
+        type = ROBOT_MOVE_TYPE::MOVE_JLIN;
+    } else if (s == "JPATH") {
+        type = ROBOT_MOVE_TYPE::MOVE_JPATH;
+    } else if (s == "JIK") {
+        type = ROBOT_MOVE_TYPE::MOVE_JIK;
+    } else if (s == "LFK") {
+        type = ROBOT_MOVE_TYPE::MOVE_LFK;
+    } else if (s == "L") {
+        type = ROBOT_MOVE_TYPE::MOVE_L;
+    } else if (s == "TLIN") {
+        type = ROBOT_MOVE_TYPE::MOVE_TLIN;
+    } else if (s == "SERVOJ") {
+        type = ROBOT_MOVE_TYPE::SERVOJ;
+    } else if (s == "SPEEDJ") {
+        type = ROBOT_MOVE_TYPE::SPEEDJ;
+    } else if (s == "HOME") {
+        type = ROBOT_MOVE_TYPE::HOME;
+    } else if (s == "PICKUP") {
+        type = ROBOT_MOVE_TYPE::PICKUP;
+    } else if (s == "MOVE_DEAFULT") {
+        type = ROBOT_MOVE_TYPE::MOVE_DEFAULT;
+    }
+    return type;
 }
-
 ////////////////////////////////////////
 // GRIPPER MOVE TYPES
 ////////////////////////////////////////
