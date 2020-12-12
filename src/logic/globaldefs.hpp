@@ -49,6 +49,23 @@ struct RobotData {
     std::array<float, 6> robotJointSpeed{0,0,0,0,0,0};
     std::array<float, 6> robotTcpSpeed{0,0,0,0,0,0};
 };
+////////////////////////////////////////
+// ROBOT ENUM STRING CONVERSIONS
+////////////////////////////////////////
+std::string getRobotMoveTypeAsString(const ROBOT_MOVE_TYPE type) {
+    std::string s;
+    switch (type) {
+    case MOVE_JLIN:
+        break;
+    case MOVE_JPATH:
+        break;
+    }
+
+    return s;
+}
+ROBOT_MOVE_TYPE getRobotMoveTypeFromString(const std::string& s) {
+    return ROBOT_MOVE_TYPE::HOME;
+}
 
 ////////////////////////////////////////
 // GRIPPER MOVE TYPES
