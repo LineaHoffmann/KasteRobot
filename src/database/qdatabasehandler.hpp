@@ -153,7 +153,8 @@ public:
                     _t.start.rx + "," +
                     _t.start.ry + "," +
                     _t.start.rz + ",";
-            table_position.insert("x_pos,y_pos,z_pos,x_rotation,y_rotaion,z_rotaion").values(start_pos_values).execute();
+            table_position.insert("x_pos,y_pos,z_pos,x_rotation,y_rotation,z_rotation").values(start_pos_values).execute();
+            Row posMoveStartRow = table_position.select("position_ID").orderBy("created_at_position", "DESC").execute().fetchOne();
             std::string end_pos_values =
                     _t.end.x + "," +
                     _t.end.y + "," +
@@ -161,18 +162,16 @@ public:
                     _t.end.rx + "," +
                     _t.end.ry + "," +
                     _t.end.rz + ",";
-            table_position.insert("x_pos,y_pos,z_pos,x_rotation,y_rotaion,z_rotaion").values(end_pos_values).execute();
-
-            // Get position ID
-            Row posMoveRow = table_position.select("position_ID").orderBy("created_at_position", "DESC").limit(2).execute().fetchAll();
+            table_position.insert("x_pos,y_pos,z_pos,x_rotation,y_rotation,z_rotation").values(end_pos_values).execute();
+            Row posMoveEndRow = table_position.select("position_ID").orderBy("created_at_position", "DESC").execute().fetchOne();
             // Insert into move table
             Table table_move = schema.getTable("move");
 
             std::string t_values =
                     "'" + std::string(logMoveRow[0]) + "'," +
                     getRobotMoveTypeAsString(_t.moveType) + ",'" +
-                    _t.start + "','" +
-                    _t.end + "'," ;
+                    std::string(posMoveStartRow[0]) + "','" +
+                    std::string(posMoveEndRow[0]) + "'" ;
             table_move.insert("log_ID,moveType,start_positionID,end_positionID").values(t_values);
         } else if (std::is_same_v<T, qDatabaseThrowEntry>) {
             table_log.insert("descriptor").values("throw").execute();
@@ -185,7 +184,7 @@ public:
                     _t.releasePoint.rx + "," +
                     _t.releasePoint.ry + "," +
                     _t.releasePoint.rz + "," ;
-            table_position.insert("x_pos,y_pos,z_pos,x_rotation,y_rotaion,z_rotaion").values(position_values);
+            table_position.insert("x_pos,y_pos,z_pos,x_rotation,y_rotation,z_rotation").values(position_values);
             Row logThrowRow = table_log.select("log_ID").orderBy("created_at","desc").execute().fetchOne();
             Row posThrowRow = table_position.select("position_ID").orderBy("created_at_position", "DESC").execute().fetchOne();
 
