@@ -107,28 +107,7 @@ std::vector<qDatabaseEntry*> qDatabaseHandler::retriveData()
         } else if (std::string(row[2]) == "move") {
             Table *tempTableMove = new Table(mSchema->getTable("log_move"));
             Row tempMoveRow = tempTableMove->select("*").where("log_ID = :param").bind("param", row[0]).execute().fetchOne();
-
-            // ROBOT ENUM TYPE.
-            ROBOT_MOVE_TYPE moveType = MOVE_DEFAULT;
-            if (std::string(tempMoveRow[4]) == "JLIN") {
-                moveType = ROBOT_MOVE_TYPE::MOVE_JLIN;
-            } else if (std::string(tempMoveRow[4]) == "JPATH") {
-                moveType = ROBOT_MOVE_TYPE::MOVE_JPATH;
-            } else if (std::string(tempMoveRow[4]) == "JIK") {
-                moveType = ROBOT_MOVE_TYPE::MOVE_JIK;
-            } else if (std::string(tempMoveRow[4]) == "LFK") {
-                moveType = ROBOT_MOVE_TYPE::MOVE_LFK;
-            } else if (std::string(tempMoveRow[4]) == "L") {
-                moveType = ROBOT_MOVE_TYPE::MOVE_L;
-            } else if (std::string(tempMoveRow[4])== "TLIN") {
-                moveType = ROBOT_MOVE_TYPE::MOVE_TLIN;
-            } else if (std::string(tempMoveRow[4]) == "SERVOJ") {
-                moveType = ROBOT_MOVE_TYPE::SERVOJ;
-            } else if (std::string(tempMoveRow[4]) == "HOME") {
-                moveType = ROBOT_MOVE_TYPE::HOME;
-            } else if (std::string(tempMoveRow[4]) == "PICKUP") {
-                moveType = ROBOT_MOVE_TYPE::PICKUP;
-            }
+            ROBOT_MOVE_TYPE moveType = getRobotMoveTypeFromString(std::string(tempMoveRow[4]));
 
             // position Start
             tempTableMove = new Table(mSchema->getTable("position"));

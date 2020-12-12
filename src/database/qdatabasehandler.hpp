@@ -120,32 +120,94 @@ public:
         Session *session = connect();
         Schema schema = session->getSchema("kasteRobot");
         Table table_log = schema.getTable("log");
+        Table table_position = schema.getTable("position");
 
         // Detect sub-type
         //  Build SQL statements and execute them
         //  Read the just added data from the database to check success
-        if constexpr (std::is_same_v<T, qDatabaseBallEntry>) {
-            static_cast<qDatabaseBallEntry<double>>(_t);
+        // NOTE SOEPE: constexpr
+        if (std::is_same_v<T, qDatabaseBallEntry>) {
             table_log.insert("descriptor").values("ball").execute();
-
-            std::stringstream s;
-        } else if constexpr (std::is_same_v<T, qDatabaseMoveEntry>) {
-            static_cast<qDatabaseMoveEntry<double>>(_t);
+            Row logBallRow = table_log.select("log_ID").orderBy("created_at", "desc").execute().fetchOne();
+            // Insert into position table
+            std::string pos_values =
+                    _t.ballPosition.x + "," +
+                    _t.ballPosition.y;
+            table_position.insert("x_pos,y_pos").values(pos_values);
+            Row posBallRow = table_position.select("position_ID").orderBy("created_at_position", "desc").execute().fetchOne();
+            // Insert into ball table
+            Table table_ball = schema.getTable("ball");
+            std::string t_values =
+                    "'" + std::string(logBallRow[0]) + "'," +
+                    _t.ballDiameter + ",'" +
+                    std::string(posBallRow[0]) + "'";
+            table_ball.insert("log_ID,diameter,ball_position").values(t_values).execute();
+        } else if (std::is_same_v<T, qDatabaseMoveEntry>) {
             table_log.insert("descriptor").values("move").execute();
-            std::stringstream s;
-        } else if constexpr (std::is_same_v<T, qDatabaseThrowEntry>) {
-            static_cast<qDatabaseThrowEntry<double>>(_t);
+            Row logMoveRow = table_log.select("log_ID").orderBy("created_at", "desc").execute().fetchOne();
+            // insert into position table
+            std::string start_pos_values =
+                    _t.start.x + "," +
+                    _t.start.y + "," +
+                    _t.start.z + "," +
+                    _t.start.rx + "," +
+                    _t.start.ry + "," +
+                    _t.start.rz + ",";
+            table_position.insert("x_pos,y_pos,z_pos,x_rotation,y_rotaion,z_rotaion").values(start_pos_values).execute();
+            std::string end_pos_values =
+                    _t.end.x + "," +
+                    _t.end.y + "," +
+                    _t.end.z + "," +
+                    _t.end.rx + "," +
+                    _t.end.ry + "," +
+                    _t.end.rz + ",";
+            table_position.insert("x_pos,y_pos,z_pos,x_rotation,y_rotaion,z_rotaion").values(end_pos_values).execute();
+
+            // Get position ID
+            Row posMoveRow = table_position.select("position_ID").orderBy("created_at_position", "DESC").limit(2).execute().fetchAll();
+            // Insert into move table
+            Table table_move = schema.getTable("move");
+
+            std::string t_values =
+                    "'" + std::string(logMoveRow[0]) + "'," +
+                    getRobotMoveTypeAsString(_t.moveType) + ",'" +
+                    _t.start + "','" +
+                    _t.end + "'," ;
+            table_move.insert("log_ID,moveType,start_positionID,end_positionID").values(t_values);
+        } else if (std::is_same_v<T, qDatabaseThrowEntry>) {
             table_log.insert("descriptor").values("throw").execute();
-            std::stringstream s;
-        } else if constexpr (std::is_same_v<T, qDatabaseGripperEntry>) {
-            static_cast<qDatabaseGripperEntry<double>>(_t);
+
+            // Insert into position
+            std::string position_values =
+                    _t.releasePoint.x + "," +
+                    _t.releasePoint.y + "," +
+                    _t.releasePoint.z + "," +
+                    _t.releasePoint.rx + "," +
+                    _t.releasePoint.ry + "," +
+                    _t.releasePoint.rz + "," ;
+            table_position.insert("x_pos,y_pos,z_pos,x_rotation,y_rotaion,z_rotaion").values(position_values);
+            Row logThrowRow = table_log.select("log_ID").orderBy("created_at","desc").execute().fetchOne();
+            Row posThrowRow = table_position.select("position_ID").orderBy("created_at_position", "DESC").execute().fetchOne();
+
+            // Insert into throw table
+            Table table_throw = schema.getTable("throw");
+            std::string t_values =
+                    "'" + std::string(logThrowRow[0]) + "','" +
+                    std::string(posThrowRow[0]) + "'," +
+                    _t.successful + "," +
+                    _t.deviation + "," +
+                    _t.releasePoint + "," +
+                    _t.releaseVelocityCalced + "," +
+                    _t.releaseVelocityActual + ",";
+           table_throw.insert("log_ID,position_ID,successful,deviation,tcp_velocity_cal,tcp_velocity_act").values(t_values).execute();
+        } else if  (std::is_same_v<T, qDatabaseGripperEntry>) {
             table_log.insert("descriptor").values("gripper").execute();
             Row tempNewRow = table_log.select("log_ID").orderBy("created_at", "desc").execute().fetchOne();
             Table table_gripper = schema.getTable("gripper");
             std::string t_values =
-                    std::string(tempNewRow[0]) + "," +
-                    _t.start + "," +
-                    _t.end + "," +
+                    "'" + std::string(tempNewRow[0]) + "','" +
+                    _t.start + "','" +
+                    _t.end + "'," +
                     _t.successful;
             table_gripper.insert("log_ID, start_width, end_width, successful").values(t_values).execute();
         } else {
