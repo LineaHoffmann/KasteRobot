@@ -1,0 +1,61 @@
+REVISED README [soepe - 14/12/2020]
+
+Please run the installation script as a root user:
+
+$ sudo ./install_kasterobot.sh
+
+This will install either development or runtime dependencies
+After running that, the following things are missing:
+	Setup of MySQL server (there is no remote)
+		It has to be fairly default, using mysql_native_password
+		Run the kasteRobotSqlScript.sql to setup the basic framework
+		Create a user with CRUD privileges for the database
+	Starting the ursim virtual machine
+
+To build the project:
+$ mkdir build
+$ cmake ../src
+$ make
+
+It should build successfully, creating a KasteRobot executable
+
+
+#########################################
+==== FOR SETTING UP THE MYSQL SERVER ====
+#########################################
+	To set up the server for connections, in terminal:
+		sudo mysql_secure_installation
+	Don't use password validation
+	Set a non-blank root password
+	After this, in terminal:
+		mysql -u root -p
+			mysql> CREATE USER 'username'@'host' IDENTIFIED WITH mysql_native_password BY 'password';
+	Replace the following: 
+	username with the wanted login username, 
+	host with localhost,
+	password with actual password
+			mysql> GRANT ALL PRIVILEGES on *.* TO 'username'@'localhost' WITH GRANT OPTION;
+	Replace username with the previously selected username and localhost with previously selected host
+			mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password'
+	Replace password with the root user password
+			mysql> FLUSH PRIVILEGES;
+	Ensure that it's running on the default port
+			mysql> SELECT @@port;
+	It should be 3306. Quit after this.
+			mysql> \q
+	Try logging in to the server with the new user:
+		mysql -u username -p
+	Try opening the MySql Workbench. Remeber to add the key for the root user if not asked. 
+
+########################
+==== STARTING URSIM ====
+########################
+	to run URSim run in terminal:
+		cd ..
+		sudo ursim-3.X.X.XXXXX/start-ursim.sh UR5
+
+########################################
+==== USING THE UML GENERATOR SCRIPT ====
+########################################
+	To run the script, enter the UML subfolder and run:
+		./hpp2uml_script.sh

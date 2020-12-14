@@ -92,7 +92,8 @@ else
 fi   
 
 echo "This script will attempt to install a bunch of dependencies and requires root privileges, which is dangerous.
-It will also get the current update / upgrade through apt."
+It will also get the current update / upgrade through apt.
+If you're the least bit in doubt, quit and read the script!"
 
 # Confirmation from user .. 
 echo "Are you sure you want to run this script? ['y' for yes]"
