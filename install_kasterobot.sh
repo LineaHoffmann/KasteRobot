@@ -12,7 +12,7 @@
 
 # Only 20.04.1 / 18.04.5 LTS tested/supported for now
 
-ppa_list="sdurobotics/ur-rtde
+ppa_list_sdu="sdurobotics/ur-rtde
 sdurobotics/robwork"
 
 repo_list=""
@@ -72,6 +72,13 @@ echo "This script sets up some dependencies for the KasteRobot project."
 echo "Do you want to run development setup or basic runtime setup? ['0' for basic, '1' for development]"
 read AS_DEV
 
+# check input
+if [ $AS_DEV != 0 ] && [ $AS_DEV != 1 ]
+  then
+    echo "Wrong option, aborting .."
+    exit
+fi
+
 # Abort if not run as root
 if [ "$EUID" -ne 0 ]
   then echo "Please run as root .."
@@ -113,7 +120,7 @@ mkdir $TEMP_DIR
 ##################################
 # DO STUFF HERE
 # need tree early if it isn't installed
-if ! dpkg -s tree 2> /dev/null
+if [ "$(dpkg -s tree | grep -c installed)" == 0 ]
   then
     echo "Installing tree through apt .."
     apt install tree -y
@@ -121,9 +128,9 @@ if ! dpkg -s tree 2> /dev/null
     echo "Apt package tree already installed .."
 fi
 # setup the sources from ppa and repo list
-for source in $ppa_list
+for source in $ppa_list_sdu
 do
-  if [ "$(tree /etc/apt/ | grep -c $source)" == 0 ]
+  if [ "$(tree /etc/apt/ | grep -c ${source//\//-ubuntu-})" == 0 ]
     then
       add-apt-repository ppa:${source} -y
       echo "Added ppa:${source} .."
@@ -132,7 +139,7 @@ do
   fi
 done
 # We also have to get the mysql apt repo with wget
-if ! dpkg -s mysql-apt-config 2> /dev/null
+if [ "$(dpkg -s mysql-apt-config | grep -c installed)" == 0 ]
   then
     echo "Adding MySQL apt configuration .. "
     wget https://dev.mysql.com/get/mysql-apt-config_0.8.16-1_all.deb -P $TEMP_DIR
@@ -148,7 +155,7 @@ if [ "$AS_DEV" == 1 ]
   then
     for package in $libs_for_install_apt_dev
       do
-        if ! dpkg -s $package 2> /dev/null
+        if [ "$(dpkg -s $package | grep -c installed)" == 0 ]
           then
             echo "Installing ${package} through apt .."
             apt install $package -y
@@ -159,7 +166,7 @@ if [ "$AS_DEV" == 1 ]
 fi
 for package in $libs_for_install_apt_run
 do
-  if ! dpkg -s $package 2> /dev/null
+  if [ "$(dpkg -s $package | grep -c installed)" == 0 ] 
     then
       echo "Installing ${package} through apt .."
       apt install $package -y
@@ -204,7 +211,7 @@ do
 done
 for package in $libs_for_install_pip
 do
-  if [ ! "$(pip3 search $package | grep -c INSTALLED)" ]
+  if [ "$(pip3 list | grep -c $package)" == 0 ]
     then
       echo "Installing $package through pip3 .."
       pip3 install $package
@@ -214,7 +221,7 @@ do
 done
 
 # wget pylon to temp folder and install
-if ! dpkg -s pylon 2> /dev/null
+if [ "$(dpkg -s pylon | grep -c installed)" == 0 ]
   then
     echo "Installing pylon 6.1.1.19861 .."
     wget https://www.baslerweb.com/fp-1589378344/media/downloads/software/pylon_software/pylon_6.1.1.19861-deb0_amd64.deb -P $TEMP_DIR
