@@ -276,16 +276,16 @@ public:
                 logwar(e.what());
                 break;
             }
-        case ID_BTN_DATABASE_TEST_INSERT:
+        case ID_BTN_TESTING_DATABASE_INSERT:
         {
-            qDatabaseGripperEntry gripperItem = qDatabaseGripperEntry("", "gripper", true, (double) 0.0, (double) 1.25);
+            qDatabaseGripperEntry gripperItem = qDatabaseGripperEntry(true, (double) 0.0, (double) 1.25);
             mDatabase->pushLogEntry(gripperItem);
-            qDatabaseBallEntry ballItem = qDatabaseBallEntry("", "ball", (double) 23.2, point2D<double>(21.3, 57.6));
-            mDatabase->pushLogEntry(ballItem);
-            qDatabaseMoveEntry moveItem = qDatabaseMoveEntry("", "move", point6D<double>(0,0,0,0,0,0), point6D<double>(1,1,1,1,1,1), HOME);
-            mDatabase->pushLogEntry(moveItem);
-            qDatabaseThrowEntry throwItem = qDatabaseThrowEntry("", "throw", false, point6D<double>(1,2,3,4,5,6), (double) 1.1, (double) 1.2, (double) 10.6);
+            qDatabaseThrowEntry throwItem = qDatabaseThrowEntry(false, point6D<double>(1,2,3,4,5,6), (double) 1.1, (double) 1.2, (double) 10.6);
             mDatabase->pushLogEntry(throwItem);
+            qDatabaseBallEntry ballItem = qDatabaseBallEntry((double) 23.2, point2D<double>(21.3, 57.6));
+            mDatabase->pushLogEntry(ballItem);
+            qDatabaseMoveEntry moveItem = qDatabaseMoveEntry(point6D<double>(0,0,0,0,0,0), point6D<double>(1,1,1,1,1,1), HOME);
+            mDatabase->pushLogEntry(moveItem);
         }
             break;
         default:

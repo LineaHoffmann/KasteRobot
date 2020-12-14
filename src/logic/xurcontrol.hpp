@@ -27,6 +27,9 @@
 #include "globaldefs.hpp"
 #include "xcollisiondetector.hpp"
 
+// Srp: Don't like including the entire thing, but ...
+#include "../database/qdatabasehandler.hpp"
+
 class xUrControl
 {
     //Static pre-defines positions.
@@ -81,6 +84,8 @@ public:
 
     bool getIsConnected() const;
 
+public:
+    void addDatabasePointer(std::shared_ptr<qDatabaseHandler> ptr);
 private:
 
     //private functions
@@ -94,6 +99,8 @@ private:
     void connect(std::string IP);
     void disconnect();
 
+    // Database shared pointer
+    std::shared_ptr<class qDatabaseHandler> mDatabase;
 
     //flags
       std::atomic<bool> isConnected = false;

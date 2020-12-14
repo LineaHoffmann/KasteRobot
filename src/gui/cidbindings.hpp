@@ -40,10 +40,10 @@ enum BINDING_ID {
     ID_BTN_DATABASE_TRY_CONNECTION,    // Database Notebook panel buttons
     ID_BTN_DATABASE_UPDATE_TREE,
     ID_DATABASE_SUB_TREE,
-    ID_BTN_DATABASE_TEST_INSERT,
 
     ID_BTN_TESTING_XYZ_VVA,      // Testing Notebook panel buttons
     ID_BTN_TESTING_DETECT_PICK,
     ID_BTN_TESTING_SPEEDJ,        //Testing SpeedJ Function
-    ID_BTN_TESTING_THROW
+    ID_BTN_TESTING_THROW,
+    ID_BTN_TESTING_DATABASE_INSERT
 };

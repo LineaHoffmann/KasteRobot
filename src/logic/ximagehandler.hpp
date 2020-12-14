@@ -17,7 +17,10 @@
 #define logerr wxLogError
 #endif
 #include "wx/log.h"
+#include "globaldefs.hpp"
 
+// Srp: Don't like including the entire thing, but ...
+#include "../database/qdatabasehandler.hpp"
 
 
 class ximageHandler
@@ -47,7 +50,12 @@ public:
     float getRadiusCM() const; //returnere i cm.
 
     bool showResult = false;
+
+    void addDatabasePointer(std::shared_ptr<qDatabaseHandler> ptr);
 private:
+
+    // Database shared pointer
+    std::shared_ptr<qDatabaseHandler> mDatabase;
 
     bool debug = false;
     cv::Rect ROI;

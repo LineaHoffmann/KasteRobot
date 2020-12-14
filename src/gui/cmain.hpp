@@ -214,6 +214,7 @@ private:
     wxButton *mBtnTestURControlSpeedJ;
     wxButton *mBtnTestDectectPick;
     wxButton *mBtnTestThrowSeq;
+    wxButton *mBtnTestDatabaseInsert;
     wxTextCtrl *mTxtTestMathInX;
     wxTextCtrl *mTxtTestThrowX;
     wxTextCtrl *mTxtTestThrowY;

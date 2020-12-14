@@ -2,7 +2,6 @@
 //#include "../includeheader.h"
 
 // WARNING: To-do plugin doesn't see the headers .. There are a few notes in there
-// TODO: Should be renamed to xUrControl for conformity
 
 xUrControl::xUrControl()
 {
@@ -151,7 +150,7 @@ void xUrControl::speedJMove(double t)
     double sec = t;
     // Parameters
       double acceleration = UR_JOINT_ACCELERATION_MAX;
-      double speed = UR_JOINT_VELOCITY_MAX;
+      //double speed = UR_JOINT_VELOCITY_MAX;
       double dt = 1.0/125;
       std::vector<double> startq{.07327, -.43385,-0.1,1.778,2.562,0.1};
       std::vector<double> joint_speed{0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
@@ -272,6 +271,11 @@ bool xUrControl::getIsConnected() const
     return isConnected.load();
 }
 
+void xUrControl::addDatabasePointer(std::shared_ptr<qDatabaseHandler> ptr)
+{
+    mDatabase = ptr;
+}
+
 std::atomic<bool> xUrControl::getIsBusy() const
 {
     return mMove.load();
@@ -289,29 +293,69 @@ void xUrControl::move()
         return;
     }
 
+    // Defaults for (failed) move entry
+    RobotData robotData = getURStruct();
+    point6D<double> startPoint(
+                robotData.robotTcpPosition[0],
+                robotData.robotTcpPosition[1],
+                robotData.robotTcpPosition[2],
+                robotData.robotTcpPosition[3],
+                robotData.robotTcpPosition[4],
+                robotData.robotTcpPosition[5]);
+    point6D<double> endPoint(-1,-1,-1,-1,-1,-1);
+
     try{
         if (mMoveMode == HOME) {
             logstd("[ROBOT] MOVE_HOME: move commenced!");
             if(mUrControl->moveJ(HOMEQ, speed, acc)){
+                robotData = getURStruct();
+                endPoint = point6D<double>(
+                            robotData.robotTcpPosition[0],
+                            robotData.robotTcpPosition[1],
+                            robotData.robotTcpPosition[2],
+                            robotData.robotTcpPosition[3],
+                            robotData.robotTcpPosition[4],
+                            robotData.robotTcpPosition[5]);
                 logstd("[ROBOT] MOVE_HOME: Completed");
             }else{
                 logerr("[ROBOT] Move home bad");
                 mUrControl->reuploadScript();
             }
+            qDatabaseMoveEntry<double> moveEntry(startPoint, endPoint, ROBOT_MOVE_TYPE::HOME);
+            mDatabase->pushLogEntry(moveEntry);
         } else if (mMoveMode == PICKUP)  {
             logstd("[ROBOT] MOVE_PICKUP: move commenced!");
             if (mUrControl->moveL(PICKUPQ, speed, acc)){
                 logstd("[ROBOT] MOVE_PICKUP: Completed");
+                robotData = getURStruct();
+                endPoint = point6D<double>(
+                            robotData.robotTcpPosition[0],
+                            robotData.robotTcpPosition[1],
+                            robotData.robotTcpPosition[2],
+                            robotData.robotTcpPosition[3],
+                            robotData.robotTcpPosition[4],
+                            robotData.robotTcpPosition[5]);
             } else {
                 logerr("[ROBOT] Move home bad");
                 mUrControl->reuploadScript();
             }
+            qDatabaseMoveEntry<double> moveEntry(startPoint, endPoint, ROBOT_MOVE_TYPE::PICKUP);
+            mDatabase->pushLogEntry(moveEntry);
         } else if (mMoveMode == SPEEDJ){
             logstd("[ROBOT] speedJ test commenced");
             speedJMove(0.5);
-        }
-        else {
-        /*NOTE: if robot is connected, switch statement will choose correct movefunction to execute!
+            robotData = getURStruct();
+            endPoint = point6D<double>(
+                        robotData.robotTcpPosition[0],
+                        robotData.robotTcpPosition[1],
+                        robotData.robotTcpPosition[2],
+                        robotData.robotTcpPosition[3],
+                        robotData.robotTcpPosition[4],
+                        robotData.robotTcpPosition[5]);
+            qDatabaseMoveEntry<double> moveEntry(startPoint, endPoint, ROBOT_MOVE_TYPE::SPEEDJ);
+            mDatabase->pushLogEntry(moveEntry);
+        } else {
+        /* NOTE: if robot is connected, switch statement will choose correct movefunction to execute!
          * chosen as enum to ease calling from controller-class
          */
             if(!mQ.empty()){
@@ -321,6 +365,16 @@ void xUrControl::move()
                         //std::vector<double> tempQ = q[0];
                         if(mUrControl->moveJ(mQ[0], speed, acc)){
                             logstd("[ROBOT] MOVE_JLIN: move completed!");
+                            robotData = getURStruct();
+                            endPoint = point6D<double>(
+                                        robotData.robotTcpPosition[0],
+                                        robotData.robotTcpPosition[1],
+                                        robotData.robotTcpPosition[2],
+                                        robotData.robotTcpPosition[3],
+                                        robotData.robotTcpPosition[4],
+                                        robotData.robotTcpPosition[5]);
+                            qDatabaseMoveEntry<double> moveEntry(startPoint, endPoint, ROBOT_MOVE_TYPE::MOVE_JLIN);
+                            mDatabase->pushLogEntry(moveEntry);
                         }
                         break;
                     case MOVE_JIK:
@@ -328,6 +382,16 @@ void xUrControl::move()
                         //std::vector<double> tempQ = q[0];
                             if(mUrControl->moveJ_IK(mQ[0], speed, acc)){
                                 logstd("[ROBOT] MOVE_JIK: move completed!");
+                                robotData = getURStruct();
+                                endPoint = point6D<double>(
+                                            robotData.robotTcpPosition[0],
+                                            robotData.robotTcpPosition[1],
+                                            robotData.robotTcpPosition[2],
+                                            robotData.robotTcpPosition[3],
+                                            robotData.robotTcpPosition[4],
+                                            robotData.robotTcpPosition[5]);
+                                qDatabaseMoveEntry<double> moveEntry(startPoint, endPoint, ROBOT_MOVE_TYPE::MOVE_JIK);
+                                mDatabase->pushLogEntry(moveEntry);
                             }
                         break;
                     case MOVE_JPATH :
@@ -339,18 +403,48 @@ void xUrControl::move()
                         }
                         if (mUrControl->moveJ(mQ)){
                             logstd("[ROBOT] MOVE_JPATH: move completed!");
+                            robotData = getURStruct();
+                            endPoint = point6D<double>(
+                                        robotData.robotTcpPosition[0],
+                                        robotData.robotTcpPosition[1],
+                                        robotData.robotTcpPosition[2],
+                                        robotData.robotTcpPosition[3],
+                                        robotData.robotTcpPosition[4],
+                                        robotData.robotTcpPosition[5]);
+                            qDatabaseMoveEntry<double> moveEntry(startPoint, endPoint, ROBOT_MOVE_TYPE::MOVE_JPATH);
+                            mDatabase->pushLogEntry(moveEntry);
                         }
                         break;
                     case MOVE_LFK: //Linear tool forward kinematics
                         logstd("[ROBOT] MOVE_LFK: move commenced!");
                         if (mUrControl->moveL_FK(mQ[0], speed, acc)){
                             logstd("[ROBOT] MOVE_LFK: move completed!");
+                            robotData = getURStruct();
+                            endPoint = point6D<double>(
+                                        robotData.robotTcpPosition[0],
+                                        robotData.robotTcpPosition[1],
+                                        robotData.robotTcpPosition[2],
+                                        robotData.robotTcpPosition[3],
+                                        robotData.robotTcpPosition[4],
+                                        robotData.robotTcpPosition[5]);
+                            qDatabaseMoveEntry<double> moveEntry(startPoint, endPoint, ROBOT_MOVE_TYPE::MOVE_LFK);
+                            mDatabase->pushLogEntry(moveEntry);
                         break;
                     }
                     case MOVE_L: //Linear tool
                         logstd("[ROBOT] MOVE_L: move commenced!");
                         if (mUrControl->moveL(mQ[0], speed, acc)){
                             logstd("[ROBOT] MOVE_L: move completed!");
+                            robotData = getURStruct();
+                            endPoint = point6D<double>(
+                                        robotData.robotTcpPosition[0],
+                                        robotData.robotTcpPosition[1],
+                                        robotData.robotTcpPosition[2],
+                                        robotData.robotTcpPosition[3],
+                                        robotData.robotTcpPosition[4],
+                                        robotData.robotTcpPosition[5]);
+                            qDatabaseMoveEntry<double> moveEntry(startPoint, endPoint, ROBOT_MOVE_TYPE::MOVE_L);
+                            mDatabase->pushLogEntry(moveEntry);
                         }
                         break;
                     default:

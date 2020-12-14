@@ -143,7 +143,7 @@ std::tuple<bool, cv::Mat, cv::Point2f, float> ximageHandler::findBallAndPosition
     std::pair<bool, cv::Mat> result = detectBall();
     if (result.first){
 
-    }else {
+    } else {
         logstd("no ball found");
     }
     std::tuple<bool, cv::Mat, cv::Point2f, float> data;
@@ -157,8 +157,9 @@ std::tuple<bool, cv::Mat, cv::Point2f, float> ximageHandler::findBallAndPosition
         s.str(std::string()); // Reset the stringstream
         s << "ball position: " << std::get<2>(data) << " || radius: " << std::get<3>(data);
         logstd(s.str().c_str());
-
-    }else {
+        qDatabaseBallEntry<double> ballEntry(std::get<3>(data), point2D<double>(std::get<2>(data).x, std::get<2>(data).y));
+        mDatabase->pushLogEntry(ballEntry);
+    } else {
         logstd("no ball found");
     }
 
@@ -272,4 +273,9 @@ void ximageHandler::setRobotBase(float xcm, float ycm)
 float ximageHandler::getRadiusCM() const
 {
     return radius/pixToCm;
+}
+
+void ximageHandler::addDatabasePointer(std::shared_ptr<qDatabaseHandler> ptr)
+{
+    mDatabase = ptr;
 }

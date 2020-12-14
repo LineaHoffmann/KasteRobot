@@ -150,8 +150,11 @@ void xGripperClient::home() {
 
 bool xGripperClient::writeRead(std::string command) {
     mReady.exchange(false);
+
+    qDatabaseGripperEntry<double> gripperEntry(false, getPos(), 0);
+
     mCommand = command + "\n";
-    auto t1Start = std::chrono::high_resolution_clock::now();
+    auto t1Start = std::chrono::steady_clock::now();
     char buf[32];
     send(mSock, mCommand.c_str(), mCommand.size(), 0); // Sending command
 
@@ -159,16 +162,17 @@ bool xGripperClient::writeRead(std::string command) {
     read(mSock, buf, 32); //Reading response
     std::string answer(buf);
     mAnswer = answer;
-    auto t1Stop = std::chrono::high_resolution_clock::now();
+    auto t1Stop = std::chrono::steady_clock::now();
     logstd(mAnswer.c_str());
     if (mAnswer[0] == 'E') {
         mReady.exchange(true);
+        mDatabase->pushLogEntry(gripperEntry);
         return false;
     }
     memset(buf, 0, 32);
     read(mSock, buf, 32); //Reading response
     std::string test(buf);
-    auto t2Stop = std::chrono::high_resolution_clock::now();
+    auto t2Stop = std::chrono::steady_clock::now();
     if (test[0] == 'F') {
         mReady.exchange(true);
     }
@@ -179,6 +183,9 @@ bool xGripperClient::writeRead(std::string command) {
         std::cout << "Timer start to ACK: " << timerStartAck.count()*1000 << " ms" << std::endl;
         std::cout << "Timer start to FIN: " << timerStartFin.count()*1000 << " ms" << std::endl;
     }
+    gripperEntry.end = getPos();
+    gripperEntry.successful = true;
+    mDatabase->pushLogEntry(gripperEntry);
     return true;
 }
 
@@ -262,6 +269,11 @@ double xGripperClient::getPos()
 
     }
     return pos;
+}
+
+void xGripperClient::addDatabasePointer(std::shared_ptr<qDatabaseHandler> ptr)
+{
+    mDatabase = ptr;
 }
 gripperData xGripperClient::getData() {
     gripperData fullData;

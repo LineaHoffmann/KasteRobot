@@ -365,6 +365,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mBtnTestURControlSpeedJ = new wxButton(mNotebookTesting, ID_BTN_TESTING_SPEEDJ, "SPEEDJ");
     mBtnTestDectectPick = new wxButton(mNotebookTesting, ID_BTN_TESTING_DETECT_PICK, "Detect and pick");
     mBtnTestThrowSeq = new wxButton(mNotebookTesting, ID_BTN_TESTING_THROW, "Throw");
+    mBtnTestDatabaseInsert = new wxButton(mNotebookTesting, ID_BTN_TESTING_DATABASE_INSERT, "DB Insert");
     // Testing tab building - Text Controls
     mTxtTestThrowX = new wxTextCtrl(mNotebookTesting, wxID_ANY, "X");
     mTxtTestThrowY = new wxTextCtrl(mNotebookTesting, wxID_ANY, "Y");
@@ -382,6 +383,7 @@ cMain::cMain() : wxFrame (nullptr, wxID_ANY, "Robot Control Interface", wxDefaul
     mSizerNotebookTesting->Add( mBtnTestMathXYZtoVAA,           wxGBPosition( 0, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookTesting->Add( mBtnTestDectectPick,            wxGBPosition( 0, 5 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookTesting->Add( mBtnTestURControlSpeedJ,        wxGBPosition( 1, 5 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
+    mSizerNotebookTesting->Add( mBtnTestDatabaseInsert,         wxGBPosition( 4, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookTesting->Add( mTxtTestMathInX,                wxGBPosition( 1, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookTesting->Add( mTxtTestMathInY,                wxGBPosition( 2, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
     mSizerNotebookTesting->Add( mBtnTestThrowSeq,               wxGBPosition( 2, 5 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER|wxEXPAND, 5 );
@@ -823,6 +825,9 @@ void cMain::OnButtonPress(wxCommandEvent &evt) {
         mTxtTestThrowY->GetValue().ToDouble(&data[1]);
         xTry([&] {mController->guiButtonPressed(ID_BTN_TESTING_THROW, data);});
     }
+        break;
+    case ID_BTN_TESTING_DATABASE_INSERT:
+        xTry([&] {mController->guiButtonPressed(ID_BTN_TESTING_DATABASE_INSERT);});
         break;
     default:
         logerr("An event fell through the button handler!");

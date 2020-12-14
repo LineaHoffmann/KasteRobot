@@ -1,6 +1,6 @@
 #include "app.hpp"
 
-#include "database/qdatabasehandler.hpp" // NOTE TEST
+#include "database/qdatabasehandler.hpp"
 
 wxIMPLEMENT_APP(app);
 

@@ -24,6 +24,7 @@
 #include <chrono>
 
 #include "globaldefs.hpp"
+#include "../database/qdatabasehandler.hpp"
 
 class xGripperClient
 {
@@ -48,6 +49,7 @@ public:
 
     double getPos();
 
+    void addDatabasePointer(std::shared_ptr<qDatabaseHandler> ptr);
 private:
     void connectSocket();
     void disconnectGripper();
@@ -58,6 +60,8 @@ private:
 
 
 private:
+    std::shared_ptr<qDatabaseHandler> mDatabase;
+
     int mSock, mConnectS, mPort;
     std::string mIpAddress, mCommand, mUserInput, mAnswer, mPos, mForce, mTemp, mSpeed, mGripstate;
     std::string mDisconnectCmd = "BYE()\n";

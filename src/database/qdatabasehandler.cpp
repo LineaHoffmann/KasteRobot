@@ -87,10 +87,7 @@ std::vector<qDatabaseEntry*> qDatabaseHandler::retriveData()
     for(Row row : *mRes)
     {
         // Timestamp - common for all types
-        Row tempDateRow = session->sql("SELECT date_format(created_at, '%T - %d/%m/%Y') "
-                                        "FROM kasteRobot.log "
-                                        "WHERE log_ID = ?").bind(row[0]).execute().fetchOne();
-
+        Row tempDateRow = session->sql("SELECT (SELECT SUBSTRING(date_format(created_at, '%d/%m/%Y - %H:%m:%s.%f'), 1, 25)) FROM kasteRobot.log WHERE log_ID = ?").bind(row[0]).execute().fetchOne();
         if(std::string(row[2]) == "throw") {
             Table *tempTableThrow = new Table(mSchema->getTable("log_throw"));
             Row tempThrowRow = tempTableThrow->select("*").where("log_ID = :param").bind("param", row[0]).execute().fetchOne();
@@ -170,7 +167,7 @@ std::vector<qDatabaseEntry*> qDatabaseHandler::retriveData()
     disconnect();
     return result;
 }
-void qDatabaseHandler::pushLogEntry(qDatabaseEntry *entry) {
+void qDatabaseHandler::pushLogEntryPtr(qDatabaseEntry *entry) {
     std::lock_guard<std::mutex> lock(mMtx);
     mWorkQueue.push(entry);
     return;
@@ -196,111 +193,96 @@ void qDatabaseHandler::mWorkerThreadLoop() {
     }
 }
 bool qDatabaseHandler::mPushEntryToLog(qDatabaseEntry* entry) {
-    {
+    // Create a new session and get the main log table
+    Session *session = connect();
+    if (session == nullptr) return false;
+    Schema schema = session->getSchema("kasteRobot");
+    Table table_log = schema.getTable("log");
+    Table table_position = schema.getTable("position");
 
-            // Create a new session and get the main log table
-            Session *session = connect();
-            Schema schema = session->getSchema("kasteRobot");
-            Table table_log = schema.getTable("log");
-            Table table_position = schema.getTable("position");
+    // Detect sub-type
+    //  Build SQL statements and execute them
+    //  Read the just added data from the database to check success
+    if (auto t = dynamic_cast<qDatabaseBallEntry<double>*>(entry)) {
+        auto _t = *t;
+        table_log.insert("descriptor").values("ball").execute();
+        Row logBallRow = table_log.select("log_ID").orderBy("created_at DESC").execute().fetchOne();
+        // Insert into position table
+        table_position.insert("x_pos", "y_pos").values(std::to_string(_t.ballPosition.x), std::to_string(_t.ballPosition.y));
+        Row posBallRow = table_position.select("position_ID").orderBy("created_at_position DESC").execute().fetchOne();
+        // Insert into ball table
+        Table table_ball = schema.getTable("ball");
+        table_ball.insert("log_ID", "diameter", "ball_position")
+                .values(std::string(logBallRow[0]), std::to_string(_t.ballDiameter), std::string(posBallRow[0])).execute();
+    } else if (auto t = dynamic_cast<qDatabaseMoveEntry<double>*>(entry)) {
+        auto _t = *t;
+        table_log.insert("descriptor").values("move").execute();
+        Row logMoveRow = table_log.select("log_ID").orderBy("created_at DESC").execute().fetchOne();
+        // insert into position table
+        table_position.insert("x_pos", "y_pos", "z_pos", "x_rotation", "y_rotation", "z_rotation")
+                .values(
+                    std::to_string(_t.start.x),
+                    std::to_string(_t.start.y),
+                    std::to_string(_t.start.z),
+                    std::to_string(_t.start.rx),
+                    std::to_string(_t.start.ry),
+                    std::to_string(_t.start.rz)).execute();
+        Row posMoveStartRow = table_position.select("position_ID").orderBy("created_at_position DESC").execute().fetchOne();
+        table_position.insert("x_pos", "y_pos", "z_pos", "x_rotation", "y_rotation", "z_rotation").values(
+                    std::to_string(_t.end.x),
+                    std::to_string(_t.end.y),
+                    std::to_string(_t.end.z),
+                    std::to_string(_t.end.rx),
+                    std::to_string(_t.end.ry),
+                    std::to_string(_t.end.rz)).execute();
+        Row posMoveEndRow = table_position.select("position_ID").orderBy("created_at_position DESC").execute().fetchOne();
+        // Insert into move table
+        Table table_move = schema.getTable("move");
+        table_move.insert("log_ID", "moveType", "start_positionID", "end_positionID")
+                .values(
+                    std::string(logMoveRow[0]),
+                    getRobotMoveTypeAsString(_t.moveType),
+                    std::string(posMoveStartRow[0]),
+                    std::string(posMoveEndRow[0])).execute();
+    } else if (auto t = dynamic_cast<qDatabaseThrowEntry<double>*>(entry)) {
+        auto _t = *t;
+        table_log.insert("descriptor").values("throw").execute();
+        table_position.insert("x_pos", "y_pos", "z_pos", "x_rotation", "y_rotation", "z_rotation")
+                .values(
+                    std::to_string(_t.releasePoint.x),
+                    std::to_string(_t.releasePoint.y),
+                    std::to_string(_t.releasePoint.z),
+                    std::to_string(_t.releasePoint.rx),
+                    std::to_string(_t.releasePoint.ry),
+                    std::to_string(_t.releasePoint.rz)).execute();
+        Row logThrowRow = table_log.select("log_ID").orderBy("created_at DESC").execute().fetchOne();
+        Row posThrowRow = table_position.select("position_ID").orderBy("created_at_position DESC").execute().fetchOne();
 
-            // Detect sub-type
-            //  Build SQL statements and execute them
-            //  Read the just added data from the database to check success
-            if (auto t = dynamic_cast<qDatabaseBallEntry<double>*>(entry)) {
-                auto _t = *t;
-                table_log.insert("descriptor").values("ball").execute();
-                Row logBallRow = table_log.select("log_ID").orderBy("created_at", "desc").execute().fetchOne();
-                // Insert into position table
-                std::string pos_values =
-                        std::to_string(_t.ballPosition.x) + "," +
-                        std::to_string(_t.ballPosition.y);
-                table_position.insert("x_pos,y_pos").values(pos_values);
-                Row posBallRow = table_position.select("position_ID").orderBy("created_at_position", "desc").execute().fetchOne();
-                // Insert into ball table
-                Table table_ball = schema.getTable("ball");
-                std::string t_values =
-                        "'" + std::string(logBallRow[0]) + "'," +
-                        std::to_string(_t.ballDiameter) + ",'" +
-                        std::string(posBallRow[0]) + "'";
-                table_ball.insert("log_ID,diameter,ball_position").values(t_values).execute();
-            } else if (auto t = dynamic_cast<qDatabaseMoveEntry<double>*>(entry)) {
-                auto _t = *t;
-                table_log.insert("descriptor").values("move").execute();
-                Row logMoveRow = table_log.select("log_ID").orderBy("created_at", "desc").execute().fetchOne();
-                // insert into position table
-                std::string start_pos_values =
-                        std::to_string(_t.start.x) + "," +
-                        std::to_string(_t.start.y) + "," +
-                        std::to_string(_t.start.z) + "," +
-                        std::to_string(_t.start.rx) + "," +
-                        std::to_string(_t.start.ry) + "," +
-                        std::to_string(_t.start.rz) + ",";
-                table_position.insert("x_pos,y_pos,z_pos,x_rotation,y_rotation,z_rotation").values(start_pos_values).execute();
-                Row posMoveStartRow = table_position.select("position_ID").orderBy("created_at_position", "DESC").execute().fetchOne();
-                std::string end_pos_values =
-                        std::to_string(_t.end.x) + "," +
-                        std::to_string(_t.end.y) + "," +
-                        std::to_string(_t.end.z) + "," +
-                        std::to_string(_t.end.rx) + "," +
-                        std::to_string(_t.end.ry) + "," +
-                        std::to_string(_t.end.rz) + ",";
-                table_position.insert("x_pos,y_pos,z_pos,x_rotation,y_rotation,z_rotation").values(end_pos_values).execute();
-                Row posMoveEndRow = table_position.select("position_ID").orderBy("created_at_position", "DESC").execute().fetchOne();
-                // Insert into move table
-                Table table_move = schema.getTable("move");
+        // Insert into throw table
+        Table table_throw = schema.getTable("throw");
+        std::string success = _t.successful ? "1" : "0";
+        table_throw.insert("log_ID","position_ID","successful","deviation","tcp_velocity_cal","tcp_velocity_act")
+                .values(
+                    std::string(logThrowRow[0]),
+                    std::string(posThrowRow[0]),
+                    success,
+                    std::to_string(_t.deviation),
+                    std::to_string(_t.releaseVelocityCalced),
+                    std::to_string(_t.releaseVelocityActual)).execute();
+    } else if (auto t = dynamic_cast<qDatabaseGripperEntry<double>*>(entry)) {
+        auto _t = *t;
+        table_log.insert("descriptor").values("gripper").execute();
+        Row tempNewRow = table_log.select("log_ID").orderBy("created_at DESC").execute().fetchOne();
+        Table table_gripper = schema.getTable("gripper");
+        std::string success = _t.successful ? "1" : "0";
+        table_gripper.insert("log_ID", "start_width", "end_width", "successful")
+                .values(std::string(tempNewRow[0]), std::to_string(_t.start), std::to_string(_t.end), success).execute();
+    } else {
+        logerr("Cannot push this type of data to the database!");
+        disconnect();
+        return false;
+    }
+    disconnect();
+    return true;
 
-                std::string t_values =
-                        "'" + std::string(logMoveRow[0]) + "'," +
-                        getRobotMoveTypeAsString(_t.moveType) + ",'" +
-                        std::string(posMoveStartRow[0]) + "','" +
-                        std::string(posMoveEndRow[0]) + "'" ;
-                table_move.insert("log_ID,moveType,start_positionID,end_positionID").values(t_values);
-            } else if (auto t = dynamic_cast<qDatabaseThrowEntry<double>*>(entry)) {
-                auto _t = *t;
-                table_log.insert("descriptor").values("throw").execute();
-
-                // Insert into position
-                std::string position_values =
-                        std::to_string(_t.releasePoint.x) + "," +
-                        std::to_string(_t.releasePoint.y) + "," +
-                        std::to_string(_t.releasePoint.z) + "," +
-                        std::to_string(_t.releasePoint.rx) + "," +
-                        std::to_string(_t.releasePoint.ry) + "," +
-                        std::to_string(_t.releasePoint.rz) + "," ;
-                table_position.insert("x_pos,y_pos,z_pos,x_rotation,y_rotation,z_rotation").values(position_values);
-                Row logThrowRow = table_log.select("log_ID").orderBy("created_at","desc").execute().fetchOne();
-                Row posThrowRow = table_position.select("position_ID").orderBy("created_at_position", "DESC").execute().fetchOne();
-
-                // Insert into throw table
-                Table table_throw = schema.getTable("throw");
-                char success = _t.successful ? '1' : '0';
-                std::string t_values =
-                        "'" + std::string(logThrowRow[0]) + "','" +
-                        std::string(posThrowRow[0]) + "'," +
-                        success + "," +
-                        std::to_string(_t.deviation) + "," +
-                        std::to_string(_t.releaseVelocityCalced) + "," +
-                        std::to_string(_t.releaseVelocityActual) + ",";
-               table_throw.insert("log_ID,position_ID,successful,deviation,tcp_velocity_cal,tcp_velocity_act").values(t_values).execute();
-            } else if (auto t = dynamic_cast<qDatabaseGripperEntry<double>*>(entry)) {
-                auto _t = *t;
-                table_log.insert("descriptor").values("gripper").execute();
-                Row tempNewRow = table_log.select("log_ID").orderBy("created_at", "desc").execute().fetchOne();
-                Table table_gripper = schema.getTable("gripper");
-                char success = _t.successful ? '1' : '0';
-                std::string t_values =
-                        "'" + std::string(tempNewRow[0]) + "','" +
-                        std::to_string(_t.start) + "','" +
-                        std::to_string(_t.end) + "'," +
-                        success;
-                table_gripper.insert("log_ID, start_width, end_width, successful").values(t_values).execute();
-            } else {
-                logerr("Cannot push this type of data to the database!");
-                disconnect();
-                return false;
-            }
-            disconnect();
-            return true;
-        }
 }
