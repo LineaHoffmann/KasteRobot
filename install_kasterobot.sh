@@ -48,6 +48,7 @@ libopengl-dev
 libssl-dev
 openjdk-8-jre
 openssh-client
+python3-pip
 librtde-dev
 libsdurw-all-dev
 libsdurws-all-dev
@@ -111,10 +112,18 @@ mkdir $TEMP_DIR
 
 ##################################
 # DO STUFF HERE
+# need tree early if it isn't installed
+if ! dpkg -s tree 2> /dev/null
+  then
+    echo "Installing tree through apt .."
+    apt install tree -y
+  else
+    echo "Apt package tree already installed .."
+fi
 # setup the sources from ppa and repo list
 for source in $ppa_list
 do
-  if [ ! "$(grep ^[^#] /etc/apt/sources.list.d/* | grep -c $source)" ]
+  if [ "$(tree /etc/apt/ | grep -c $source)" == 0 ]
     then
       add-apt-repository ppa:${source} -y
       echo "Added ppa:${source} .."
@@ -123,7 +132,7 @@ do
   fi
 done
 # We also have to get the mysql apt repo with wget
-if [ ! "$(dpkg -s mysql-apt-config | grep -c "Status: install ok installed")" ]
+if ! dpkg -s mysql-apt-config 2> /dev/null
   then
     echo "Adding MySQL apt configuration .. "
     wget https://dev.mysql.com/get/mysql-apt-config_0.8.16-1_all.deb -P $TEMP_DIR
@@ -135,11 +144,11 @@ apt update
 apt-get upgrade --with-new-pkgs -y
 
 # install packages
-if [ "$AS_DEV" -eq 1 ]
+if [ "$AS_DEV" == 1 ]
   then
     for package in $libs_for_install_apt_dev
       do
-        if [ ! "$(dpkg -s $package | grep -c installed)" ]
+        if ! dpkg -s $package 2> /dev/null
           then
             echo "Installing ${package} through apt .."
             apt install $package -y
@@ -150,7 +159,7 @@ if [ "$AS_DEV" -eq 1 ]
 fi
 for package in $libs_for_install_apt_run
 do
-  if [ ! "$(dpkg -s $package | grep -c installed)" ]
+  if ! dpkg -s $package 2> /dev/null
     then
       echo "Installing ${package} through apt .."
       apt install $package -y
@@ -158,7 +167,7 @@ do
       echo "Apt package $package already installed .."
   fi
 done
-if [ "$AS_DEV" -eq 1 ]
+if [ "$AS_DEV" == 1 ]
   then
     for package in $libs_for_install_snap_dev
       do
@@ -168,7 +177,7 @@ if [ "$AS_DEV" -eq 1 ]
             package_tag=" --${package//*,/}"
             package="${package//,*/}"
         fi
-        if [ ! "$(snap info $package | grep -c installed)" ]
+        if [ "$(tree /snap | grep -c $package)" == 0 ]
           then
             echo "Installing ${package}${package_tag} through snap .."
             snap install ${package}${package_tag}
@@ -185,7 +194,7 @@ do
       package_tag=" --${package//*,/}"
       package="${package//,*/}"
   fi
-  if [ ! "$(snap info $package | grep -c installed)" ]
+  if [ "$(tree /snap | grep -c $package)" == 0 ]
     then
       echo "Installing ${package}${package_tag} through snap .."
       snap install ${package}${package_tag}
@@ -205,7 +214,7 @@ do
 done
 
 # wget pylon to temp folder and install
-if [ ! "$(dpkg -s pylon | grep -c "Status: install ok installed")" -eq 1 ]
+if ! dpkg -s pylon 2> /dev/null
   then
     echo "Installing pylon 6.1.1.19861 .."
     wget https://www.baslerweb.com/fp-1589378344/media/downloads/software/pylon_software/pylon_6.1.1.19861-deb0_amd64.deb -P $TEMP_DIR
@@ -215,7 +224,7 @@ if [ ! "$(dpkg -s pylon | grep -c "Status: install ok installed")" -eq 1 ]
 fi
 
 # wget ursim to temp folder and setup java default
-if [ ! "$(find /etc/runit/ -iname "runsvdir-ursim*" | wc -l)" ]
+if [ "$(tree /etc | grep -c runsvdir-ursim)" == 0 ]
   then
     echo "Getting and installing UR-sim 3.14.1031212 .."
     wget https://s3-eu-west-1.amazonaws.com/ur-support-site/89458/URSim_Linux-3.14.2.1031212.tar.gz -P $TEMP_DIR
