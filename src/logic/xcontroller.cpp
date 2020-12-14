@@ -386,7 +386,8 @@ void xController::throwBall(double x, double y)
         return;
     }
 
-    std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(mCamera->getImage());
+    //std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(mCamera->getImage());
+    std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(cv::imread("../resources/ballimgs/remappedBall2.png"));
     if (!std::get<0>(ballResult)){
         logstd("Ball not found, moving robot to pre pickup position, aborting");
         //TODO: abort log to database implementation, no ball
@@ -412,7 +413,7 @@ void xController::throwBall(double x, double y)
     double radius = std::get<3>(ballResult);
     q.clear();
     q.push_back(pickupPosition);
-    q[0][2] += (double) radius * 3;
+    q[0][2] += (double) (radius/100) * 3;
 
 
         //flyt robot til positionen i variablen pickupPosition uden z højde
@@ -430,8 +431,6 @@ void xController::throwBall(double x, double y)
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
 
-    q.clear();
-
     mGripper->grip();
     while (mGripper->isReady()){
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -443,17 +442,11 @@ void xController::throwBall(double x, double y)
         //TODO: ABORTING throw
         return;
     }
+
     //moving to pre-pickup position
-    try{
-        mRobot->setMove(ROBOT_MOVE_TYPE::PICKUP);
-        logstd("Robot moving to pre pickup position");
-        while(mRobot->getIsBusy()){
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        }
-    } catch (const x_err::error &e){
-        logerr("homing failed");
-        //TODO: ABORTING throw move bad
-        return;
+    mRobot->setMove(ROBOT_MOVE_TYPE::PICKUP);
+    while(mRobot->getIsBusy()){
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
     //preparing throw
@@ -461,9 +454,15 @@ void xController::throwBall(double x, double y)
     RobotData robotData(mRobot->getURStruct());
     int prevPollingRate = mRobot->getPollingRate();
     double relAngle = -2.05668	-1.62165;
+    q.clear();
     q.push_back(std::vector<double>{-1.15192, -1.57, -2.2689, -1.8325 ,1.57,1.57});
 
     xMath::calcThrow(q[0],x,y);
+
+    for ( double d : q[0]){
+        std::cout << d << " | ";
+    }
+    std::cout << std::endl;
 
     logstd("Moving to throwing position");
     try{
@@ -497,6 +496,7 @@ void xController::throwBall(double x, double y)
 
 
     mRobot->setPollingRate(prevPollingRate);
+    mIsAvailable.exchange(true);
 
     logstd("[THROW] throw completed");
 

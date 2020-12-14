@@ -251,8 +251,8 @@ public:
             if constexpr (std::is_same_v<T,std::array<double,2>>){
                 static_cast<std::array<double,2>>(data);
                 double x{data[0]}, y{data[1]};
-
-
+                mIsAvailable.exchange(false);
+                std::thread(&xController::throwBall, this, x,y).detach();
             }
         }
             break;
@@ -322,6 +322,7 @@ private:
     std::mutex mMtx;
     std::thread *mCameraCalibrationThread;
     std::atomic<bool> mWithBall;
+    std::atomic<bool> mIsAvailable;
 
 
 };

@@ -148,8 +148,10 @@ std::vector<double> xMath::ball_position_to_robotframe(std::tuple<bool, cv::Mat,
 }
 
 void xMath::calcThrow(std::vector<double> &q, double x, double y){
-    double l = sqrt(pow(x,2) + pow(y,2));
-    double q0 = atan2(y,x) + (deg2rad(22.25) + tan(10.93/l));
+    double r = sqrt(pow(x,2) + pow(y,2));
+    double q0 = atan2(y,x) + (deg2rad(22.25) + asin(10.93/r));
+
+    double l = sqrt(pow(r,2) - pow(10.93,2));
 
     double q1 = -0.00017959125445504*pow(l,2) + 0.0458994035661245*l -4.22833522965417;
 
