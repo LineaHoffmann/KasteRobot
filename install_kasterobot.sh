@@ -265,11 +265,16 @@ apt-get autoremove -y
 echo "Cleaning temporary directory .."
 rm -R $TEMP_DIR
 
+mkdir build
+
 # Changing ownership and group to default user 1000
 install_user="$(cat /etc/passwd | grep "x:1000")"
 install_user="${install_user//:*/}"
 chown -R install_user: ../KasteRobot/
 chmod -R 777 ../KasteRobot/
 
-echo "Script done. Please run [cmake src] to compile the makefile. Then build using [make]."
+cd build
+
+echo "Script done. Please run [cmake ../src] in the [build] directory to compile the makefile. 
+Then build using [make]."
 exit
