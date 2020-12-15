@@ -12,6 +12,10 @@
 
 # Only 20.04.1 / 18.04.5 LTS tested/supported for now
 
+# KNOWN ISSUES
+# update-alternatives, not absolute path?
+# URsim untested
+
 ppa_list_sdu="sdurobotics/ur-rtde
 sdurobotics/robwork"
 
@@ -24,21 +28,21 @@ libs_for_install_pip="hpp2plantuml"
 
 libs_for_install_snap_dev="gitkraken,classic"
 
-libs_for_install_snap_run=""
+libs_for_install_snap_build=""
 
 libs_for_install_apt_dev="qt5-default
 qtcreator
 valgrind
 kcachegrind
-git"
+git
+plantuml"
 
-libs_for_install_apt_run="build-essential
+libs_for_install_apt_build="build-essential
 cmake
 libwxbase3.0-dev
 libwxgtk3.0-gtk3-dev
 wx-common
 wx3.0-i18n
-plantuml
 curl
 libboost-all-dev
 libclang-common-8-dev
@@ -69,13 +73,13 @@ mysql-community-server"
 #################################
 
 echo "This script sets up some dependencies for the KasteRobot project." 
-echo "Do you want to run development setup or basic runtime setup? ['0' for basic, '1' for development]"
+echo "Do you want to run? ['y' for yes]:"
 read AS_DEV
 
 # check input
-if [ $AS_DEV != 0 ] && [ $AS_DEV != 1 ]
+if [ $AS_DEV != y ]
   then
-    echo "Wrong option, aborting .."
+    echo "Aborting .."
     exit
 fi
 
@@ -164,7 +168,7 @@ if [ "$AS_DEV" == 1 ]
         fi
     done
 fi
-for package in $libs_for_install_apt_run
+for package in $libs_for_install_apt_build
 do
   if [ "$(dpkg -s $package | grep -c installed)" == 0 ] 
     then
@@ -193,7 +197,7 @@ if [ "$AS_DEV" == 1 ]
         fi
     done
 fi
-for package in $libs_for_install_snap_run
+for package in $libs_for_install_snap_build
 do
   package_tag=""
   if [[ $package = *,* ]]
@@ -261,5 +265,11 @@ apt-get autoremove -y
 echo "Cleaning temporary directory .."
 rm -R $TEMP_DIR
 
-echo "Script done."
+# Changing ownership and group to default user 1000
+install_user="$(cat /etc/passwd | grep "x:1000")"
+install_user="${install_user//:*/}"
+chown -R install_user: ../KasteRobot/
+chmod -R 777 ../KasteRobot/
+
+echo "Script done. Please run [cmake src] to compile the makefile. Then build using [make]."
 exit
