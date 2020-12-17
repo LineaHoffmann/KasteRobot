@@ -301,11 +301,9 @@ void xController::testThrowSpeedJ(double angle)
     //start q[2] kan afgøre hvor langt der kastes ved brug af en af disse ligninger
     //angle = -0.0106*længde + 0.2075
     double x = 160;
-    //double jonas = -0.00006*(x*x) + 0.0071*x - 1.1886;
-    double jonas = -0.0087*x - 0.1347;
-    double baseAngle = -1.047197;
-    std::vector<std::vector<double> > startq{{baseAngle, jonas, -2.2689, -1.8325 ,1.57,1.57}};
-    //{-1.15192, -1.39626,-0.39392081, -1.5708,1.5708,1.5708};
+    double shoulderAngle = -1.60;
+    double baseAngle = -1.15192;
+    std::vector<std::vector<double> > startq{{baseAngle, shoulderAngle, -2.2689, -1.8325 ,1.57,1.57}};
 
     logstd("Moving to throwing position");
     mRobot->setMove(ROBOT_MOVE_TYPE::MOVE_JLIN,startq, 1, 1);
@@ -397,8 +395,8 @@ void xController::throwBall(double x, double y)
         return;
     }
 
-    //std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(mCamera->getImage());
-    std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(cv::imread("../resources/ballimgs/remappedBall2.png"));
+    std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(mCamera->getImage());
+    //std::tuple<bool, cv::Mat, cv::Point2f, float> ballResult = mImagehandler->findBallAndPosition(cv::imread("../resources/ballimgs/remappedBall2.png"));
     if (!std::get<0>(ballResult)){
         logstd("Ball not found, moving robot to pre pickup position, aborting");
         mDatabase->pushLogEntry(throwEntry);
