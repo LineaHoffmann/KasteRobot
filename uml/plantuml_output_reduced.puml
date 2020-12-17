@@ -1,5 +1,4 @@
 @startuml
-
 scale 0.75
 
 
@@ -17,156 +16,22 @@ class app {
 	+app()
 	+~app()
 	+OnInit() : bool
-	-mJoinThread : std::atomic<bool>
-	-thread : std::thread*
-	-guiMain : std::unique_ptr<cMain>
-	-threadFunc() : void
 }
 
 
 class cImagePanel {
 	+cImagePanel(wxWindow* parent, wxStandardID id, const wxPoint& position, const wxSize& size, const wxString& name)
-	-wxDECLARE_EVENT_TABLE()
 	+~cImagePanel()
-	-scale : float
-	-mHasNewImage : std::atomic<bool>
-	-mIsDrawing : std::atomic<bool>
-	-Draw(wxDC& dc) : void
-	-OnPaintEvent(wxPaintEvent& event) : void
-	-OnSizeEvent(wxSizeEvent& event) : void
 	+setNewImage(const wxImage& img) : void
-	-mCurrentImage : wxImage
-	-mNewImage : wxImage
 }
 
 
 class cMain {
 	+cMain()
-	-wxDECLARE_EVENT_TABLE()
 	+~cMain()
-	-xTry(Callable&& f) -> decltype(f()) : auto
-	-mPanelView1 : cImagePanel*
-	-mPanelView2 : cImagePanel*
-	-mMtx : std::mutex
-	-mController : std::unique_ptr<xController>
-	-mDatabaseSubTreeEntries : std::vector<std::pair<qDatabaseEntry*, wxTreeListItem> >
-	-info : treeInfo*
-	-OnButtonPress(wxCommandEvent& evt) : void
-	-OnNewDatabaseTreeSelection(wxTreeListEvent& evt) : void
-	-OnTimerInfoUpdate(wxTimerEvent& evt) : void
-	-OnTimerView1Update(wxTimerEvent& evt) : void
-	-OnTimerView2Update(wxTimerEvent& evt) : void
 	+popStrFromStatus() : void
 	+pushStrToStatus(std::string& msg) : void
 	+setLogicControllerPointer(std::unique_ptr<xController> controller) : void
-	-mAboutBox : wxAboutDialogInfo*
-	-mBtnCameraCutOut : wxButton*
-	-mBtnCameraDetectorSettings : wxButton*
-	-mBtnCameraFindBall : wxButton*
-	-mBtnCameraRecalibrate : wxButton*
-	-mBtnCameraStart : wxButton*
-	-mBtnCameraStop : wxButton*
-	-mBtnDatabaseTryConnection : wxButton*
-	-mBtnDatabaseUpdateTree : wxButton*
-	-mBtnGripperAutosend : wxButton*
-	-mBtnGripperConnect : wxButton*
-	-mBtnGripperDisconnect : wxButton*
-	-mBtnGripperGrip : wxButton*
-	-mBtnGripperHome : wxButton*
-	-mBtnGripperRelease : wxButton*
-	-mBtnGripperSendCmd : wxButton*
-	-mBtnRobotConnect : wxButton*
-	-mBtnRobotDisconnect : wxButton*
-	-mBtnRobotSendCmd : wxButton*
-	-mBtnRobotSendHome : wxButton*
-	-mBtnRobotSendPickup : wxButton*
-	-mBtnRobotSendPos : wxButton*
-	-mBtnRobotUpdate : wxButton*
-	-mBtnTestDatabaseInsert : wxButton*
-	-mBtnTestDectectPick : wxButton*
-	-mBtnTestMathXYZtoVAA : wxButton*
-	-mBtnTestThrowSeq : wxButton*
-	-mBtnTestURControlSpeedJ : wxButton*
-	-mTextLog : wxLogTextCtrl*
-	-mMenuBar : wxMenuBar*
-	-mNotebook : wxNotebook*
-	-mNotebookCamera : wxPanel*
-	-mNotebookDatabase : wxPanel*
-	-mNotebookGeneral : wxPanel*
-	-mNotebookGripper : wxPanel*
-	-mNotebookRobot : wxPanel*
-	-mNotebookTesting : wxPanel*
-	-mBmpCameraStatus : wxStaticBitmap*
-	-mBmpDatabaseStatus : wxStaticBitmap*
-	-mBmpGripperStatus : wxStaticBitmap*
-	-mBmpRobotStatus : wxStaticBitmap*
-	-mStatusBar : wxStatusBar*
-	-mTextCtrl : wxTextCtrl*
-	-mTxtCameraBallMax : wxTextCtrl*
-	-mTxtCameraBallMin : wxTextCtrl*
-	-mTxtCameraCalibrationPath : wxTextCtrl*
-	-mTxtCameraExposure : wxTextCtrl*
-	-mTxtCameraFramerate : wxTextCtrl*
-	-mTxtCameraHue : wxTextCtrl*
-	-mTxtCameraHueDelta : wxTextCtrl*
-	-mTxtDatabaseIP : wxTextCtrl*
-	-mTxtDatabaseItemView : wxTextCtrl*
-	-mTxtDatabasePassword : wxTextCtrl*
-	-mTxtDatabasePort : wxTextCtrl*
-	-mTxtDatabaseSchema : wxTextCtrl*
-	-mTxtDatabaseUser : wxTextCtrl*
-	-mTxtGripperCmd : wxTextCtrl*
-	-mTxtGripperIP : wxTextCtrl*
-	-mTxtGripperPort : wxTextCtrl*
-	-mTxtRobotCmd : wxTextCtrl*
-	-mTxtRobotIP : wxTextCtrl*
-	-mTxtRobotPort : wxTextCtrl*
-	-mTxtRobotRX : wxTextCtrl*
-	-mTxtRobotRY : wxTextCtrl*
-	-mTxtRobotRZ : wxTextCtrl*
-	-mTxtRobotX : wxTextCtrl*
-	-mTxtRobotY : wxTextCtrl*
-	-mTxtRobotZ : wxTextCtrl*
-	-mTxtTestMathInAngleHighLim : wxTextCtrl*
-	-mTxtTestMathInAngleLowLim : wxTextCtrl*
-	-mTxtTestMathInVelocityHighLim : wxTextCtrl*
-	-mTxtTestMathInVelocityLowLim : wxTextCtrl*
-	-mTxtTestMathInX : wxTextCtrl*
-	-mTxtTestMathInY : wxTextCtrl*
-	-mTxtTestMathInZ : wxTextCtrl*
-	-mTxtTestThrowX : wxTextCtrl*
-	-mTxtTestThrowY : wxTextCtrl*
-	-mTimerInfo : wxTimer
-	-mTimerView1 : wxTimer
-	-mDatabaseSubTree : wxTreeListCtrl*
-	-mTreeList : wxTreeListCtrl*
-	-mTreeCameraCalibrationPath : wxTreeListItem*
-	-mTreeCameraExposure : wxTreeListItem*
-	-mTreeCameraFramerate : wxTreeListItem*
-	-mTreeCameraState : wxTreeListItem*
-	-mTreeDatabaseHost : wxTreeListItem*
-	-mTreeDatabaseName : wxTreeListItem*
-	-mTreeDatabasePort : wxTreeListItem*
-	-mTreeDatabaseSchema : wxTreeListItem*
-	-mTreeDatabaseState : wxTreeListItem*
-	-mTreeGripperForce : wxTreeListItem*
-	-mTreeGripperIP : wxTreeListItem*
-	-mTreeGripperPort : wxTreeListItem*
-	-mTreeGripperSpeed : wxTreeListItem*
-	-mTreeGripperSt : wxTreeListItem*
-	-mTreeGripperState : wxTreeListItem*
-	-mTreeGripperTemp : wxTreeListItem*
-	-mTreeGripperWidth : wxTreeListItem*
-	-mTreeRobotIP : wxTreeListItem*
-	-mTreeRobotJointPosition : wxTreeListItem*
-	-mTreeRobotPollingRate : wxTreeListItem*
-	-mTreeRobotPort : wxTreeListItem*
-	-mTreeRobotState : wxTreeListItem*
-	-mTreeRobotTcpPosition : wxTreeListItem*
-	-mTreeRootCamera : wxTreeListItem*
-	-mTreeRootDatabase : wxTreeListItem*
-	-mTreeRootGripper : wxTreeListItem*
-	-mTreeRootRobot : wxTreeListItem*
 }
 
 
@@ -272,26 +137,9 @@ class qDatabaseGripperEntry <template <typename T>> {
 class qDatabaseHandler {
 	+qDatabaseHandler()
 	+~qDatabaseHandler()
-	-mSsl_mode : SSLMode
-	-mSchema : Schema*
-	-connect() : Session*
-	-mSession : Session*
-	-mTable : Table*
-	-mPushEntryToLog(qDatabaseEntry* entry) : bool
-	-mThreadLife : std::atomic<bool>
-	-mMtx : std::mutex
-	-mWorkQueue : std::queue<qDatabaseEntry*>
-	-mDatabase : std::string
-	-mHost : std::string
-	-mPassword : std::string
-	-mUser : std::string
-	-mThread : std::thread*
-	-mRes : std::vector<Row>*
 	+showTables() : std::vector<Row>*
 	+retriveData() : std::vector<qDatabaseEntry*>
-	-mPort : uint32_t
 	+disconnect() : void
-	-mWorkerThreadLoop() : void
 	+pushLogEntry(qDatabaseEntryDerivative entry) : void
 	+pushLogEntryPtr(qDatabaseEntry* entry) : void
 	+setDatabaseCredentials(const std::string& user, const std::string& password, const std::string& hostname, const std::string& schema, uint32_t port) : void
@@ -350,32 +198,12 @@ namespace x_err {
 class xBaslerCam {
 	+xBaslerCam(const std::string& calibrationPath, const double exposure, const uint64_t framerate)
 	+~xBaslerCam()
-	-pylonImage : Pylon::CPylonImage
 	+hasNewImage() : bool
 	+isConnected() : bool
-	-isRectified : bool
 	+start() : bool
-	-R : cv::Mat
-	-T : cv::Mat
-	-cameraMatrix : cv::Mat
-	-distCoeffs : cv::Mat
 	+getImage() : cv::Mat
-	-map1 : cv::Mat
-	-map2 : cv::Mat
-	-openCvImage : cv::Mat
-	-remapped_image : cv::Mat
-	-mExposure : double
-	-mExit : std::atomic<bool>
-	-mHasNewImage : std::atomic<bool>
-	-mIsRunning : std::atomic<bool>
-	-mMtx : std::mutex
 	+getMapping() : std::pair<cv::Mat , cv::Mat>
-	-mPath : std::string
 	+baslerCamThread : std::thread*
-	-caliPics : std::vector<cv::Mat>
-	-mFrame : uint64_t
-	-mFramerate : uint64_t
-	-GrabPictures() : void
 	+calibrate() : void
 	+{static} liveCalibration(std::shared_ptr<xBaslerCam> liveCamera, std::string path) : void
 	+setFrameRate(uint64_t value) : void
@@ -391,14 +219,6 @@ class xCollisionDetector {
 	+xCollisionDetector(std::string filePath)
 	+checkCollision(std::vector<std::vector<double> > jointConfigs) : bool
 	+checkQ(rw::math::Q jointConfig) : bool
-	-defState : rw::kinematics::State
-	-device : rw::models::SerialDevice::Ptr
-	-workcell : rw::models::WorkCell::Ptr
-	-plannerConstraint : rw::pathplanning::PlannerConstraint
-	-planner : rw::pathplanning::QToQPlanner::Ptr
-	-detector : rw::proximity::CollisionDetector::Ptr
-	-cdstrategy : rw::proximity::CollisionStrategy::Ptr
-	-filepath : std::string
 	+inverseKinematic(std::vector<double> jointConfigs) : std::vector<double>
 	+qToVec(rw::math::Q q) : std::vector<double>
 	+makePath(std::vector<double> Qbeg, std::vector<double> Qend) : std::vector<std::vector<double> >
@@ -412,16 +232,6 @@ class xController {
 	+~xController()
 	+hasNewImage() : bool
 	+getImage() : cv::Mat
-	-mIsAvailable : std::atomic<bool>
-	-mWithBall : std::atomic<bool>
-	-mMtx : std::mutex
-	-mDatabase : std::shared_ptr<qDatabaseHandler>
-	-mCamera : std::shared_ptr<xBaslerCam>
-	-mCollisionDetector : std::shared_ptr<xCollisionDetector>
-	-mGripper : std::shared_ptr<xGripperClient>
-	-mRobot : std::shared_ptr<xUrControl>
-	-mImagehandler : std::shared_ptr<ximageHandler>
-	-mCameraCalibrationThread : std::thread*
 	+getDatabaseEntries() : std::vector<qDatabaseEntry*>
 	+createPath(std::vector<std::vector<double> > q) : void
 	+fillInfo(treeInfo& info) : void
@@ -441,54 +251,18 @@ class xGripperClient {
 	+~xGripperClient()
 	+isConnected() : bool
 	+isReady() : bool
-	-mAutosendCmd : bool
 	+writeRead(std::string mCommand) : bool
 	+getPos() : double
 	+getData() : gripperData
-	-mConnectS : int
-	-mPort : int
-	-mSock : int
-	-mHint : sockaddr_in
-	-mAutosend : std::atomic<bool>
-	-mConnectReq : std::atomic<bool>
-	-mConnected : std::atomic<bool>
-	-mDisconnectReq : std::atomic<bool>
-	-mGetDataReady : std::atomic<bool>
-	-mGripReq : std::atomic<bool>
-	-mHomeReq : std::atomic<bool>
-	-mReady : std::atomic<bool>
-	-mReleaseReq : std::atomic<bool>
-	-mTRuntime : std::atomic<bool>
-	-mGripperPolling : std::atomic<int>
-	-mMtx : std::mutex
-	-mIpPort : std::pair<std::string, int>
-	-mDatabase : std::shared_ptr<qDatabaseHandler>
-	-mAnswer : std::string
-	-mCommand : std::string
-	-mDisconnectCmd : std::string
-	-mForce : std::string
-	-mGripstate : std::string
-	-mIpAddress : std::string
-	-mPos : std::string
-	-mSpeed : std::string
-	-mTemp : std::string
-	-mUserInput : std::string
-	-mT1 : std::thread*
-	-mTData : std::thread*
 	+addDatabasePointer(std::shared_ptr<qDatabaseHandler> ptr) : void
-	-autoread() : void
 	+autoreadReq() : void
 	+connectReq(std::pair<std::string, int> ipPort) : void
-	-connectSocket() : void
-	-disconnectGripper() : void
 	+disconnectReq() : void
-	-entryThread() : void
 	+grip() : void
 	+home() : void
 	+release() : void
 	+setGripperPolling(int polling) : void
 	+setIpPort(std::pair<std::string, int>) : void
-	-startThread() : void
 }
 
 
@@ -507,41 +281,12 @@ class xUrControl {
 	+xUrControl(std::string IP)
 	+~xUrControl()
 	+getURStruct() : RobotData
-	-mURStruct : RobotData
 	+getIsConnected() : bool {query}
 	+getIsBusy() : std::atomic<bool> {query}
-	-isConnected : std::atomic<bool>
-	-mConnect : std::atomic<bool>
-	-mCont : std::atomic<bool>
-	-mContinue : std::atomic<bool>
-	-mDisconnect : std::atomic<bool>
-	-mIsBusy : std::atomic<bool>
-	-mMove : std::atomic<bool>
-	-acc : std::atomic<double>
-	-speed : std::atomic<double>
 	+getPollingRate() : std::atomic<int> {query}
-	-mMoveMode : std::atomic<int>
-	-mPollingRate : std::atomic<int>
-	-mEptr : std::exception_ptr
-	-mMtx : std::mutex
-	-mDatabase : std::shared_ptr<class qDatabaseHandler>
-	-mIP : std::string
 	+getIP() : std::string& {query}
-	-mThreadData : std::thread*
-	-mThreadMain : std::thread*
 	+getCurrentPose() : std::vector<double>
-	-mJoints : std::vector<double>*
-	-mQ : std::vector<std::vector<double> >
-	-mUrControl : ur_rtde::RTDEControlInterface*
-	-mUrRecieve : ur_rtde::RTDEReceiveInterface*
 	+addDatabasePointer(std::shared_ptr<qDatabaseHandler> ptr) : void
-	-connect(std::string IP) : void
-	-disconnect() : void
-	-entryThread() : void
-	-getData() : void
-	-init() : void
-	-initRobot(std::string IP) : void
-	-move() : void
 	+setConnect(std::string IP) : void
 	+setDisconnect() : void
 	+setIP(const std::string& value) : void
@@ -560,25 +305,13 @@ class ximageHandler {
 	+ximageHandler()
 	+ximageHandler(cv::Mat cleanImg)
 	+cutOutTable() : bool
-	-debug : bool
 	+showResult : bool
 	+getInputImage() : cv::Mat {query}
 	+getTable() : cv::Mat
-	-inputImage : cv::Mat
-	-table : cv::Mat
-	-centerPixel : cv::Point2f
 	+getPositionCM() : cv::Point2f {query}
-	-robotBase : cv::Point2f
-	-ROI : cv::Rect
 	+getRadiusCM() : float {query}
-	-pixToCm : float
-	-radius : float
-	-tableWidth : float
 	+detectBall() : std::pair<bool , cv::Mat>
-	-minMaxRadius : std::pair<float, float>
-	-mDatabase : std::shared_ptr<qDatabaseHandler>
 	+findBallAndPosition(cv::Mat image) : std::tuple<bool , cv::Mat , cv::Point2f , float>
-	-colorRange : std::vector<int>
 	+addDatabasePointer(std::shared_ptr<qDatabaseHandler> ptr) : void
 	+ballColor(int hue, int spread) : void
 	+loadImage(cv::Mat image) : void
@@ -654,11 +387,6 @@ enum ROBOT_MOVE_TYPE {
 	SERVOJ
 	SPEEDJ
 }
-
-
-enum empty {
-}
-
 
 
 

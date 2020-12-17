@@ -44,6 +44,6 @@ echo "Running hpp2plantuml with above files as input arguments .. "
 hpp2plantuml $PUML_STRING -o plantuml_output.puml
 
 echo "Running PlantUML on generated .puml file .."
-cat plantuml_output.puml | java -jar $PLANTUML_SRC_PATH -pipe > uml_diagram.png
+cat plantuml_output.puml | java -jar $PLANTUML_SRC_PATH -pipe > uml_diagram.pdf
 
-echo "Complete. I've made two files for you, a png and a puml."
+echo "Complete. I've made two files for you, a pdf and a puml."

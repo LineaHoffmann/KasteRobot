@@ -118,7 +118,7 @@ private:
               std::atomic<int> mMoveMode;
               std::atomic<double> acc, speed;
 
-    std::atomic<int> mPollingRate = 2;
+    std::atomic<int> mPollingRate = 40; // Default to 25Hz
     std::string mIP = "127.0.0.1";
     std::vector<double> *mJoints = nullptr; //pointer to
 
