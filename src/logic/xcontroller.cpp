@@ -6,7 +6,7 @@ xController::xController()
     mWithBall.exchange(false);
 
     // Camera
-    mCamera = std::make_shared<xBaslerCam>("../resources/pylonimgs/*.bmp", 5000, 30);
+    mCamera = std::make_shared<xBaslerCam>("../resources/pylonimgs/*.jpg", 5000, 30);
 
     //Imagehandler
     mImagehandler = std::make_shared<ximageHandler>(cv::imread("../resources/testImg.png"));
